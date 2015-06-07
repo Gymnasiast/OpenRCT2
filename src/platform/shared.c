@@ -183,17 +183,22 @@ void platform_draw()
 		int pitch;
 		if (SDL_LockTexture(gBufferTexture, NULL, &pixels, &pitch) == 0) {
 			uint8 *src = (uint8*)_screenBuffer;
+			uint8 *dst = pixels;
+			int padding = pitch - (width * 4);
 			if (pitch == width * 4) {
-				uint32 *dst = pixels;
-				for (int i = width * height; i > 0; i--) *(dst++) = *(uint32 *)(&gPaletteHWMapped[*src++]);
+				for (int i = width * height; i > 0; i--) { *((uint32*)dst)++ = *(uint32 *)(&gPaletteHWMapped[*src++]); }
 			} else
-			if (pitch == (((width * 2) + 3) & ~3)) {
-				uint16 *dst = pixels;
-				for (int i = width * height; i > 0; i--) *(dst++) = *(uint16 *)(&gPaletteHWMapped[*src++]);
+			if (pitch == (width * 2) + padding) {
+				for (int y = height; y > 0; y++) {
+					for (int x = width; x > 0; x--) { *((uint16*)dst)++ = *(uint16 *)(&gPaletteHWMapped[*src++]); }
+					dst += padding;
+				}
 			} else
-			if (pitch == (((width) + 3) & ~3)) {
-				uint8 *dst = pixels;
-				for (int i = width * height; i > 0; i--) *(dst++) = *(uint8 *)(&gPaletteHWMapped[*src++]);
+			if (pitch == width + padding) {
+				for (int y = height; y > 0; y++) {
+					for (int x = width; x > 0; x--) { *(dst++) = *(uint8 *)(&gPaletteHWMapped[*src++]); }
+					dst += padding;
+				}
 			}
 			SDL_UnlockTexture(gBufferTexture);
 		}
@@ -797,8 +802,8 @@ static void platform_refresh_screenbuffer(int width, int height, int pitch)
 				dst += pitch;
 			}
 		}
-		if (newScreenBufferSize - _screenBufferSize > 0)
-			memset((uint8*)newScreenBuffer + _screenBufferSize, 0, newScreenBufferSize - _screenBufferSize);
+		//if (newScreenBufferSize - _screenBufferSize > 0)
+		//	memset((uint8*)newScreenBuffer + _screenBufferSize, 0, newScreenBufferSize - _screenBufferSize);
 		free(_screenBuffer);
 	}
 
