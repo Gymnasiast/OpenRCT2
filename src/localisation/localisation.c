@@ -20,6 +20,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <iconv.h>
 #endif // _WIN32
 #include "../addresses.h"
 #include "../config.h"
@@ -835,15 +837,15 @@ utf8 *win1252_to_utf8_alloc(const char *src)
 	return (utf8*)realloc(result, actualSpace);
 }
 
-int win1252_to_utf8(utf8string dst, const char *src, int maxBufferLength)
+int win1252_to_utf8(utf8string dst, const char *src, size_t maxBufferLength)
 {
 	utf16 stackBuffer[256];
 	utf16 *heapBuffer = NULL;
 	utf16 *intermediateBuffer = stackBuffer;
-	int bufferCount = countof(stackBuffer);
+	size_t bufferCount = countof(stackBuffer);
+	size_t srcLength = strlen(src);
 
 	if (maxBufferLength > bufferCount) {
-		int srcLength = strlen(src);
 		if (srcLength > bufferCount) {
 			bufferCount = srcLength + 4;
 			heapBuffer = malloc(bufferCount * sizeof(utf16));
@@ -855,13 +857,24 @@ int win1252_to_utf8(utf8string dst, const char *src, int maxBufferLength)
 	MultiByteToWideChar(CP_ACP, 0, src, -1, intermediateBuffer, bufferCount);
 	int result = WideCharToMultiByte(CP_UTF8, 0, intermediateBuffer, -1, dst, maxBufferLength, NULL, NULL);
 #else
-	//STUB();
-	// we cannot walk past maxBufferLength, but in case we have still space left
-	// we need one byte for null terminator
-	int result = strnlen(src, maxBufferLength) + 1;
-	result = min(result, maxBufferLength);
-	safe_strncpy(dst, src, maxBufferLength);
-	dst[maxBufferLength - 1] = '\0';
+	//log_warning("converting %s of size %d", src, srcLength);
+	char *buffer_conv = strndup(src, srcLength);
+	char *buffer_orig = buffer_conv;
+	iconv_t cd = iconv_open("UTF8", "CP1252");
+	if ((iconv_t)-1 == cd)
+	{
+		log_error("failed to init iconv!");
+		return 0;
+	}
+	size_t obl = maxBufferLength;
+	char *outBuf = dst;
+	int conversion_result = iconv(cd, &buffer_conv, &srcLength, &outBuf, &obl);
+	iconv_close(cd);
+	size_t byte_diff = maxBufferLength - obl;
+	dst[byte_diff - 1] = '\0';
+	//log_warning("converted %s of size %d", dst, byte_diff);
+	int result = byte_diff;
+	free(buffer_orig);
 #endif // _WIN32
 
 	if (heapBuffer != NULL) {
