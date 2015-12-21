@@ -7,6 +7,7 @@
 - Feature: Allow enabling / disabling of different notifications.
 - Feature: Improved tile inspector.
 - Feature: Integrate RCT1 style scenario select with optional unlock progression.
+- Feature: Ability to set ownership of map edges.
 - Fix: Dated autosave files are not created on OSX and Linux.
 - Fix: Title sequence directories are not deleted when title sequence is deleted on OSX and Linux.
 - Fix: [#1333] Rides never become safe again after a crash.
