@@ -147,6 +147,7 @@ struct Ride
     // pointer to static info. for example, wild mouse type is 0x36, subtype is
     // 0x4c.
     uint8_t subtype;
+    uint8_t track_style;
     uint8_t mode;
     uint8_t colour_scheme_type;
     rct_vehicle_colour vehicle_colours[MAX_CARS_PER_TRAIN];
@@ -1198,6 +1199,7 @@ const char* ride_type_get_enum_name(int32_t rideType);
 
 uint8_t ride_entry_get_first_non_null_ride_type(const rct_ride_entry* rideEntry);
 bool ride_type_supports_boosters(uint8_t rideType);
+bool ride_type_has_subvarieties(uint8_t rideType);
 int32_t get_booster_speed(uint8_t rideType, int32_t rawSpeed);
 void fix_invalid_vehicle_sprite_sizes();
 bool ride_entry_has_category(const rct_ride_entry* rideEntry, uint8_t category);

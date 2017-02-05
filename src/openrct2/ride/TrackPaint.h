@@ -276,6 +276,8 @@ extern const uint8_t mapLeftEighthTurnToOrthogonal[5];
 
 extern const size_t mini_golf_peep_animation_lengths[];
 
+extern uint8_t gTrackStyle;
+
 bool track_paint_util_has_fence(
     enum edge_t edge, LocationXY16 position, const rct_tile_element* tileElement, Ride* ride, uint8_t rotation);
 void track_paint_util_paint_floor(
@@ -468,5 +470,6 @@ TRACK_PAINT_FUNCTION get_track_paint_function_inverted_impulse_rc(int32_t trackT
 TRACK_PAINT_FUNCTION get_track_paint_function_mini_rc(int32_t trackType, int32_t direction);
 TRACK_PAINT_FUNCTION get_track_paint_function_mine_ride(int32_t trackType, int32_t direction);
 TRACK_PAINT_FUNCTION get_track_paint_function_lim_launched_rc(int32_t trackType, int32_t direction);
+TRACK_PAINT_FUNCTION get_track_paint_function_flying_turns(int32_t trackType, int32_t direction);
 
 #endif

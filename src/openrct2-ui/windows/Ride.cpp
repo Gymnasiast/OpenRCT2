@@ -77,8 +77,9 @@ enum {
     WIDX_TAB_8,
     WIDX_TAB_9,
     WIDX_TAB_10,
+    WIDX_SHARED_COUNT,
 
-    WIDX_VIEWPORT = 14,
+    WIDX_VIEWPORT = WIDX_SHARED_COUNT,
     WIDX_VIEW,
     WIDX_VIEW_DROPDOWN,
     WIDX_STATUS,
@@ -93,7 +94,7 @@ enum {
     WIDX_RIDE_TYPE,
     WIDX_RIDE_TYPE_DROPDOWN,
 
-    WIDX_VEHICLE_TYPE = 14,
+    WIDX_VEHICLE_TYPE = WIDX_SHARED_COUNT,
     WIDX_VEHICLE_TYPE_DROPDOWN,
     WIDX_VEHICLE_TRAINS_PREVIEW,
     WIDX_VEHICLE_TRAINS,
@@ -103,7 +104,7 @@ enum {
     WIDX_VEHICLE_CARS_PER_TRAIN_INCREASE,
     WIDX_VEHICLE_CARS_PER_TRAIN_DECREASE,
 
-    WIDX_MODE_TWEAK = 14,
+    WIDX_MODE_TWEAK = WIDX_SHARED_COUNT,
     WIDX_MODE_TWEAK_INCREASE,
     WIDX_MODE_TWEAK_DECREASE,
     WIDX_LIFT_HILL_SPEED,
@@ -131,13 +132,13 @@ enum {
     WIDX_OPERATE_NUMBER_OF_CIRCUITS_INCREASE,
     WIDX_OPERATE_NUMBER_OF_CIRCUITS_DECREASE,
 
-    WIDX_INSPECTION_INTERVAL = 14,
+    WIDX_INSPECTION_INTERVAL = WIDX_SHARED_COUNT,
     WIDX_INSPECTION_INTERVAL_DROPDOWN,
     WIDX_LOCATE_MECHANIC,
     WIDX_REFURBISH_RIDE,
     WIDX_FORCE_BREAKDOWN,
 
-    WIDX_TRACK_PREVIEW = 14,
+    WIDX_TRACK_PREVIEW = WIDX_SHARED_COUNT,
     WIDX_TRACK_COLOUR_SCHEME,
     WIDX_TRACK_COLOUR_SCHEME_DROPDOWN,
     WIDX_TRACK_MAIN_COLOUR,
@@ -158,23 +159,23 @@ enum {
     WIDX_VEHICLE_ADDITIONAL_COLOUR_1,
     WIDX_VEHICLE_ADDITIONAL_COLOUR_2,
 
-    WIDX_PLAY_MUSIC = 14,
+    WIDX_PLAY_MUSIC = WIDX_SHARED_COUNT,
     WIDX_MUSIC,
     WIDX_MUSIC_DROPDOWN,
 
-    WIDX_SAVE_TRACK_DESIGN = 14,
+    WIDX_SAVE_TRACK_DESIGN = WIDX_SHARED_COUNT,
     WIDX_SELECT_NEARBY_SCENERY,
     WIDX_RESET_SELECTION,
     WIDX_SAVE_DESIGN,
     WIDX_CANCEL_DESIGN,
 
-    WIDX_GRAPH = 14,
+    WIDX_GRAPH = WIDX_SHARED_COUNT,
     WIDX_GRAPH_VELOCITY,
     WIDX_GRAPH_ALTITUDE,
     WIDX_GRAPH_VERTICAL,
     WIDX_GRAPH_LATERAL,
 
-    WIDX_PRIMARY_PRICE_LABEL = 14,
+    WIDX_PRIMARY_PRICE_LABEL = WIDX_SHARED_COUNT,
     WIDX_PRIMARY_PRICE,
     WIDX_PRIMARY_PRICE_INCREASE,
     WIDX_PRIMARY_PRICE_DECREASE,
@@ -185,7 +186,7 @@ enum {
     WIDX_SECONDARY_PRICE_DECREASE,
     WIDX_SECONDARY_PRICE_SAME_THROUGHOUT_PARK,
 
-    WIDX_SHOW_GUESTS_THOUGHTS = 14,
+    WIDX_SHOW_GUESTS_THOUGHTS = WIDX_SHARED_COUNT,
     WIDX_SHOW_GUESTS_ON_RIDE,
     WIDX_SHOW_GUESTS_QUEUING
 };
@@ -277,8 +278,8 @@ static rct_widget window_ride_maintenance_widgets[] = {
 static rct_widget window_ride_colour_widgets[] = {
     MAIN_RIDE_WIDGETS,
     { WWT_SPINNER,          1,  3,      70,     47,     93,     0xFFFFFFFF,                     STR_NONE                                                    },
-    { WWT_DROPDOWN,         1,  74,     312,    49,     60,     STR_ARG_14_STRINGID,            STR_NONE                                                    },
-    { WWT_BUTTON,           1,  301,    311,    50,     59,     STR_DROPDOWN_GLYPH,             STR_COLOUR_SCHEME_TO_CHANGE_TIP                             },
+    { WWT_DROPDOWN,         1,  74,     312,    62,     73,     STR_ARG_14_STRINGID,            STR_NONE                                                    },
+    { WWT_BUTTON,           1,  301,    311,    63,     72,     STR_DROPDOWN_GLYPH,             STR_COLOUR_SCHEME_TO_CHANGE_TIP                             },
     { WWT_COLOURBTN,        1,  79,     90,     74,     85,     0xFFFFFFFF,                     STR_SELECT_MAIN_COLOUR_TIP                                  },
     { WWT_COLOURBTN,        1,  99,     110,    74,     85,     0xFFFFFFFF,                     STR_SELECT_ADDITIONAL_COLOUR_1_TIP                          },
     { WWT_COLOURBTN,        1,  119,    130,    74,     85,     0xFFFFFFFF,                     STR_SELECT_SUPPORT_STRUCTURE_COLOUR_TIP                     },
@@ -4367,17 +4368,37 @@ static void window_ride_colour_mousedown(rct_window* w, rct_widgetindex widgetIn
             window_dropdown_show_colour(w, widget, w->colours[1], ride->track_colour_supports[colourSchemeIndex]);
             break;
         case WIDX_MAZE_STYLE_DROPDOWN:
-            for (i = 0; i < 4; i++)
+            if (ride->type == RIDE_TYPE_MAZE)
             {
-                gDropdownItemsFormat[i] = STR_DROPDOWN_MENU_LABEL;
-                gDropdownItemsArgs[i] = MazeOptions[i].text;
+                numItems = (int32_t)Util::CountOf(MazeOptions);
+                for (i = 0; i < numItems; i++)
+                {
+                    gDropdownItemsFormat[i] = STR_DROPDOWN_MENU_LABEL;
+                    gDropdownItemsArgs[i] = MazeOptions[i].text;
+                }
             }
-
+            else
+            {
+                numItems = 2;
+                gDropdownItemsFormat[0] = STR_DROPDOWN_MENU_LABEL;
+                gDropdownItemsFormat[1] = STR_DROPDOWN_MENU_LABEL;
+                gDropdownItemsArgs[0] = STR_DEFAULT_TRACK_STYLE;
+                gDropdownItemsArgs[1] = STR_ALTERNATIVE_TRACK_STYLE;
+            }
+            
             window_dropdown_show_text_custom_width(
                 w->x + dropdownWidget->left, w->y + dropdownWidget->top, dropdownWidget->bottom - dropdownWidget->top + 1,
-                w->colours[1], 0, DROPDOWN_FLAG_STAY_OPEN, 4, widget->right - dropdownWidget->left);
-
-            dropdown_set_checked(ride->track_colour_supports[colourSchemeIndex], true);
+                w->colours[1], 0, DROPDOWN_FLAG_STAY_OPEN, numItems, widget->right - dropdownWidget->left);
+            
+            if (ride->type == RIDE_TYPE_MAZE)
+            {
+                dropdown_set_checked(ride->track_colour_supports[colourSchemeIndex], true);    
+            }
+            else
+            {
+                dropdown_set_checked(ride->track_style, true);
+            }
+            
             break;
         case WIDX_ENTRANCE_STYLE_DROPDOWN:
             checkedIndex = -1;
@@ -4480,9 +4501,20 @@ static void window_ride_colour_dropdown(rct_window* w, rct_widgetindex widgetInd
                 0, (4 << 8) | 1, 0, (dropdownIndex << 8) | w->number, GAME_COMMAND_SET_RIDE_APPEARANCE, w->ride_colour, 0);
             break;
         case WIDX_MAZE_STYLE_DROPDOWN:
-            game_do_command(
-                0, (4 << 8) | 1, 0, (dropdownIndex << 8) | w->number, GAME_COMMAND_SET_RIDE_APPEARANCE, w->ride_colour, 0);
+        {
+            Ride * ride = get_ride(w->number);
+            if (ride->type == RIDE_TYPE_MAZE)
+            {
+                game_do_command(
+                    0, (4 << 8) | 1, 0, (dropdownIndex << 8) | w->number, GAME_COMMAND_SET_RIDE_APPEARANCE, w->ride_colour, 0);
+            }
+            else
+            {
+                game_do_command(
+                    0, (8 << 8) | 1, 0, (dropdownIndex << 8) | w->number, GAME_COMMAND_SET_RIDE_APPEARANCE, w->var_48C, 0);
+            }
             break;
+        }
         case WIDX_ENTRANCE_STYLE_DROPDOWN:
             game_do_command(
                 0, (6 << 8) | 1, 0, (window_ride_entrance_style_list[dropdownIndex] << 8) | w->number,
@@ -4575,11 +4607,16 @@ static void window_ride_colour_invalidate(rct_window* w)
     trackColour = ride_get_track_colour(ride, colourScheme);
 
     // Maze style
-    if (ride->type == RIDE_TYPE_MAZE)
+    if (ride->type == RIDE_TYPE_MAZE || ride_type_has_subvarieties(ride->type))
     {
         window_ride_colour_widgets[WIDX_MAZE_STYLE].type = WWT_DROPDOWN;
         window_ride_colour_widgets[WIDX_MAZE_STYLE_DROPDOWN].type = WWT_BUTTON;
-        window_ride_colour_widgets[WIDX_MAZE_STYLE].text = MazeOptions[trackColour.supports].text;
+        
+        if (ride->type == RIDE_TYPE_MAZE)
+            window_ride_colour_widgets[WIDX_MAZE_STYLE].text = MazeOptions[trackColour.supports].text;
+        else
+            window_ride_colour_widgets[WIDX_MAZE_STYLE].text = 
+                ride->track_style == 0 ? STR_DEFAULT_TRACK_STYLE : STR_ALTERNATIVE_TRACK_STYLE;
     }
     else
     {
@@ -4806,6 +4843,10 @@ static void window_ride_colour_paint(rct_window* w, rct_drawpixelinfo* dpi)
             int32_t spriteIndex = TrackColourPreviews[ride->type].track;
             if (spriteIndex != 0)
             {
+                if (is_csg_loaded() && ride->type == RIDE_TYPE_WOODEN_ROLLER_COASTER && ride->track_style == 1) 
+                {
+                    spriteIndex = SPR_CSG_BEGIN + 54744;
+                }
                 spriteIndex |= SPRITE_ID_PALETTE_COLOUR_2(trackColour.main, trackColour.additional);
                 gfx_draw_sprite(dpi, spriteIndex, x, y, 0);
             }
@@ -4814,6 +4855,10 @@ static void window_ride_colour_paint(rct_window* w, rct_drawpixelinfo* dpi)
             spriteIndex = TrackColourPreviews[ride->type].supports;
             if (spriteIndex != 0)
             {
+                if (is_csg_loaded() && ride->type == RIDE_TYPE_WOODEN_ROLLER_COASTER && ride->track_style == 1) 
+                {
+                    spriteIndex = SPR_CSG_BEGIN + 54745;
+                }
                 spriteIndex |= SPRITE_ID_PALETTE_COLOUR_1(trackColour.supports);
                 gfx_draw_sprite(dpi, spriteIndex, x, y, 0);
             }

@@ -735,6 +735,11 @@ private:
             dst->subtype = _rideTypeToRideEntryMap[src->type];
         }
 
+        if (src->type == RCT1_RIDE_TYPE_WOODEN_ROLLER_COASTER)
+        {
+            dst->track_style = 1;
+        }
+
         rct_ride_entry* rideEntry = get_ride_entry(dst->subtype);
         // This can happen with hacked parks
         if (rideEntry == nullptr)

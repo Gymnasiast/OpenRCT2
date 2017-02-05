@@ -392,7 +392,18 @@ static constexpr const uint32_t _wooden_rc_block_brakes_image_ids[4][2] = {
 
 static uint32_t wooden_rc_get_track_colour(paint_session* session)
 {
-    return (session->TrackColours[SCHEME_TRACK] & ~0xF80000) | session->TrackColours[SCHEME_SUPPORTS];
+   
+    if (gTrackStyle == 1)
+    {
+        return session->TrackColours[SCHEME_TRACK];
+
+    }
+    else
+    {
+        return (session->TrackColours[SCHEME_TRACK] & ~0xF80000) | session->TrackColours[SCHEME_SUPPORTS];
+
+    }
+    
 }
 
 static uint32_t wooden_rc_get_rails_colour(paint_session* session)

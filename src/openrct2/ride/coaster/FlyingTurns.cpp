@@ -1,11 +1,18 @@
+#pragma region Copyright(c) 2014 - 2016 OpenRCT2 Developers
 /*****************************************************************************
- * Copyright (c) 2014-2018 OpenRCT2 developers
+ * OpenRCT2, an open source clone of Roller Coaster Tycoon 2.
  *
- * For a complete list of all authors, please refer to contributors.md
- * Interested in contributing? Visit https://github.com/OpenRCT2/OpenRCT2
+ * OpenRCT2 is the work of many authors, a full list can be found in contributors.md
+ * For more information, visit https://github.com/OpenRCT2/OpenRCT2
  *
- * OpenRCT2 is licensed under the GNU General Public License version 3.
+ * OpenRCT2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * A full copy of the GNU General Public License can be found in licence.txt
  *****************************************************************************/
+#pragma endregion
 
 #include "../../drawing/Drawing.h"
 #include "../../interface/Viewport.h"
@@ -20,7 +27,7 @@
 #include "../TrackPaint.h"
 
 /** rct2: 0x006FE5B4 */
-static void bobsleigh_rc_track_flat(
+static void flying_turns_track_flat(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -43,9 +50,9 @@ static void bobsleigh_rc_track_flat(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14579, 0, 0, 32, 1, 26, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
+        if (1 == 1)
         {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
         }
     }
     else
@@ -67,9 +74,10 @@ static void bobsleigh_rc_track_flat(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14575, 0, 0, 32, 1, 26, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
+        if (1 == 1)
         {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
         }
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -78,11 +86,11 @@ static void bobsleigh_rc_track_flat(
     paint_util_set_general_support_height(session, height + 32, 0x20);
 }
 
-static void bobsleigh_rc_track_station(
-    paint_session* session, uint8_t rideIndex, [[maybe_unused]] uint8_t trackSequence, uint8_t direction, int32_t height,
+static void flying_turns_track_station(
+    paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    static constexpr const uint32_t imageIds[4][2] = {
+    static const uint32_t imageIds[4][2] = {
         { 14580, SPR_STATION_BASE_B_SW_NE },
         { 14581, SPR_STATION_BASE_B_NW_SE },
         { 14580, SPR_STATION_BASE_B_SW_NE },
@@ -102,7 +110,7 @@ static void bobsleigh_rc_track_station(
 }
 
 /** rct2: 0x006FE5C4 */
-static void bobsleigh_rc_track_25_deg_up(
+static void flying_turns_track_25_deg_up(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -135,10 +143,9 @@ static void bobsleigh_rc_track_25_deg_up(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14641, 0, 0, 32, 1, 50, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 8, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 9 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     else
     {
@@ -169,10 +176,9 @@ static void bobsleigh_rc_track_25_deg_up(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14617, 0, 0, 32, 1, 50, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 8, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 9 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -188,7 +194,7 @@ static void bobsleigh_rc_track_25_deg_up(
 }
 
 /** rct2: 0x006FE5D4 */
-static void bobsleigh_rc_track_flat_to_25_deg_up(
+static void flying_turns_track_flat_to_25_deg_up(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -221,10 +227,9 @@ static void bobsleigh_rc_track_flat_to_25_deg_up(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14625, 0, 0, 32, 1, 42, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 3, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 1 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     else
     {
@@ -255,10 +260,9 @@ static void bobsleigh_rc_track_flat_to_25_deg_up(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14601, 0, 0, 32, 1, 42, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 3, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 1 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -274,7 +278,7 @@ static void bobsleigh_rc_track_flat_to_25_deg_up(
 }
 
 /** rct2: 0x006FE5E4 */
-static void bobsleigh_rc_track_25_deg_up_to_flat(
+static void flying_turns_track_25_deg_up_to_flat(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -307,10 +311,9 @@ static void bobsleigh_rc_track_25_deg_up_to_flat(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14633, 0, 0, 32, 1, 34, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 5 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     else
     {
@@ -341,10 +344,9 @@ static void bobsleigh_rc_track_25_deg_up_to_flat(
                     session, direction, session->TrackColours[SCHEME_TRACK] | 14609, 0, 0, 32, 1, 34, height, 0, 27, height);
                 break;
         }
-        if (track_paint_util_should_paint_supports(session->MapPosition))
-        {
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
-        }
+
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 5 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -360,31 +362,31 @@ static void bobsleigh_rc_track_25_deg_up_to_flat(
 }
 
 /** rct2: 0x006FE5F4 */
-static void bobsleigh_rc_track_25_deg_down(
+static void flying_turns_track_25_deg_down(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE604 */
-static void bobsleigh_rc_track_flat_to_25_deg_down(
+static void flying_turns_track_flat_to_25_deg_down(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_25_deg_up_to_flat(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_25_deg_up_to_flat(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE614 */
-static void bobsleigh_rc_track_25_deg_down_to_flat(
+static void flying_turns_track_25_deg_down_to_flat(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_flat_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_flat_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE624 */
-static void bobsleigh_rc_track_left_quarter_turn_5(
+static void flying_turns_track_left_quarter_turn_5(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -422,7 +424,7 @@ static void bobsleigh_rc_track_left_quarter_turn_5(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -590,7 +592,7 @@ static void bobsleigh_rc_track_left_quarter_turn_5(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -608,16 +610,16 @@ static void bobsleigh_rc_track_left_quarter_turn_5(
 }
 
 /** rct2: 0x006FE634 */
-static void bobsleigh_rc_track_right_quarter_turn_5(
+static void flying_turns_track_right_quarter_turn_5(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
     trackSequence = mapLeftQuarterTurn5TilesToRightQuarterTurn5Tiles[trackSequence];
-    bobsleigh_rc_track_left_quarter_turn_5(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
+    flying_turns_track_left_quarter_turn_5(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE644 */
-static void bobsleigh_rc_track_flat_to_left_bank(
+static void flying_turns_track_flat_to_left_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -648,9 +650,9 @@ static void bobsleigh_rc_track_flat_to_left_bank(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14649, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -659,7 +661,7 @@ static void bobsleigh_rc_track_flat_to_left_bank(
 }
 
 /** rct2: 0x006FE654 */
-static void bobsleigh_rc_track_flat_to_right_bank(
+static void flying_turns_track_flat_to_right_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -690,9 +692,9 @@ static void bobsleigh_rc_track_flat_to_right_bank(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14657, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -701,7 +703,7 @@ static void bobsleigh_rc_track_flat_to_right_bank(
 }
 
 /** rct2: 0x006FE664 */
-static void bobsleigh_rc_track_left_bank_to_flat(
+static void flying_turns_track_left_bank_to_flat(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -732,9 +734,9 @@ static void bobsleigh_rc_track_left_bank_to_flat(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14655, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -743,7 +745,7 @@ static void bobsleigh_rc_track_left_bank_to_flat(
 }
 
 /** rct2: 0x006FE674 */
-static void bobsleigh_rc_track_right_bank_to_flat(
+static void flying_turns_track_right_bank_to_flat(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -774,9 +776,9 @@ static void bobsleigh_rc_track_right_bank_to_flat(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14647, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -785,7 +787,7 @@ static void bobsleigh_rc_track_right_bank_to_flat(
 }
 
 /** rct2: 0x006FE684 */
-static void bobsleigh_rc_track_banked_left_quarter_turn_5(
+static void flying_turns_track_banked_left_quarter_turn_5(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -823,7 +825,7 @@ static void bobsleigh_rc_track_banked_left_quarter_turn_5(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -991,7 +993,7 @@ static void bobsleigh_rc_track_banked_left_quarter_turn_5(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -1009,16 +1011,16 @@ static void bobsleigh_rc_track_banked_left_quarter_turn_5(
 }
 
 /** rct2: 0x006FE694 */
-static void bobsleigh_rc_track_banked_right_quarter_turn_5(
+static void flying_turns_track_banked_right_quarter_turn_5(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
     trackSequence = mapLeftQuarterTurn5TilesToRightQuarterTurn5Tiles[trackSequence];
-    bobsleigh_rc_track_banked_left_quarter_turn_5(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
+    flying_turns_track_banked_left_quarter_turn_5(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE6A4 */
-static void bobsleigh_rc_track_left_bank_to_25_deg_up(
+static void flying_turns_track_left_bank_to_25_deg_up(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1049,10 +1051,10 @@ static void bobsleigh_rc_track_left_bank_to_25_deg_up(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14681, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
-    {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 3, height, session->TrackColours[SCHEME_SUPPORTS]);
-    }
+
+    wooden_a_supports_paint_setup(
+        session, direction & 1, 1 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
+
     if (direction == 0 || direction == 3)
     {
         paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -1067,7 +1069,7 @@ static void bobsleigh_rc_track_left_bank_to_25_deg_up(
 }
 
 /** rct2: 0x006FE6B4 */
-static void bobsleigh_rc_track_right_bank_to_25_deg_up(
+static void flying_turns_track_right_bank_to_25_deg_up(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1098,9 +1100,10 @@ static void bobsleigh_rc_track_right_bank_to_25_deg_up(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14689, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 3, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(
+            session, direction & 1, 1 + direction, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -1116,7 +1119,7 @@ static void bobsleigh_rc_track_right_bank_to_25_deg_up(
 }
 
 /** rct2: 0x006FE6C4 */
-static void bobsleigh_rc_track_25_deg_up_to_left_bank(
+static void flying_turns_track_25_deg_up_to_left_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1147,9 +1150,9 @@ static void bobsleigh_rc_track_25_deg_up_to_left_bank(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14665, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -1165,7 +1168,7 @@ static void bobsleigh_rc_track_25_deg_up_to_left_bank(
 }
 
 /** rct2: 0x006FE6D4 */
-static void bobsleigh_rc_track_25_deg_up_to_right_bank(
+static void flying_turns_track_25_deg_up_to_right_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1196,9 +1199,9 @@ static void bobsleigh_rc_track_25_deg_up_to_right_bank(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14673, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     if (direction == 0 || direction == 3)
     {
@@ -1214,39 +1217,39 @@ static void bobsleigh_rc_track_25_deg_up_to_right_bank(
 }
 
 /** rct2: 0x006FE6E4 */
-static void bobsleigh_rc_track_left_bank_to_25_deg_down(
+static void flying_turns_track_left_bank_to_25_deg_down(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_25_deg_up_to_right_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_25_deg_up_to_right_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE6F4 */
-static void bobsleigh_rc_track_right_bank_to_25_deg_down(
+static void flying_turns_track_right_bank_to_25_deg_down(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_25_deg_up_to_left_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_25_deg_up_to_left_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE704 */
-static void bobsleigh_rc_track_25_deg_down_to_left_bank(
+static void flying_turns_track_25_deg_down_to_left_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_right_bank_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_right_bank_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE714 */
-static void bobsleigh_rc_track_25_deg_down_to_right_bank(
+static void flying_turns_track_25_deg_down_to_right_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_left_bank_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_left_bank_to_25_deg_up(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE724 */
-static void bobsleigh_rc_track_left_bank(
+static void flying_turns_track_left_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1277,9 +1280,9 @@ static void bobsleigh_rc_track_left_bank(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14697, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -1288,15 +1291,15 @@ static void bobsleigh_rc_track_left_bank(
 }
 
 /** rct2: 0x006FE734 */
-static void bobsleigh_rc_track_right_bank(
+static void flying_turns_track_right_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
-    bobsleigh_rc_track_left_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
+    flying_turns_track_left_bank(session, rideIndex, trackSequence, (direction + 2) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE744 */
-static void bobsleigh_rc_track_s_bend_left(
+static void flying_turns_track_s_bend_left(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1334,7 +1337,7 @@ static void bobsleigh_rc_track_s_bend_left(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -1352,8 +1355,8 @@ static void bobsleigh_rc_track_s_bend_left(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14843, 0, 0, 32, 26, 0, height, 0, 0,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 1:
                     sub_98197C_rotated(
@@ -1361,8 +1364,8 @@ static void bobsleigh_rc_track_s_bend_left(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14847, 0, 0, 32, 26, 0, height, 0, 0,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 6, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 1, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 2:
                     sub_98197C_rotated(
@@ -1409,8 +1412,8 @@ static void bobsleigh_rc_track_s_bend_left(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14843, 0, 0, 32, 26, 0, height, 0, 0,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 3:
                     sub_98197C_rotated(
@@ -1418,8 +1421,8 @@ static void bobsleigh_rc_track_s_bend_left(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14847, 0, 0, 32, 26, 0, height, 0, 0,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 6, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 1, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
             }
             paint_util_set_segment_support_height(
@@ -1461,7 +1464,7 @@ static void bobsleigh_rc_track_s_bend_left(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 1:
@@ -1479,7 +1482,7 @@ static void bobsleigh_rc_track_s_bend_left(
 }
 
 /** rct2: 0x006FE754 */
-static void bobsleigh_rc_track_s_bend_right(
+static void flying_turns_track_s_bend_right(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1517,7 +1520,7 @@ static void bobsleigh_rc_track_s_bend_right(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -1535,8 +1538,8 @@ static void bobsleigh_rc_track_s_bend_right(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14851, 0, 0, 32, 26, 0, height, 0, 6,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 1:
                     sub_98197C_rotated(
@@ -1544,8 +1547,8 @@ static void bobsleigh_rc_track_s_bend_right(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14855, 0, 0, 32, 26, 0, height, 0, 6,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 2:
                     sub_98197C_rotated(
@@ -1592,8 +1595,8 @@ static void bobsleigh_rc_track_s_bend_right(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14851, 0, 0, 32, 26, 0, height, 0, 6,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
                 case 3:
                     sub_98197C_rotated(
@@ -1601,8 +1604,8 @@ static void bobsleigh_rc_track_s_bend_right(
                     sub_98197C_rotated(
                         session, direction, session->TrackColours[SCHEME_TRACK] | 14855, 0, 0, 32, 26, 0, height, 0, 6,
                         height + 27);
-                    metal_a_supports_paint_setup(
-                        session, METAL_SUPPORTS_TUBES, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+                    wooden_a_supports_paint_setup(
+                        session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
                     break;
             }
             paint_util_set_segment_support_height(
@@ -1644,7 +1647,7 @@ static void bobsleigh_rc_track_s_bend_right(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 1:
@@ -1662,7 +1665,7 @@ static void bobsleigh_rc_track_s_bend_right(
 }
 
 /** rct2: 0x006FE794 */
-static void bobsleigh_rc_track_left_quarter_turn_3(
+static void flying_turns_track_left_quarter_turn_3(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1700,7 +1703,7 @@ static void bobsleigh_rc_track_left_quarter_turn_3(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -1783,7 +1786,7 @@ static void bobsleigh_rc_track_left_quarter_turn_3(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -1801,16 +1804,16 @@ static void bobsleigh_rc_track_left_quarter_turn_3(
 }
 
 /** rct2: 0x006FE7A4 */
-static void bobsleigh_rc_track_right_quarter_turn_3(
+static void flying_turns_track_right_quarter_turn_3(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
     trackSequence = mapLeftQuarterTurn3TilesToRightQuarterTurn3Tiles[trackSequence];
-    bobsleigh_rc_track_left_quarter_turn_3(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
+    flying_turns_track_left_quarter_turn_3(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE7B4 */
-static void bobsleigh_rc_track_left_quarter_turn_3_bank(
+static void flying_turns_track_left_quarter_turn_3_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1848,7 +1851,7 @@ static void bobsleigh_rc_track_left_quarter_turn_3_bank(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -1931,7 +1934,7 @@ static void bobsleigh_rc_track_left_quarter_turn_3_bank(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -1949,16 +1952,16 @@ static void bobsleigh_rc_track_left_quarter_turn_3_bank(
 }
 
 /** rct2: 0x006FE7C4 */
-static void bobsleigh_rc_track_right_quarter_turn_3_bank(
+static void flying_turns_track_right_quarter_turn_3_bank(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
     trackSequence = mapLeftQuarterTurn3TilesToRightQuarterTurn3Tiles[trackSequence];
-    bobsleigh_rc_track_left_quarter_turn_3_bank(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
+    flying_turns_track_left_quarter_turn_3_bank(session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE7D4 */
-static void bobsleigh_rc_track_left_half_banked_helix_up_small(
+static void flying_turns_track_left_half_banked_helix_up_small(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -1996,7 +1999,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 2, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 2, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -2080,7 +2083,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -2127,7 +2130,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 2, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 2, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 0:
@@ -2216,7 +2219,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height + 8, TUNNEL_0);
@@ -2230,7 +2233,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_small(
 }
 
 /** rct2: 0x006FE7E4 */
-static void bobsleigh_rc_track_right_half_banked_helix_up_small(
+static void flying_turns_track_right_half_banked_helix_up_small(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -2268,7 +2271,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 2, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 2, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -2352,7 +2355,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 0:
@@ -2399,7 +2402,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 2, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 2, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -2488,7 +2491,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_small(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 6, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 6, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height + 8, TUNNEL_0);
@@ -2502,7 +2505,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_small(
 }
 
 /** rct2: 0x006FE7F4 */
-static void bobsleigh_rc_track_left_half_banked_helix_down_small(
+static void flying_turns_track_left_half_banked_helix_down_small(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -2512,12 +2515,12 @@ static void bobsleigh_rc_track_left_half_banked_helix_down_small(
         direction = (direction - 1) & 3;
     }
     trackSequence = mapLeftQuarterTurn3TilesToRightQuarterTurn3Tiles[trackSequence];
-    bobsleigh_rc_track_right_half_banked_helix_up_small(
+    flying_turns_track_right_half_banked_helix_up_small(
         session, rideIndex, trackSequence, (direction + 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE804 */
-static void bobsleigh_rc_track_right_half_banked_helix_down_small(
+static void flying_turns_track_right_half_banked_helix_down_small(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -2527,12 +2530,12 @@ static void bobsleigh_rc_track_right_half_banked_helix_down_small(
         direction = (direction + 1) & 3;
     }
     trackSequence = mapLeftQuarterTurn3TilesToRightQuarterTurn3Tiles[trackSequence];
-    bobsleigh_rc_track_left_half_banked_helix_up_small(
+    flying_turns_track_left_half_banked_helix_up_small(
         session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE814 */
-static void bobsleigh_rc_track_left_half_banked_helix_up_large(
+static void flying_turns_track_left_half_banked_helix_up_large(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -2570,7 +2573,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -2739,7 +2742,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 7, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -2786,7 +2789,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 0:
@@ -2960,7 +2963,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 7, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height + 8, TUNNEL_0);
@@ -2974,7 +2977,7 @@ static void bobsleigh_rc_track_left_half_banked_helix_up_large(
 }
 
 /** rct2: 0x006FE824 */
-static void bobsleigh_rc_track_right_half_banked_helix_up_large(
+static void flying_turns_track_right_half_banked_helix_up_large(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -3012,7 +3015,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
@@ -3181,7 +3184,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 7, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 0:
@@ -3228,7 +3231,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 1, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             switch (direction)
             {
                 case 2:
@@ -3402,7 +3405,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_large(
                         height + 27);
                     break;
             }
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 7, height, session->TrackColours[SCHEME_SUPPORTS]);
+            wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
             if (direction == 0 || direction == 3)
             {
                 paint_util_push_tunnel_rotated(session, direction, height + 8, TUNNEL_0);
@@ -3416,7 +3419,7 @@ static void bobsleigh_rc_track_right_half_banked_helix_up_large(
 }
 
 /** rct2: 0x006FE834 */
-static void bobsleigh_rc_track_left_half_banked_helix_down_large(
+static void flying_turns_track_left_half_banked_helix_down_large(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -3426,12 +3429,12 @@ static void bobsleigh_rc_track_left_half_banked_helix_down_large(
         direction = (direction - 1) & 3;
     }
     trackSequence = mapLeftQuarterTurn5TilesToRightQuarterTurn5Tiles[trackSequence];
-    bobsleigh_rc_track_right_half_banked_helix_up_large(
+    flying_turns_track_right_half_banked_helix_up_large(
         session, rideIndex, trackSequence, (direction + 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE844 */
-static void bobsleigh_rc_track_right_half_banked_helix_down_large(
+static void flying_turns_track_right_half_banked_helix_down_large(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -3441,12 +3444,12 @@ static void bobsleigh_rc_track_right_half_banked_helix_down_large(
         direction = (direction + 1) & 3;
     }
     trackSequence = mapLeftQuarterTurn5TilesToRightQuarterTurn5Tiles[trackSequence];
-    bobsleigh_rc_track_left_half_banked_helix_up_large(
+    flying_turns_track_left_half_banked_helix_up_large(
         session, rideIndex, trackSequence, (direction - 1) & 3, height, tileElement);
 }
 
 /** rct2: 0x006FE854 */
-static void bobsleigh_rc_track_brakes(
+static void flying_turns_track_brakes(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -3467,9 +3470,9 @@ static void bobsleigh_rc_track_brakes(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14585, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -3478,7 +3481,7 @@ static void bobsleigh_rc_track_brakes(
 }
 
 /** rct2: 0x006FE864 */
-static void bobsleigh_rc_track_block_brakes(
+static void flying_turns_track_block_brakes(
     paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
     const rct_tile_element* tileElement)
 {
@@ -3499,9 +3502,9 @@ static void bobsleigh_rc_track_block_brakes(
                 session, direction, session->TrackColours[SCHEME_TRACK] | 14591, 0, 0, 32, 1, 26, height, 0, 27, height);
             break;
     }
-    if (track_paint_util_should_paint_supports(session->MapPosition))
+    if (1 == 1)
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        wooden_a_supports_paint_setup(session, direction & 1, 0, height, session->TrackColours[SCHEME_SUPPORTS], nullptr);
     }
     paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_0);
     paint_util_set_segment_support_height(
@@ -3509,155 +3512,96 @@ static void bobsleigh_rc_track_block_brakes(
     paint_util_set_general_support_height(session, height + 32, 0x20);
 }
 
-static void bobsleigh_rc_track_on_ride_photo(
-    paint_session* session, uint8_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
-    const rct_tile_element* tileElement)
+TRACK_PAINT_FUNCTION get_track_paint_function_flying_turns(int32_t trackType, int32_t direction)
 {
-    switch (direction)
-    {
-        case 0:
-            sub_98196C_rotated(session, direction, IMAGE_TYPE_REMAP | SPR_STATION_BASE_D, 0, 0, 32, 32, 1, height);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14572, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14574, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            break;
-        case 1:
-            sub_98196C_rotated(session, direction, IMAGE_TYPE_REMAP | SPR_STATION_BASE_D, 0, 0, 32, 32, 1, height);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 6, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14573, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14575, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            break;
-        case 2:
-            sub_98196C_rotated(session, direction, IMAGE_TYPE_REMAP | SPR_STATION_BASE_D, 0, 0, 32, 32, 1, height);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14572, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14574, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-
-            break;
-        case 3:
-            sub_98196C_rotated(session, direction, IMAGE_TYPE_REMAP | SPR_STATION_BASE_D, 0, 0, 32, 32, 1, height);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 6, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            metal_a_supports_paint_setup(session, METAL_SUPPORTS_TUBES, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14573, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-            sub_98197C_rotated(
-                session, direction, session->TrackColours[SCHEME_TRACK] | 14575, 0, 0, 32, 20, 0, height, 0, 6, height + 3);
-
-            break;
-    }
-    track_paint_util_onride_photo_paint(session, direction, height + 3, tileElement);
-    paint_util_push_tunnel_rotated(session, direction, height, TUNNEL_6);
-    paint_util_set_segment_support_height(session, SEGMENTS_ALL, 0xFFFF, 0);
-    paint_util_set_general_support_height(session, height + 48, 0x20);
-}
-
-TRACK_PAINT_FUNCTION get_track_paint_function_bobsleigh_rc(int32_t trackType, int32_t direction)
-{
-    if (gTrackStyle == 1)
-    {
-        return get_track_paint_function_flying_turns(trackType, direction);
-    }
-    
     switch (trackType)
     {
         case TRACK_ELEM_FLAT:
-            return bobsleigh_rc_track_flat;
+            return flying_turns_track_flat;
         case TRACK_ELEM_END_STATION:
         case TRACK_ELEM_BEGIN_STATION:
         case TRACK_ELEM_MIDDLE_STATION:
-            return bobsleigh_rc_track_station;
+            return flying_turns_track_station;
         case TRACK_ELEM_25_DEG_UP:
-            return bobsleigh_rc_track_25_deg_up;
+            return flying_turns_track_25_deg_up;
         case TRACK_ELEM_FLAT_TO_25_DEG_UP:
-            return bobsleigh_rc_track_flat_to_25_deg_up;
+            return flying_turns_track_flat_to_25_deg_up;
         case TRACK_ELEM_25_DEG_UP_TO_FLAT:
-            return bobsleigh_rc_track_25_deg_up_to_flat;
+            return flying_turns_track_25_deg_up_to_flat;
         case TRACK_ELEM_25_DEG_DOWN:
-            return bobsleigh_rc_track_25_deg_down;
+            return flying_turns_track_25_deg_down;
         case TRACK_ELEM_FLAT_TO_25_DEG_DOWN:
-            return bobsleigh_rc_track_flat_to_25_deg_down;
+            return flying_turns_track_flat_to_25_deg_down;
         case TRACK_ELEM_25_DEG_DOWN_TO_FLAT:
-            return bobsleigh_rc_track_25_deg_down_to_flat;
+            return flying_turns_track_25_deg_down_to_flat;
         case TRACK_ELEM_LEFT_QUARTER_TURN_5_TILES:
-            return bobsleigh_rc_track_left_quarter_turn_5;
+            return flying_turns_track_left_quarter_turn_5;
         case TRACK_ELEM_RIGHT_QUARTER_TURN_5_TILES:
-            return bobsleigh_rc_track_right_quarter_turn_5;
+            return flying_turns_track_right_quarter_turn_5;
         case TRACK_ELEM_FLAT_TO_LEFT_BANK:
-            return bobsleigh_rc_track_flat_to_left_bank;
+            return flying_turns_track_flat_to_left_bank;
         case TRACK_ELEM_FLAT_TO_RIGHT_BANK:
-            return bobsleigh_rc_track_flat_to_right_bank;
+            return flying_turns_track_flat_to_right_bank;
         case TRACK_ELEM_LEFT_BANK_TO_FLAT:
-            return bobsleigh_rc_track_left_bank_to_flat;
+            return flying_turns_track_left_bank_to_flat;
         case TRACK_ELEM_RIGHT_BANK_TO_FLAT:
-            return bobsleigh_rc_track_right_bank_to_flat;
+            return flying_turns_track_right_bank_to_flat;
         case TRACK_ELEM_BANKED_LEFT_QUARTER_TURN_5_TILES:
-            return bobsleigh_rc_track_banked_left_quarter_turn_5;
+            return flying_turns_track_banked_left_quarter_turn_5;
         case TRACK_ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES:
-            return bobsleigh_rc_track_banked_right_quarter_turn_5;
+            return flying_turns_track_banked_right_quarter_turn_5;
         case TRACK_ELEM_LEFT_BANK_TO_25_DEG_UP:
-            return bobsleigh_rc_track_left_bank_to_25_deg_up;
+            return flying_turns_track_left_bank_to_25_deg_up;
         case TRACK_ELEM_RIGHT_BANK_TO_25_DEG_UP:
-            return bobsleigh_rc_track_right_bank_to_25_deg_up;
+            return flying_turns_track_right_bank_to_25_deg_up;
         case TRACK_ELEM_25_DEG_UP_TO_LEFT_BANK:
-            return bobsleigh_rc_track_25_deg_up_to_left_bank;
+            return flying_turns_track_25_deg_up_to_left_bank;
         case TRACK_ELEM_25_DEG_UP_TO_RIGHT_BANK:
-            return bobsleigh_rc_track_25_deg_up_to_right_bank;
+            return flying_turns_track_25_deg_up_to_right_bank;
         case TRACK_ELEM_LEFT_BANK_TO_25_DEG_DOWN:
-            return bobsleigh_rc_track_left_bank_to_25_deg_down;
+            return flying_turns_track_left_bank_to_25_deg_down;
         case TRACK_ELEM_RIGHT_BANK_TO_25_DEG_DOWN:
-            return bobsleigh_rc_track_right_bank_to_25_deg_down;
+            return flying_turns_track_right_bank_to_25_deg_down;
         case TRACK_ELEM_25_DEG_DOWN_TO_LEFT_BANK:
-            return bobsleigh_rc_track_25_deg_down_to_left_bank;
+            return flying_turns_track_25_deg_down_to_left_bank;
         case TRACK_ELEM_25_DEG_DOWN_TO_RIGHT_BANK:
-            return bobsleigh_rc_track_25_deg_down_to_right_bank;
+            return flying_turns_track_25_deg_down_to_right_bank;
         case TRACK_ELEM_LEFT_BANK:
-            return bobsleigh_rc_track_left_bank;
+            return flying_turns_track_left_bank;
         case TRACK_ELEM_RIGHT_BANK:
-            return bobsleigh_rc_track_right_bank;
+            return flying_turns_track_right_bank;
         case TRACK_ELEM_S_BEND_LEFT:
-            return bobsleigh_rc_track_s_bend_left;
+            return flying_turns_track_s_bend_left;
         case TRACK_ELEM_S_BEND_RIGHT:
-            return bobsleigh_rc_track_s_bend_right;
+            return flying_turns_track_s_bend_right;
         case TRACK_ELEM_LEFT_QUARTER_TURN_3_TILES:
-            return bobsleigh_rc_track_left_quarter_turn_3;
+            return flying_turns_track_left_quarter_turn_3;
         case TRACK_ELEM_RIGHT_QUARTER_TURN_3_TILES:
-            return bobsleigh_rc_track_right_quarter_turn_3;
+            return flying_turns_track_right_quarter_turn_3;
         case TRACK_ELEM_LEFT_QUARTER_TURN_3_TILES_BANK:
-            return bobsleigh_rc_track_left_quarter_turn_3_bank;
+            return flying_turns_track_left_quarter_turn_3_bank;
         case TRACK_ELEM_RIGHT_QUARTER_TURN_3_TILES_BANK:
-            return bobsleigh_rc_track_right_quarter_turn_3_bank;
+            return flying_turns_track_right_quarter_turn_3_bank;
         case TRACK_ELEM_LEFT_HALF_BANKED_HELIX_UP_SMALL:
-            return bobsleigh_rc_track_left_half_banked_helix_up_small;
+            return flying_turns_track_left_half_banked_helix_up_small;
         case TRACK_ELEM_RIGHT_HALF_BANKED_HELIX_UP_SMALL:
-            return bobsleigh_rc_track_right_half_banked_helix_up_small;
+            return flying_turns_track_right_half_banked_helix_up_small;
         case TRACK_ELEM_LEFT_HALF_BANKED_HELIX_DOWN_SMALL:
-            return bobsleigh_rc_track_left_half_banked_helix_down_small;
+            return flying_turns_track_left_half_banked_helix_down_small;
         case TRACK_ELEM_RIGHT_HALF_BANKED_HELIX_DOWN_SMALL:
-            return bobsleigh_rc_track_right_half_banked_helix_down_small;
+            return flying_turns_track_right_half_banked_helix_down_small;
         case TRACK_ELEM_LEFT_HALF_BANKED_HELIX_UP_LARGE:
-            return bobsleigh_rc_track_left_half_banked_helix_up_large;
+            return flying_turns_track_left_half_banked_helix_up_large;
         case TRACK_ELEM_RIGHT_HALF_BANKED_HELIX_UP_LARGE:
-            return bobsleigh_rc_track_right_half_banked_helix_up_large;
+            return flying_turns_track_right_half_banked_helix_up_large;
         case TRACK_ELEM_LEFT_HALF_BANKED_HELIX_DOWN_LARGE:
-            return bobsleigh_rc_track_left_half_banked_helix_down_large;
+            return flying_turns_track_left_half_banked_helix_down_large;
         case TRACK_ELEM_RIGHT_HALF_BANKED_HELIX_DOWN_LARGE:
-            return bobsleigh_rc_track_right_half_banked_helix_down_large;
+            return flying_turns_track_right_half_banked_helix_down_large;
         case TRACK_ELEM_BRAKES:
-            return bobsleigh_rc_track_brakes;
+            return flying_turns_track_brakes;
         case TRACK_ELEM_BLOCK_BRAKES:
-            return bobsleigh_rc_track_block_brakes;
-
-        case TRACK_ELEM_ON_RIDE_PHOTO:
-            return bobsleigh_rc_track_on_ride_photo;
+            return flying_turns_track_block_brakes;
     }
     return nullptr;
 }

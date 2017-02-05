@@ -200,6 +200,8 @@ enum
 };
 // clang-format on
 
+uint8_t gTrackStyle = 0;
+
 bool track_paint_util_has_fence(
     enum edge_t edge, LocationXY16 position, const rct_tile_element* tileElement, Ride* ride, uint8_t rotation)
 {
@@ -2208,6 +2210,7 @@ void track_paint(paint_session* session, uint8_t direction, int32_t height, cons
             TRACK_PAINT_FUNCTION paintFunction = paintFunctionGetter(trackType, direction);
             if (paintFunction != nullptr)
             {
+                gTrackStyle = ride->track_style;
                 paintFunction(session, rideIndex, trackSequence, direction, height, tileElement);
             }
         }

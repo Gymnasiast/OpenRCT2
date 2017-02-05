@@ -6490,6 +6490,13 @@ void game_command_set_ride_appearance(
                 }
             }
             break;
+        case 8:
+            if (apply) 
+            {
+                ride->track_style = std::clamp<uint8_t>(value, 0, 1);
+                gfx_invalidate_screen();
+            }
+            break;
     }
     window_invalidate_by_number(WC_RIDE, ride_id);
 }
@@ -8604,6 +8611,11 @@ bool ride_type_supports_boosters(uint8_t rideType)
         return true;
     }
     return false;
+}
+
+bool ride_type_has_subvarieties(uint8_t rideType)
+{
+    return (rideType == RIDE_TYPE_WOODEN_ROLLER_COASTER || rideType == RIDE_TYPE_BOBSLEIGH_COASTER);
 }
 
 int32_t get_booster_speed(uint8_t rideType, int32_t rawSpeed)

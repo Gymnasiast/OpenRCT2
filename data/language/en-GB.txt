@@ -3722,6 +3722,8 @@ STR_6258    :Clear (transparent)
 STR_6259    :Disabled
 STR_6260    :Show blocked tiles
 STR_6261    :Show wide paths
+STR_6262    :Default track style
+STR_6263    :Alternative track style
 
 #############
 # Scenarios #
