@@ -1403,7 +1403,7 @@ static void paint_miniature_railway_track_right_eighth_to_diag(uint8 rideIndex, 
 
 	bool isSupported = false;
 	bool isLeftEighthToOrthog = mapElement->properties.track.type == TRACK_ELEM_LEFT_EIGHTH_TO_ORTHOGONAL;
-	// Right eighth to orthogonal calls this function but we do not want to have a support call for it
+	// Left eighth to orthogonal calls this function but we do not want to have a support call for it
 	// for track sequence 4
 	if (trackSequence != 4 || !isLeftEighthToOrthog) {
 		isSupported = wooden_a_supports_paint_setup(supportType[direction][trackSequence], 0, height, gTrackColours[SCHEME_SUPPORTS], NULL);
@@ -1479,11 +1479,11 @@ enum {
 	SUPPORT_PLAIN_W = 5,
 };
 
-static const sint16 monorail_diag_support_types[][4] = {
+static const sint16 miniature_railway_diag_support_types[][4] = {
 	{SUPPORT_PLAIN, SUPPORT_PLAIN_N, SUPPORT_PLAIN_S, SUPPORT_PLAIN},
-	{SUPPORT_PLAIN, SUPPORT_PLAIN_E, SUPPORT_PLAIN_W, SUPPORT_PLAIN_90_DEG},
+	{SUPPORT_PLAIN_90_DEG, SUPPORT_PLAIN_E, SUPPORT_PLAIN_W, SUPPORT_PLAIN_90_DEG},
 	{SUPPORT_PLAIN, SUPPORT_PLAIN_S, SUPPORT_PLAIN_N, SUPPORT_PLAIN},
-	{SUPPORT_PLAIN, SUPPORT_PLAIN_W, SUPPORT_PLAIN_E, SUPPORT_PLAIN_90_DEG},
+	{SUPPORT_PLAIN_90_DEG, SUPPORT_PLAIN_W, SUPPORT_PLAIN_E, SUPPORT_PLAIN_90_DEG},
 };
 
 typedef struct floor_desc {
@@ -1505,7 +1505,7 @@ static const floor_desc floors[] = {
 static void miniature_railway_track_diag_flat(uint8 rideIndex, uint8 trackSequence, uint8 direction, sint32 height, rct_map_element *mapElement) {
 
 	bool isSupported = false;
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 
 	uint32 floorImage = 0;
 	rct_xy16 floorBoundSize = { 0 };
@@ -1568,7 +1568,7 @@ static void miniature_railway_track_diag_25_deg_up(uint8 rideIndex, uint8 trackS
 	// TODO: The supports are inconsistent for different rotations
 
 	sint8 supportFunction = WOOD_B;
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 	if (supportType == SUPPORT_PLAIN || supportType == SUPPORT_PLAIN_90_DEG) {
 		supportFunction = WOOD_A;
 	}
@@ -1636,7 +1636,7 @@ static void miniature_railway_track_diag_flat_to_25_deg_up(uint8 rideIndex, uint
 	rct_xy16 floorBoundSize = { 0 };
 	rct_xy16 floorBoundOffset = { 0 };
 
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 	if (supportType != -1) {
 		floorImage = floors[supportType].image_id;
 		floorBoundSize = floors[supportType].bound_size;
@@ -1674,10 +1674,10 @@ static void miniature_railway_track_diag_flat_to_25_deg_up(uint8 rideIndex, uint
 /** rct2: 0x008AD220 */
 static void miniature_railway_track_diag_25_deg_up_to_flat(uint8 rideIndex, uint8 trackSequence, uint8 direction, sint32 height, rct_map_element *mapElement) {
 	const sint8 supportOffsets[][4] = {
-		{0, +8, +8, +8},
-		{0, -8, -8, 0},
-		{0, +8, +8, +8},
-		{0, -8, -8, +8},
+		{+8, +8, +8, +8},
+		{+8, -8, -8, 0},
+		{+8, +8, +8, +8},
+		{+8, -8, -8, +8},
 	};
 
 	sint8 supportFunction = WOOD_B;
@@ -1686,7 +1686,7 @@ static void miniature_railway_track_diag_25_deg_up_to_flat(uint8 rideIndex, uint
 	}
 
 	bool hasSupports = false;
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 
 	uint32 floorImage = 0;
 	rct_xy16 floorBoundSize = { 0 };
@@ -1704,10 +1704,10 @@ static void miniature_railway_track_diag_25_deg_up_to_flat(uint8 rideIndex, uint
 	}
 
 	const sint8 offsetsB[4][4][2] = {
-		{{0, 0}, {+8, +16}, {+8, +8},  {+8, +8}},
-		{{0, 0}, {-8, -8},  {-8, -8},  {+8, +8}},
-		{{0, 0}, {+8, +8},  {+8, +16}, {+8, +8}},
-		{{0, 0}, {-8, -8},  {-8, -8},  {+8, +8}},
+		{{8, 8}, {+8, +16}, {+8, +8},  {+8, +8}},
+		{{8, 8}, {-8, -8},  {-8, -8},  {+8, +8}},
+		{{8, 8}, {+8, +8},  {+8, +16}, {+8, +8}},
+		{{8, 8}, {-8, -8},  {-8, -8},  {+8, +8}},
 	};
 
 	uint32 imageId = miniature_railway_track_pieces_diag_25_deg_up_to_flat[direction];
@@ -1755,7 +1755,7 @@ static void miniature_railway_track_diag_25_deg_down(uint8 rideIndex, uint8 trac
 	uint32 floorImage = 0;
 	rct_xy16 floorBoundSize = { 0 };
 	rct_xy16 floorBoundOffset = { 0 };
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 
 	if (supportType != -1) {
 		floorImage = floors[supportType].image_id;
@@ -1818,7 +1818,7 @@ static void miniature_railway_track_diag_flat_to_25_deg_down(uint8 rideIndex, ui
 	uint32 floorImage = 0;
 	rct_xy16 floorBoundSize = { 0 };
 	rct_xy16 floorBoundOffset = { 0 };
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 
 	if (supportType != -1) {
 		floorImage = floors[supportType].image_id;
@@ -1868,7 +1868,7 @@ static void miniature_railway_track_diag_25_deg_down_to_flat(uint8 rideIndex, ui
 	uint32 floorImage = 0;
 	rct_xy16 floorBoundSize = { 0 };
 	rct_xy16 floorBoundOffset = { 0 };
-	sint16 supportType = monorail_diag_support_types[direction][trackSequence];
+	sint16 supportType = miniature_railway_diag_support_types[direction][trackSequence];
 
 	if (supportType != -1) {
 		floorImage = floors[supportType].image_id;
