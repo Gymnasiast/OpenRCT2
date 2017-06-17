@@ -843,7 +843,6 @@ static void window_new_ride_scrollpaint(rct_window *w, rct_drawpixelinfo *dpi, s
     sint32 y = 1;
     ride_list_item *listItem = _windowNewRideListItems;
     while (listItem->type != RIDE_TYPE_NULL || listItem->entry_index != 255) {
-        rct_ride_entry *rideEntry;
         // Draw flat button rectangle
         sint32 flags = 0;
         if (w->new_ride.selected_ride_id == *((sint16*)listItem))
@@ -852,13 +851,7 @@ static void window_new_ride_scrollpaint(rct_window *w, rct_drawpixelinfo *dpi, s
             gfx_fill_rect_inset(dpi, x, y, x + 115, y + 115, w->colours[1], INSET_RECT_FLAG_FILL_MID_LIGHT | flags);
 
         // Draw ride image with feathered border
-        rideEntry = get_ride_entry(listItem->entry_index);
-        sint32 image_id = rideEntry->images_offset;
-        if (listItem->type != rideEntry->ride_type[0]) {
-            image_id++;
-            if (listItem->type != rideEntry->ride_type[1])
-                image_id++;
-        }
+        sint32 image_id = ride_get_preview_image_offset(listItem->type, listItem->entry_index);
         gfx_draw_sprite_raw_masked(dpi, x + 2, y + 2, SPR_NEW_RIDE_MASK, image_id);
 
         // Next position

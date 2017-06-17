@@ -2639,14 +2639,14 @@ static void window_ride_vehicle_mousedown(rct_widgetindex widgetIndex, rct_windo
     rideEntry = get_ride_entry_by_ride(ride);
 
     if(gCheatsShowVehiclesFromOtherTrackTypes && !(ride_type_has_flag(ride->type, RIDE_TYPE_FLAG_FLAT_RIDE) || ride->type==RIDE_TYPE_MAZE || ride->type==RIDE_TYPE_MINI_GOLF)) {
-        selectionShouldBeExpanded=true;
-        rideTypeIterator=0;
-        rideTypeIteratorMax=90;
+        selectionShouldBeExpanded = true;
+        rideTypeIterator = 0;
+        rideTypeIteratorMax = RIDE_TYPE_COUNT;
     }
     else {
-        selectionShouldBeExpanded=false;
-        rideTypeIterator=ride->type;
-        rideTypeIteratorMax=ride->type;
+        selectionShouldBeExpanded = false;
+        rideTypeIterator = ride->type;
+        rideTypeIteratorMax = ride->type;
     }
 
     switch (widgetIndex) {
@@ -2655,7 +2655,7 @@ static void window_ride_vehicle_mousedown(rct_widgetindex widgetIndex, rct_windo
         numItems = 0;
 
         // Dropdowns with more items start acting weird, so cap it to 63.
-        for (; rideTypeIterator<=rideTypeIteratorMax && numItems<=63; rideTypeIterator++) {
+        for (; rideTypeIterator <= rideTypeIteratorMax && numItems <= 63; rideTypeIterator++) {
 
             if(selectionShouldBeExpanded && ride_type_has_flag(rideTypeIterator, RIDE_TYPE_FLAG_FLAT_RIDE))
                 continue;
@@ -2694,6 +2694,33 @@ static void window_ride_vehicle_mousedown(rct_widgetindex widgetIndex, rct_windo
                 numItems++;
             }
         }
+
+        // Adds the rocket cars to the Midi Coaster
+//        if (!selectionShouldBeExpanded && ride->type == RIDE_TYPE_JUNIOR_ROLLER_COASTER && gConfigInterface.select_by_track_type)
+//        {
+//            currentRideGroup = get_ride_group(ride->type, rideEntry);
+//            if (currentRideGroup->naming.name == STR_MIDI_COASTER_GROUP)
+//            {
+//                rideEntryIndexPtr = get_ride_entry_indices_for_ride_type(RIDE_TYPE_MINI_ROLLER_COASTER);
+//
+//                for (uint8 *currentRideEntryIndex = rideEntryIndexPtr; *currentRideEntryIndex != 0xFF && numItems <= 63; currentRideEntryIndex++)
+//                {
+//                    rideEntryIndex = *currentRideEntryIndex;
+//                    currentRideEntry = get_ride_entry(rideEntryIndex);
+//
+//                    char rideEntryName[9];
+//                    memcpy(rideEntryName, object_entry_groups[OBJECT_TYPE_RIDE].entries[rideEntryIndex].name, 8);
+//                    rideEntryName[8] = 0;
+//
+//                    if (strcmp(rideEntryName, "RCKC    ") == 0) {
+//                        gDropdownItemsFormat[numItems] = STR_DROPDOWN_MENU_LABEL;
+//                        gDropdownItemsArgs[numItems] = (rideEntryIndex << 16) | currentRideEntry->name;
+//
+//                        numItems++;
+//                    }
+//                }
+//            }
+//        }
 
         window_dropdown_show_text_custom_width(
             w->x + dropdownWidget->left,

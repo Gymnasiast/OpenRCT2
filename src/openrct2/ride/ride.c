@@ -8601,3 +8601,26 @@ bool ride_type_supports_boosters(uint8 rideType)
     }
     return false;
 }
+
+sint32 ride_get_preview_image_offset(uint8 rideType, uint8 rideEntryIndex)
+{
+    rct_ride_entry * rideEntry = get_ride_entry(rideEntryIndex);
+
+    char rideEntryName[9];
+    memcpy(rideEntryName, object_entry_groups[OBJECT_TYPE_RIDE].entries[rideEntryIndex].name, 8);
+    rideEntryName[8] = 0;
+
+    if (strcmp(rideEntryName, "RCKC    ") == 0)
+    {
+        log_error("Fixing offset");
+        return rideEntry->images_offset + 1;
+    }
+
+    sint32 imageId = rideEntry->images_offset;
+    if (rideType != rideEntry->ride_type[0]) {
+        imageId++;
+        if (rideType != rideEntry->ride_type[1])
+            imageId++;
+    }
+    return imageId;
+}
