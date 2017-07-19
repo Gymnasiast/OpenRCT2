@@ -843,7 +843,7 @@ void scenario_remove_trackless_rides(rct_s6_data *s6)
     bool rideHasTrack[MAX_RIDES];
     ride_all_has_any_track_elements(rideHasTrack);
     for (sint32 i = 0; i < MAX_RIDES; i++) {
-        rct_ride *ride = &s6->rides[i];
+        rct2_ride *ride = &s6->rides[i];
 
         if (rideHasTrack[i] || ride->type == RIDE_TYPE_NULL) {
             continue;
