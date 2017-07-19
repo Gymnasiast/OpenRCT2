@@ -472,6 +472,17 @@ public:
             dst->exits[i] = src->exits[i];
             dst->last_peep_in_queue[i] = src->last_peep_in_queue[i];
         }
+        for (uint8 i = RCT12_MAX_STATIONS_PER_RIDE; i < MAX_STATIONS; i++)
+        {
+            dst->station_starts[i].xy = RCT_XY8_UNDEFINED;
+            dst->station_heights[i] = 0;
+            dst->station_length[i] = 0;
+            dst->station_depart[i] = 0;
+            dst->train_at_station[i] = 255;
+            dst->entrances[i].xy = RCT_XY8_UNDEFINED;
+            dst->exits[i].xy = RCT_XY8_UNDEFINED;
+            dst->last_peep_in_queue[i] = 0xFFFF;
+        }
 
         for (uint8 i = 0; i < MAX_VEHICLES_PER_RIDE; i++)
         {
