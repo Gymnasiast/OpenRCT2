@@ -23,35 +23,39 @@
 #ifdef __cplusplus
 interface ITitleSequencePlayer;
 
-class TitleScreen final
+namespace OpenRCT2
 {
-public:
-    ITitleSequencePlayer *  GetSequencePlayer();
-    size_t                  GetCurrentSequence();
-    bool                    PreviewSequence(size_t value);
-    void                    StopPreviewingSequence();
-    bool                    IsPreviewingSequence();
-    bool                    ShouldHideVersionInfo();
-    void                    SetHideVersionInfo(bool value);
+    class GameState;
 
-    TitleScreen();
-    ~TitleScreen();
+    class TitleScreen final
+    {
+    public:
+        TitleScreen(GameState * gameState);
+        ~TitleScreen();
 
-    void Load();
-    void Update();
-    void CreateWindows();
-    void ChangePresetSequence(size_t preset);
+        ITitleSequencePlayer *  GetSequencePlayer();
+        uint16                  GetCurrentSequence();
+        void                    SetCurrentSequence(uint16 value);
+        bool                    ShouldHideVersionInfo();
+        void                    SetHideVersionInfo(bool value);
 
-private:
-    ITitleSequencePlayer *  _sequencePlayer = nullptr;
-    size_t                  _loadedTitleSequenceId = SIZE_MAX;
-    size_t                  _currentSequence = SIZE_MAX;
-    bool                    _hideVersionInfo = false;
-    bool                    _previewingSequence = false;
+        void Load();
+        void Update();
+        void CreateWindows();
+        void ChangeSequence(sint32 preset);
 
-    void TitleInitialise();
-    bool TryLoadSequence(bool loadPreview = false);
-};
+    private:
+        GameState * const       _gameState;
+
+        ITitleSequencePlayer *  _sequencePlayer = nullptr;
+        uint16                  _loadedTitleSequenceId = UINT16_MAX;
+        uint16                  _currentSequence = UINT16_MAX;
+        bool                    _hideVersionInfo = false;
+
+        void TitleInitialise();
+        void TryLoadSequence();
+    };
+}
 #endif
 
 #ifdef __cplusplus
