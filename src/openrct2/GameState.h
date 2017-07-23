@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "Date.h"
+
 namespace OpenRCT2
 {
     class Park;
@@ -26,12 +28,14 @@ namespace OpenRCT2
     class GameState final
     {
     private:
-        Park * const _park;
+        Date            _date;
+        Park * const    _park;
 
     public:
         GameState();
         ~GameState();
 
+        Date * GetDate() { return &_date; }
         Park * GetPark() { return _park; }
 
         void Update();

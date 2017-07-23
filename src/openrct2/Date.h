@@ -18,6 +18,11 @@
 
 #include "common.h"
 
+extern "C"
+{
+    #include "localisation/date.h"
+}
+
 namespace OpenRCT2
 {
     /**

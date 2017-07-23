@@ -16,19 +16,22 @@
 
 #include "core/Guard.hpp"
 #include "core/Math.hpp"
-#include "localisation/date.h"
 #include "Date.h"
 
 using namespace OpenRCT2;
 
-constexpr sint32 MONTH_TICKS_INCREMENT  = 4;
-constexpr sint32 MASK_WEEK_TICKS        = 0x3FFF;
-constexpr sint32 MASK_FORTNIGHT_TICKS   = 0x7FFF;
-constexpr sint32 MASK_MONTH_TICKS       = 0xFFFF;
+constexpr sint32 MONTH_TICKS_INCREMENT = 4;
+constexpr sint32 MASK_WEEK_TICKS = 0x3FFF;
+constexpr sint32 MASK_FORTNIGHT_TICKS = 0x7FFF;
+constexpr sint32 MASK_MONTH_TICKS = 0xFFFF;
+
+Date::Date()
+{
+}
 
 Date::Date(uint32 monthsElapsed, uint16 monthTicks)
-    : _monthTicks(monthTicks),
-      _monthsElapsed(monthsElapsed)
+    : _monthsElapsed(monthsElapsed),
+      _monthTicks(monthTicks)
 {
 }
 
@@ -123,5 +126,6 @@ sint32 Date::GetDaysInMonth(sint32 month)
     Guard::ArgumentInRange(month, 0, MONTH_COUNT - 1);
 
     static const sint16 DaysInMonth[MONTH_COUNT] = { 31, 30, 31, 30, 31, 31, 30, 31 };
+
     return DaysInMonth[month];
 }
