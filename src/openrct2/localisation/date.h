@@ -73,4 +73,9 @@ bool date_is_month_start(sint32 monthTicks);
 }
 #endif
 
+bool date_is_day_start(sint32 monthTicks);
+bool date_is_week_start(sint32 monthTicks);
+bool date_is_fortnight_start(sint32 monthTicks);
+bool date_is_month_start(sint32 monthTicks);
+
 #endif
