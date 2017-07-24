@@ -50,6 +50,7 @@
 #include "../world/map_animation.h"
 #include "../world/park.h"
 
+
 class ObjectLoadException : public Exception
 {
 public:
