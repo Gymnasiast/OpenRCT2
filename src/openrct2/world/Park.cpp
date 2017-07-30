@@ -588,7 +588,7 @@ bool park_entry_price_unlocked()
 
 using namespace OpenRCT2;
 
-static Park * _singleton;
+static Park * _singleton = nullptr;
 
 Park::Park()
 {
