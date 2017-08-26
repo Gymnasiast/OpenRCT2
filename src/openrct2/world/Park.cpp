@@ -1160,6 +1160,10 @@ extern "C"
 
     void park_init()
     {
+        if (_singleton == nullptr)
+        {
+            return;
+        }
         _singleton->Initialise();
     }
 
