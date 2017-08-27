@@ -74,6 +74,7 @@ interface IStream;
 namespace OpenRCT2
 {
     interface IPlatformEnvironment;
+    class GameState;
 
     namespace Audio
     {
@@ -95,6 +96,7 @@ namespace OpenRCT2
         virtual Audio::IAudioContext *  GetAudioContext() abstract;
         virtual Ui::IUiContext *        GetUiContext() abstract;
         virtual IPlatformEnvironment *  GetPlatformEnvironment() abstract;
+        virtual GameState *             GetGameState() const abstract;
 
         virtual sint32 RunOpenRCT2(int argc, const char * * argv) abstract;
 
