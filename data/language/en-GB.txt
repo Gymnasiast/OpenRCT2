@@ -4452,6 +4452,11 @@ STR_6140    :Changelog...
 STR_6141    :RCT1 Bottom Toolbar
 STR_6142    :{WINDOW_COLOUR_2}Track name: {BLACK}{STRING}
 STR_6143    :{WINDOW_COLOUR_2}Ride type: {BLACK}{STRINGID}
+STR_6144    :Please select your RCT2 directory
+STR_6145    :OpenRCT2 needs files from the original RollerCoaster Tycoon 2 in order to work.
+STR_6146    :Please select the directory where you installed RollerCoaster Tycoon 2.
+STR_6147    :Could not find %s%s at this path
+STR_6148    :For security reasons, it is strongly recommended not to run OpenRCT2 with elevated permissions.
 
 #############
 # Scenarios #

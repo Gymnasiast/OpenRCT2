@@ -730,9 +730,10 @@ extern "C"
                 while (true)
                 {
                     IUiContext * uiContext = GetContext()->GetUiContext();
-                    uiContext->ShowMessageBox("OpenRCT2 needs files from the original RollerCoaster Tycoon 2 in order to work. Please select the directory where you installed RollerCoaster Tycoon 2.");
+                    const std::string dialogMessage = String::StdFormat("%s\n%s", language_get_string(STR_SELECT_RCT2_DIRECTORY_LINE_1), language_get_string(STR_SELECT_RCT2_DIRECTORY_LINE_2));
+                    uiContext->ShowMessageBox(dialogMessage);
 
-                    std::string installPath = uiContext->ShowDirectoryDialog("Please select your RCT2 directory");
+                    std::string installPath = uiContext->ShowDirectoryDialog(language_get_string(STR_SELECT_RCT2_DIRECTORY_TITLE));
                     if (installPath.empty())
                     {
                         return false;
@@ -746,7 +747,8 @@ extern "C"
                         return true;
                     }
 
-                    std::string message = String::StdFormat("Could not find %s" PATH_SEPARATOR "Data" PATH_SEPARATOR "g1.dat at this path", installPath.c_str());
+                    const char * errorString = language_get_string(STR_COULD_NOT_FIND_G1_DAT_AT_THIS_PATH);
+                    std::string message = String::StdFormat(errorString, installPath.c_str(), PATH_SEPARATOR "Data" PATH_SEPARATOR "g1.dat" );
                     uiContext->ShowMessageBox(message);
                 }
             }

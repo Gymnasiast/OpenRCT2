@@ -3791,6 +3791,12 @@ enum {
     STR_TRACK_DESIGN_NAME = 6142,
     STR_TRACK_DESIGN_TYPE = 6143,
 
+    STR_SELECT_RCT2_DIRECTORY_TITLE = 6144,
+    STR_SELECT_RCT2_DIRECTORY_LINE_1 = 6145,
+    STR_SELECT_RCT2_DIRECTORY_LINE_2 = 6146,
+    STR_COULD_NOT_FIND_G1_DAT_AT_THIS_PATH = 6147,
+    STR_DO_NOT_RUN_WITH_ELEVATED_PERMISSIONS = 6148,
+
     // Have to include resource strings (from scenarios and objects) for the time being now that language is partially working
     STR_COUNT = 32768
 };
