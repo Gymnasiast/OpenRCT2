@@ -257,6 +257,14 @@ public:
             dst->objective_arg_2 = _s4.scenario_objective_currency;
         dst->objective_arg_3 = _s4.scenario_objective_num_guests;
 
+
+        log_error("%d", _s4.scenario_objective_type);
+        log_error("%d", _s4.scenario_objective_years);
+        log_error("%d", _s4.unk_199552);
+        log_error("%d", _s4.scenario_objective_currency);
+        log_error("%d", _s4.scenario_objective_num_guests);
+        log_error(" ");
+
         std::string name = std::string(_s4.scenario_name, sizeof(_s4.scenario_name));
         std::string details;
 

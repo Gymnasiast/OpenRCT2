@@ -1562,7 +1562,7 @@ static void window_park_objective_paint(rct_window *w, rct_drawpixelinfo *dpi)
     y += 10;
 
     // Objective
-    set_format_arg(0, uint16, gScenarioObjectiveNumGuests);
+    set_format_arg(0, uint16, 7);//gScenarioObjectiveNumGuests);
     set_format_arg(2, sint16, date_get_total_months(MONTH_OCTOBER, gScenarioObjectiveYear));
     set_format_arg(4, money32, gScenarioObjectiveCurrency);
 
