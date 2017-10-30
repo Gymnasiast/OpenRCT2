@@ -20,6 +20,7 @@
 #include "../core/IStream.hpp"
 #include "../core/Path.hpp"
 #include "../core/String.hpp"
+#include "../core/Util.hpp"
 #include "../management/Award.h"
 #include "../network/network.h"
 #include "../object/ObjectManager.h"
@@ -67,7 +68,7 @@ private:
     IObjectManager * const      _objectManager;
 
     const utf8 *    _s6Path = nullptr;
-    rct_s6_data     _s6;
+    rct_s6_data_classic_0xf     _s6;
     uint8           _gameVersion = 0;
 
 public:
@@ -124,7 +125,7 @@ public:
         auto chunkReader = SawyerChunkReader(stream);
         chunkReader.ReadChunk(&_s6.header, sizeof(_s6.header));
 
-        log_verbose("saved game classic_flag = 0x%02x\n", _s6.header.classic_flag);
+        log_info("saved game classic_flag = 0x%02x\n", _s6.header.classic_flag);
         if (isScenario)
         {
             if (_s6.header.type != S6_TYPE_SCENARIO)
@@ -167,7 +168,8 @@ public:
             chunkReader.ReadChunk(&_s6.objects, sizeof(_s6.objects));
             chunkReader.ReadChunk(&_s6.elapsed_months, 16);
             chunkReader.ReadChunk(&_s6.map_elements, sizeof(_s6.map_elements));
-            chunkReader.ReadChunk(&_s6.next_free_map_element_pointer_index, 3048816);
+            //chunkReader.ReadChunk(&_s6.next_free_map_element_pointer_index, 3048816);
+            chunkReader.ReadChunk(&_s6.next_free_map_element_pointer_index, 4328816);
         }
 
         auto missingObjects = _objectManager->GetInvalidObjects(_s6.objects);
@@ -201,7 +203,7 @@ public:
         memcpy(gMapElements, _s6.map_elements, sizeof(_s6.map_elements));
 
         gNextFreeMapElementPointerIndex = _s6.next_free_map_element_pointer_index;
-        for (sint32 i = 0; i < RCT2_MAX_SPRITES; i++)
+        for (sint32 i = 0; i < Util::CountOf(_s6.sprites); i++)
         {
             memcpy(get_sprite(i), &_s6.sprites[i], sizeof(rct_sprite));
         }

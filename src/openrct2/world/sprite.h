@@ -22,7 +22,7 @@
 #include "../ride/Vehicle.h"
 
 #define SPRITE_INDEX_NULL       0xFFFF
-#define MAX_SPRITES             10000
+#define MAX_SPRITES             15000
 #define NUM_SPRITE_LISTS        6
 
 enum SPRITE_IDENTIFIER {
