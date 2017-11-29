@@ -788,6 +788,198 @@ static void window_new_ride_paint(rct_window* w, rct_drawpixelinfo* dpi)
     }
 }
 
+static int32_t window_new_ride_get_alternative_image(uint8_t rideEntryIndex, const rct_ride_entry * rideEntry)
+{
+    constexpr const int32_t SPR_CSG_RIDE_PREVIEWS_BEGIN = SPR_CSG_BEGIN + 64195;
+
+    if (!is_csg_loaded())
+    {
+        return SPR_NONE;
+    }
+
+    auto objectEntry = object_entry_get_object(ObjectType::Ride, rideEntryIndex);
+    auto rideEntryName = objectEntry->GetLegacyIdentifier();
+
+    if      (String::Equals(rideEntryName, "NRL     "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MINIATURE_RAILWAY;
+    else if (String::Equals(rideEntryName, "MONO2   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MONORAIL;
+    else if (String::Equals(rideEntryName, "CLIFT1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CHAIRLIFT;
+    else if (String::Equals(rideEntryName, "SMONO   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SUSPENDED_MONORAIL;
+
+    else if (String::Equals(rideEntryName, "MONBK   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CYCLE_RAILWAY;
+    else if (String::Equals(rideEntryName, "CHBUILD "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CROOKED_HOUSE;
+    else if (String::Equals(rideEntryName, "HHBUILD "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HAUNTED_HOUSE;
+    else if (String::Equals(rideEntryName, "FWH1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_FERRIS_WHEEL;
+    else if (String::Equals(rideEntryName, "HMAZE   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HEDGE_MAZE;
+    else if (String::Equals(rideEntryName, "MGR1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MERRY_GO_ROUND;
+    else if (String::Equals(rideEntryName, "GOLF1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MINIATURE_GOLF;
+    else if (String::Equals(rideEntryName, "OBS1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_OBSERVATION_TOWER;
+    else if (String::Equals(rideEntryName, "SPCAR   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CAR_RIDE;
+    else if (String::Equals(rideEntryName, "HELICAR "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CYCLE_MONORAIL;
+    else if (String::Equals(rideEntryName, "HSKELT  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SPIRAL_SLIDE;
+//    else if (String::Equals(rideEntryName, "DODG1   "))
+//        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_DODGEMS;
+//    else if (String::Equals(rideEntryName, "SRINGS  "))
+//        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SPACE_RINGS;
+    else if (String::Equals(rideEntryName, "CIRCUS1 "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CIRCUS;
+    else if (String::Equals(rideEntryName, "GTC     "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_GHOST_TRAIN;
+    else if (String::Equals(rideEntryName, "FSAUC   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_FLYING_SAUCERS;
+
+    else if (String::Equals(rideEntryName, "PTCT1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WOODEN_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "MFT     "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WOODEN_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "WMOUSE  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WOODEN_CRAZY_RODENT_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "SFRIC1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WOODEN_SIDE_FRICTION_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "VREEL   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_VIRGINIA_REEL;
+    else if (String::Equals(rideEntryName, "REVCAR  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WOODEN_REVERSER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "SMC1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_WILD_MOUSE_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "IVMC1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_INVERTED_WILD_MOUSE_COASTER;
+    else if (String::Equals(rideEntryName, "ZLDB    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_MINI_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "AMT1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MINE_TRAIN_ROLLER_COASTER;
+        // Skipping Looping RC, as it's too different.
+    else if (String::Equals(rideEntryName, "TOGST   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STAND_UP_STEEL_ROLLER_COASTER;
+        // Not quite the same design, but hardly visible.
+    else if (String::Equals(rideEntryName, "ARRT1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_CORKSCREW_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "BMSD    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "BMSU    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "BMFL    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_STEEL_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "ARRSW1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SUSPENDED_ROLLER_COASTER;
+        // Skipping Compact Inverted
+    else if (String::Equals(rideEntryName, "NEMT    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_INVERTED_ROLLER_COASTER;
+        // Skipping mini suspended
+    else if (String::Equals(rideEntryName, "STEEP1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SINGLE_RAIL_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "BOB1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_BOBSLED_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "UTCAR   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HEARTLINE_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "UTCARR  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HEARTLINE_TWISTER_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "VEKVAMP "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_FLYING_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "REVF1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_REVERSE_FREEFALL_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "BMVD    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_VERTICAL_ROLLER_COASTER;
+    else if (String::Equals(rideEntryName, "THCAR   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_AIR_POWERED_VERTICAL_COASTER;
+
+    else if (String::Equals(rideEntryName, "TWIST1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_TWIST;
+    else if (String::Equals(rideEntryName, "SSC1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_LAUNCHED_FREEFALL;
+    else if (String::Equals(rideEntryName, "SWSH1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SWINGING_SHIP;
+    else if (String::Equals(rideEntryName, "KART1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_GO_KARTS;
+    else if (String::Equals(rideEntryName, "SWSH2   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SWINGING_INVERTER_SHIP;
+    else if (String::Equals(rideEntryName, "SIMPOD  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_MOTION_SIMULATOR;
+    else if (String::Equals(rideEntryName, "C3D     "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_3D_CINEMA;
+    else if (String::Equals(rideEntryName, "TOPSP1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_TOP_SPIN;
+    else if (String::Equals(rideEntryName, "GDROP1  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_ROTO_DROP;
+    else if (String::Equals(rideEntryName, "ENTERP  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_ENTERPRISE;
+
+    else if (String::Equals(rideEntryName, "DING1   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WATER_SLIDE;
+    else if (String::Equals(rideEntryName, "LFB1    "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_LOG_FLUME;
+    else if (String::Equals(rideEntryName, "RAPBOAT "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_RIVER_RAPIDS;
+    else if (String::Equals(rideEntryName, "SPBOAT  "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_RIVER_RIDE;
+    else if (String::Equals(rideEntryName, "RBOAT   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_BOAT_HIRE;
+    else if (String::Equals(rideEntryName, "RFTBOAT "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_RAFT_RIDE;
+    else if (String::Equals(rideEntryName, "CSTBOAT "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_WATER_COASTER;
+
+//    else if (String::Equals(rideEntryName, "TLT1    "))
+//        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_TOILETS;
+    else if (String::Equals(rideEntryName, "INFOK   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_INFORMATION_KIOSK;
+
+    else if (String::Equals(rideEntryName, "BURGB   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_BURGER_BAR;
+    else if (String::Equals(rideEntryName, "CHCKS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_FRIED_CHICKEN_STALL;
+//    else if (String::Equals(rideEntryName, "CHPSH   "))
+//        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CHIPS_STALL;
+    else if (String::Equals(rideEntryName, "CNDYF   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_CANDYFLOSS_STALL;
+    else if (String::Equals(rideEntryName, "DOUGH   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_DOUGHNUT_SHOP;
+    else if (String::Equals(rideEntryName, "HOTDS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HOT_DOG_STALL;
+//    else if (String::Equals(rideEntryName, "ICECR1  "))
+//        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_ICE_CREAM_STALL;
+    else if (String::Equals(rideEntryName, "PIZZS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_PIZZA_STALL;
+    else if (String::Equals(rideEntryName, "POPCS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_POPCORN_STALL;
+    else if (String::Equals(rideEntryName, "SQDST   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_EXOTIC_SEA_FOOD_STALL;
+    else if (String::Equals(rideEntryName, "TOFFS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_TOFFEE_APPLE_STALL;
+
+    else if (String::Equals(rideEntryName, "COFFS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_COFFEE_SHOP;
+    else if (String::Equals(rideEntryName, "DRNKS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_DRINK_STALL;
+    else if (String::Equals(rideEntryName, "LEMST   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_LEMONADE_STALL;
+
+    else if (String::Equals(rideEntryName, "BALLN   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_BALLOON_STALL;
+    else if (String::Equals(rideEntryName, "HATST   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_HAT_STALL;
+    else if (String::Equals(rideEntryName, "SOUVS   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_SOUVENIR_STALL;
+    else if (String::Equals(rideEntryName, "TSHRT   "))
+        return SPR_CSG_RIDE_PREVIEWS_BEGIN + RCT1_RIDE_TYPE_T_SHIRT_STALL;
+    else
+        return SPR_NONE;
+}
+
 /**
  *
  *  rct2: 0x006B6ABF
@@ -812,19 +1004,29 @@ static void window_new_ride_scrollpaint(rct_window* w, rct_drawpixelinfo* dpi, i
             gfx_fill_rect_inset(
                 dpi, { coords, coords + ScreenCoordsXY{ 115, 115 } }, w->colours[1], INSET_RECT_FLAG_FILL_MID_LIGHT | flags);
 
-        // Draw ride image with feathered border
         rideEntry = get_ride_entry(listItem->EntryIndex);
-        int32_t imageId = rideEntry->images_offset;
+        int32_t alternativeImage = window_new_ride_get_alternative_image(listItem->EntryIndex, rideEntry);
 
-        for (size_t i = 0; i < MAX_RIDE_TYPES_PER_RIDE_ENTRY; i++)
+        if (alternativeImage == SPR_NONE)
         {
-            if (rideEntry->ride_type[i] == listItem->Type)
-                break;
-            else
-                imageId++;
-        }
+            // Draw ride image with feathered border
+            int32_t imageId = rideEntry->images_offset;
 
-        gfx_draw_sprite_raw_masked(dpi, coords + ScreenCoordsXY{ 2, 2 }, SPR_NEW_RIDE_MASK, imageId);
+            for (size_t i = 0; i < MAX_RIDE_TYPES_PER_RIDE_ENTRY; i++)
+            {
+                if (rideEntry->ride_type[i] == listItem->Type)
+                    break;
+                else
+                    imageId++;
+            }
+
+            gfx_draw_sprite_raw_masked(dpi, coords + ScreenCoordsXY{ 2, 2 }, SPR_NEW_RIDE_MASK, imageId);
+        }
+        else
+        {
+            // These images are already feathered
+            gfx_draw_sprite(dpi, alternativeImage, coords + ScreenCoordsXY{ 2, 2 }, 0);
+        }
 
         // Next position
         coords.x += 116;
