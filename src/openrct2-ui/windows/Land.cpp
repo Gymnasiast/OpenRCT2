@@ -36,6 +36,25 @@ enum WINDOW_LAND_WIDGET_IDX {
     WIDX_WALL,
 };
 
+static uint32 wallTexturePreviews[] =
+{
+    SPR_WALL_TEXTURE_ROCK,
+    SPR_WALL_TEXTURE_WOOD_RED,
+    SPR_WALL_TEXTURE_WOOD_BLACK,
+    SPR_WALL_TEXTURE_ICE,
+    SPR_CSG_BEGIN + 47365,
+    SPR_CSG_BEGIN + 47366,
+    SPR_CSG_BEGIN + 47368,
+    SPR_CSG_BEGIN + 47369,
+    SPR_CSG_BEGIN + 47371,
+    SPR_CSG_BEGIN + 47373,
+    SPR_CSG_BEGIN + 47374,
+    SPR_CSG_BEGIN + 47375,
+    SPR_CSG_BEGIN + 47376,
+    SPR_CSG_BEGIN + 47377,
+    SPR_CSG_BEGIN + 47378,
+};
+
 validate_global_widx(WC_LAND, WIDX_PREVIEW);
 
 static rct_widget window_land_widgets[] = {
@@ -241,7 +260,7 @@ static void window_land_dropdown(rct_window *w, rct_widgetindex widgetIndex, sin
 
         type = (dropdownIndex == -1) ?
             _selectedWallTexture :
-            (uint32)gDropdownItemsArgs[dropdownIndex] - SPR_WALL_TEXTURE_ROCK;
+            dropdownIndex;
 
         if (gLandToolTerrainEdge == type) {
             gLandToolTerrainEdge = 255;
@@ -306,7 +325,7 @@ static void window_land_invalidate(rct_window *w)
         w->pressed_widgets |= (1 << WIDX_PAINTMODE);
 
     window_land_widgets[WIDX_FLOOR].image = SPR_FLOOR_TEXTURE_GRASS + _selectedFloorTexture;
-    window_land_widgets[WIDX_WALL].image = SPR_WALL_TEXTURE_ROCK + _selectedWallTexture;
+    window_land_widgets[WIDX_WALL].image = wallTexturePreviews[_selectedWallTexture];
     // Update the preview image (for tool sizes up to 7)
     window_land_widgets[WIDX_PREVIEW].image = land_tool_size_to_sprite_index(gLandToolSize);
 }

@@ -49,6 +49,25 @@ static char WallTextureOrder[] =
     0, 0
 };
 
+static uint32 wallTexturePreviews[] =
+{
+        SPR_WALL_TEXTURE_ROCK,
+        SPR_WALL_TEXTURE_WOOD_RED,
+        SPR_WALL_TEXTURE_WOOD_BLACK,
+        SPR_WALL_TEXTURE_ICE,
+        SPR_CSG_BEGIN + 47365,
+        SPR_CSG_BEGIN + 47366,
+        SPR_CSG_BEGIN + 47368,
+        SPR_CSG_BEGIN + 47369,
+        SPR_CSG_BEGIN + 47371,
+        SPR_CSG_BEGIN + 47373,
+        SPR_CSG_BEGIN + 47374,
+        SPR_CSG_BEGIN + 47375,
+        SPR_CSG_BEGIN + 47376,
+        SPR_CSG_BEGIN + 47377,
+        SPR_CSG_BEGIN + 47378,
+};
+
 uint16 gLandToolSize;
 money32 gLandToolRaiseCost;
 money32 gLandToolLowerCost;
@@ -102,7 +121,7 @@ void land_tool_show_edge_style_dropdown(rct_window * w, rct_widget * widget, uin
 
     for (uint8 i = 0; i < TERRAIN_EDGE_COUNT; i++) {
         gDropdownItemsFormat[i] = DROPDOWN_FORMAT_LAND_PICKER;
-        gDropdownItemsArgs[i] = SPR_WALL_TEXTURE_ROCK + WallTextureOrder[i];
+        gDropdownItemsArgs[i] = wallTexturePreviews[i];
         if (WallTextureOrder[i] == currentEdgeType)
             defaultIndex = i;
     }
