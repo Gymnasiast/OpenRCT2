@@ -14,39 +14,32 @@
  *****************************************************************************/
 #pragma endregion
 
+#include "../Cheats.h"
 #include "../core/Math.hpp"
 #include "../core/Util.hpp"
 #include "../config/Config.h"
 #include "../Date.h"
+#include "../Game.h"
+#include "../interface/colour.h"
+#include "../interface/window.h"
+#include "../localisation/localisation.h"
+#include "../management/Award.h"
+#include "../management/Finance.h"
+#include "../management/Marketing.h"
+#include "../management/NewsItem.h"
+#include "../management/Research.h"
 #include "../network/network.h"
-#include "Park.h"
 #include "../OpenRCT2.h"
-
-extern "C"
-{
-    #include "../cheats.h"
-    #include "../game.h"
-    #include "../interface/colour.h"
-    #include "../interface/window.h"
-    #include "../localisation/localisation.h"
-    #include "../management/award.h"
-    #include "../management/finance.h"
-    #include "../management/marketing.h"
-    #include "../management/news_item.h"
-    #include "../management/research.h"
-    #include "../peep/peep.h"
-    #include "../peep/staff.h"
-    #include "../rct2.h"
-    #include "../ride/ride.h"
-    #include "../ride/ride_data.h"
-    #include "../scenario/scenario.h"
-    #include "../world/map.h"
-    #include "entrance.h"
-    #include "sprite.h"
-}
-
-extern "C"
-{
+#include "../peep/Peep.h"
+#include "../peep/Staff.h"
+#include "../rct2.h"
+#include "../ride/ride.h"
+#include "../ride/ride_data.h"
+#include "../scenario/scenario.h"
+#include "../world/map.h"
+#include "Entrance.h"
+#include "Park.h"
+#include "sprite.h"
 
 rct_string_id gParkName;
 uint32 gParkNameArgs;
@@ -258,7 +251,7 @@ void update_park_fences_around_tile(sint32 x, sint32 y)
 void park_set_name(const char *name)
 {
     // Required else the pointer arithmetic in the game commands below could cause an access violation
-    char* newName = malloc(USER_STRING_MAX_LENGTH + 1);
+    char * newName = (char *)malloc(USER_STRING_MAX_LENGTH + 1);
     strncpy(newName, name, USER_STRING_MAX_LENGTH);
 
     gGameCommandErrorTitle = STR_CANT_RENAME_PARK;
@@ -719,25 +712,25 @@ void Park::Update(const Date &date)
 sint32 Park::CalculateParkSize() const
 {
     sint32 tiles = 0;
-    map_element_iterator it;
-    map_element_iterator_begin(&it);
+    tile_element_iterator it;
+    tile_element_iterator_begin(&it);
     do
     {
-        if (map_element_get_type(it.element) == MAP_ELEMENT_TYPE_SURFACE &&
+        if (tile_element_get_type(it.element) == TILE_ELEMENT_TYPE_SURFACE &&
             it.element->properties.surface.ownership & (OWNERSHIP_CONSTRUCTION_RIGHTS_OWNED | OWNERSHIP_OWNED))
         {
             tiles++;
         }
     }
-    while (map_element_iterator_next(&it));
+    while (tile_element_iterator_next(&it));
     return tiles;
 }
 
 sint32 Park::CalculateParkRating() const
 {
-    if (gForcedParkRating >= 0)
+    if (_forcedParkRating >= 0)
     {
-        return gForcedParkRating;
+        return _forcedParkRating;
     }
 
     sint32 result = 1150;
@@ -795,7 +788,7 @@ sint32 Park::CalculateParkRating() const
         sint32 totalRideExcitement = 0;
 
         sint32 i;
-        rct_ride * ride;
+        Ride * ride;
         FOR_ALL_RIDES(i, ride)
         {
             totalRideUptime += 100 - ride->downtime;
@@ -879,7 +872,7 @@ money32 Park::CalculateParkValue() const
     return result;
 }
 
-money32 Park::CalculateRideValue(const rct_ride * ride) const
+money32 Park::CalculateRideValue(const Ride * ride) const
 {
     money32 result = 0;
     if (ride->type != RIDE_TYPE_NULL &&
@@ -899,7 +892,7 @@ money16 Park::CalculateTotalRideValueForMoney() const
 {
     money16 totalRideValue = 0;
     sint32 i;
-    rct_ride * ride;
+    Ride * ride;
     FOR_ALL_RIDES(i, ride)
     {
         if (ride->status != RIDE_STATUS_OPEN) continue;
@@ -925,7 +918,7 @@ uint32 Park::CalculateSuggestedMaxGuests() const
 
     // TODO combine the two ride loops
     sint32 i;
-    rct_ride * ride;
+    Ride * ride;
     FOR_ALL_RIDES(i, ride)
     {
         if (ride->status != RIDE_STATUS_OPEN) continue;
@@ -1083,7 +1076,7 @@ rct_peep * Park::GenerateGuest()
             peep->sprite_direction = spawn.direction << 3;
             peep->destination_x = floor2(peep->x, 32) + 16;
             peep->destination_y = floor2(peep->y, 32) + 16;
-            peep->destination_tolerence = 5;
+            peep->destination_tolerance = 5;
             peep->var_76 = 0;
             peep->direction = spawn.direction;
             peep->var_37 = 0;
@@ -1193,7 +1186,7 @@ extern "C"
         return _singleton->CalculateCompanyValue();
     }
 
-    rct_peep * park_generate_new_guest()
+    rct_peep *park_generate_new_guest()
     {
         return _singleton->GenerateGuest();
     }

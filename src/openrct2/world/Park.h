@@ -55,8 +55,6 @@ enum PARK_FLAGS
 
 #ifdef __cplusplus
 
-struct rct_peep;
-struct rct_ride;
 
 namespace OpenRCT2
 {
@@ -89,7 +87,7 @@ namespace OpenRCT2
         void UpdateHistories();
 
     private:
-        money32     CalculateRideValue(const rct_ride * ride) const;
+        money32     CalculateRideValue(const Ride * ride) const;
         money16     CalculateTotalRideValueForMoney() const;
         uint32      CalculateSuggestedMaxGuests() const;
         uint32      CalculateGuestGenerationProbability() const;
@@ -170,6 +168,8 @@ extern "C"
     void game_command_buy_land_rights(sint32 *eax, sint32 *ebx, sint32 *ecx, sint32 *edx, sint32 *esi, sint32 *edi, sint32 *ebp);
 
     money16 park_get_entrance_fee();
+    bool park_ride_prices_unlocked();
+    bool park_entry_price_unlocked();
 #ifdef __cplusplus
 }
 #endif

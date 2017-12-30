@@ -22,16 +22,10 @@
 #include "platform/Platform2.h"
 #include "world/Climate.h"
 #include "world/Park.h"
-
-extern "C"
-{
-    #include "editor.h"
-    #include "input.h"
-    #include "interface/Screenshot.h"
-    #include "management/news_item.h"
-    #include "world/Park.h"
-    #include "windows/error.h"
-}
+#include "Editor.h"
+#include "Input.h"
+#include "interface/Screenshot.h"
+#include "management/NewsItem.h"
 
 using namespace OpenRCT2;
 
@@ -127,7 +121,7 @@ void GameState::Update()
             gWindowMapFlashingFlags |= (1 << 3);
         gWindowMapFlashingFlags &= ~(1 << 2);
 
-        window_map_tooltip_update_visibility();
+        context_update_map_tooltip();
 
         // Input
         gUnk141F568 = gUnk13CA740;
@@ -222,7 +216,7 @@ void GameState::UpdateLogic()
         }
         gErrorType = ERROR_TYPE_NONE;
 
-        window_error_open(title_text, body_text);
+        context_show_error(title_text, body_text);
     }
 
     // Start autosave timer after update

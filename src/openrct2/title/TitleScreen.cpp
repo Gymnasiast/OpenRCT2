@@ -225,10 +225,10 @@ void TitleScreen::TitleInitialise()
         _sequencePlayer = CreateTitleSequencePlayer(scenarioRepository, _gameState);
     }
     size_t seqId = title_get_config_sequence();
-    if (seqId == SIZE_MAX)
+    if (seqId == UINT16_MAX)
     {
         seqId = title_sequence_manager_get_index_for_config_id("*OPENRCT2");
-        if (seqId == SIZE_MAX)
+        if (seqId == UINT16_MAX)
         {
             seqId = 0;
         }
@@ -267,8 +267,8 @@ bool TitleScreen::TryLoadSequence(bool loadPreview)
         }
         Console::Error::WriteLine("Unable to play any title sequences.");
         _sequencePlayer->Eject();
-        _currentSequence = SIZE_MAX;
-        _loadedTitleSequenceId = SIZE_MAX;
+        _currentSequence = UINT16_MAX;
+        _loadedTitleSequenceId = UINT16_MAX;
         if (!loadPreview)
         {
             game_init_all(150);

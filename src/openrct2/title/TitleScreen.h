@@ -34,7 +34,12 @@ namespace OpenRCT2
         ~TitleScreen();
 
         ITitleSequencePlayer *  GetSequencePlayer();
-        uint16                  GetCurrentSequence();
+        size_t                  GetCurrentSequence();
+        bool                    PreviewSequence(size_t value);
+        void                    StopPreviewingSequence();
+        bool                    IsPreviewingSequence();
+        bool                    TryLoadSequence(bool loadPreview);
+        void                    ChangePresetSequence(size_t preset);
         void                    SetCurrentSequence(uint16 value);
         bool                    ShouldHideVersionInfo();
         void                    SetHideVersionInfo(bool value);
@@ -51,6 +56,7 @@ namespace OpenRCT2
         uint16                  _loadedTitleSequenceId = UINT16_MAX;
         uint16                  _currentSequence = UINT16_MAX;
         bool                    _hideVersionInfo = false;
+        bool                    _previewingSequence = false;
 
         void TitleInitialise();
         void TryLoadSequence();

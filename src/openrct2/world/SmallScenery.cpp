@@ -20,7 +20,7 @@
 #include "../ride/TrackDesign.h"
 #include "footpath.h"
 #include "map.h"
-#include "park.h"
+#include "Park.h"
 #include "scenery.h"
 #include "SmallScenery.h"
 
@@ -562,7 +562,6 @@ extern "C"
             *ebx & 0xFF
         );
     }
-<<<<<<< HEAD
 
     sint32 scenery_small_get_primary_colour(const rct_tile_element * tileElement)
     {
@@ -602,6 +601,4 @@ extern "C"
     {
         return (bool)(sceneryEntry->small_scenery.flags & flags);
     }
-=======
->>>>>>> 8dbb6af8c... Fix include casing
 }
