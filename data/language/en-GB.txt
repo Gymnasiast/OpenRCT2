@@ -4511,6 +4511,19 @@ STR_6201    :{MONTH}
 STR_6202    :Enable virtual floor
 STR_6203    :{SMALLFONT}{BLACK}When enabled, a virtual floor will be rendered when holding Ctrl or Shift to ease vertical placement of elements.
 
+
+STR_6382    :Brick
+STR_6383    :Iron
+STR_6384    :Grey stucco
+STR_6385    :Yellow stucco
+STR_6386    :Red stucco
+STR_6387    :Purple stucco
+STR_6388    :Green stucco
+STR_6389    :Brown sandstone
+STR_6390    :Grey sandstone
+STR_6391    :Skyscraper A
+STR_6392    :Skyscraper B
+
 #############
 # Scenarios #
 ################

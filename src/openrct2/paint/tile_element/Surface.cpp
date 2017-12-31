@@ -560,6 +560,9 @@ static void viewport_surface_smoothen_edge(paint_session * session, enum edge_t 
 
 static void viewport_surface_draw_tile_side_bottom(paint_session * session, enum edge_t edge, uint8 height, uint8 edgeStyle, struct tile_descriptor self, struct tile_descriptor neighbour, bool isWater)
 {
+    if (!is_csg_loaded() && edgeStyle >= TERRAIN_EDGE_RCT2_COUNT)
+        edgeStyle = TERRAIN_EDGE_ROCK;
+
     registers regs{};
 
     LocationXY8 offset = { 0, 0 };
@@ -631,6 +634,9 @@ static void viewport_surface_draw_tile_side_bottom(paint_session * session, enum
     {
         return;
     }
+
+    if (!is_csg_loaded() && edgeStyle >= TERRAIN_EDGE_RCT2_COUNT)
+        edgeStyle = TERRAIN_EDGE_ROCK;
 
     uint32 base_image_id = _terrainEdgeSpriteIds[edgeStyle][0];
     if (gCurrentViewportFlags & VIEWPORT_FLAG_UNDERGROUND_INSIDE)
@@ -762,6 +768,9 @@ static void viewport_surface_draw_water_side_bottom(paint_session * session, enu
 
 static void viewport_surface_draw_tile_side_top(paint_session * session, enum edge_t edge, uint8 height, uint8 terrain, struct tile_descriptor self, struct tile_descriptor neighbour, bool isWater)
 {
+    if (!is_csg_loaded() && terrain >= TERRAIN_EDGE_RCT2_COUNT)
+        terrain = TERRAIN_EDGE_ROCK;
+
     registers regs{};
 
     LocationXY8 offset = { 0, 0 };
