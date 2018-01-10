@@ -700,14 +700,40 @@ void S6Exporter::ExportResearchedSceneryItems()
 
 void S6Exporter::ExportResearchList()
 {
-    for (size_t i = 0; i < RCT2_MAX_RESEARCH_ITEMS; i++)
+    size_t i = 0;
+
+    while (i < RCT2_MAX_RESEARCH_ITEMS - 2)
     {
-        _s6.research_items[i].entryIndex = gResearchItems[i].entryIndex;
-        _s6.research_items[i].baseRideType = gResearchItems[i].baseRideType;
-        _s6.research_items[i].type = gResearchItems[i].type;
-        _s6.research_items[i].flags = gResearchItems[i].flags;
-        _s6.research_items[i].category = gResearchItems[i].category;
+        for (auto researchItem : gResearchItemsAvailable)
+        {
+            _s6.research_items[i].entryIndex = researchItem.entryIndex;
+            _s6.research_items[i].baseRideType = researchItem.baseRideType;
+            _s6.research_items[i].type = researchItem.type;
+            _s6.research_items[i].flags = researchItem.flags;
+            _s6.research_items[i].category = researchItem.category;
+
+            i++;
+        }
+
+        _s6.research_items[i].rawValue = RCT2_RESEARCHED_ITEMS_SEPARATOR;
+        i++;
+
+        for (auto researchItem : gResearchItemsUnavailable)
+        {
+            _s6.research_items[i].entryIndex = researchItem.entryIndex;
+            _s6.research_items[i].baseRideType = researchItem.baseRideType;
+            _s6.research_items[i].type = researchItem.type;
+            _s6.research_items[i].flags = researchItem.flags;
+            _s6.research_items[i].category = researchItem.category;
+
+            i++;
+        }
+
+        break;
     }
+
+    _s6.research_items[i].rawValue = RCT2_RESEARCHED_ITEMS_END;
+    _s6.research_items[i + 1].rawValue = RCT2_RESEARCHED_ITEMS_END_2;
 }
 
 extern "C"

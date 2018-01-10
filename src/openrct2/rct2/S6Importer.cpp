@@ -48,6 +48,7 @@
 #include "../world/Entrance.h"
 #include "../world/map_animation.h"
 #include "../world/Park.h"
+#include "../world/scenery.h"
 
 class ObjectLoadException : public std::runtime_error
 {
@@ -234,9 +235,6 @@ public:
         gGuestChangeModifier  = _s6.guest_count_change_modifier;
         gResearchFundingLevel = _s6.current_research_level;
         // pad_01357400
-        ImportResearchedRideTypes();
-        ImportResearchedRideEntries();
-        ImportResearchedSceneryItems();
         // _s6.researched_track_types_a
         // _s6.researched_track_types_b
 
@@ -256,8 +254,6 @@ public:
         gStaffHandymanColour = _s6.handyman_colour;
         gStaffMechanicColour = _s6.mechanic_colour;
         gStaffSecurityColour = _s6.security_colour;
-
-        ImportResearchedSceneryItems();
 
         gParkRating = _s6.park_rating;
 
@@ -345,7 +341,6 @@ public:
         gLastEntranceStyle             = _s6.last_entrance_style;
         // rct1_water_colour
         // pad_01358842
-        ImportResearchList();
         gMapBaseZ = _s6.map_base_z;
         memcpy(gScenarioName, _s6.scenario_name, sizeof(_s6.scenario_name));
         memcpy(gScenarioDetails, _s6.scenario_description, sizeof(_s6.scenario_description));
@@ -416,6 +411,8 @@ public:
         gClimateNextWeatherGloom     = _s6.next_weather_gloom;
         gClimateCurrentRainLevel     = _s6.current_rain_level;
         gClimateNextRainLevel        = _s6.next_rain_level;
+
+        ImportResearch();
 
         // News items
         for (size_t i = 0; i < RCT12_MAX_NEWS_ITEMS; i++)
@@ -699,6 +696,14 @@ public:
         // pad_208[0x58];
     }
 
+    void ImportResearch()
+    {
+        ImportResearchedRideTypes();
+        ImportResearchedRideEntries();
+        ImportResearchedSceneryItems();
+        ImportResearchList();
+    }
+
     void ImportResearchedRideTypes()
     {
         set_every_ride_type_not_invented();
@@ -746,14 +751,91 @@ public:
 
     void ImportResearchList()
     {
-        for (size_t i = 0; i < RCT2_MAX_RESEARCH_ITEMS; i++)
+        bool invented = true;
+        bool rideEntrySeen[MAX_RIDE_OBJECTS] = {};
+
+        for (size_t i = 0; i < RCT2_MAX_RESEARCH_ITEMS ; i++)
         {
-            gResearchItems[i].entryIndex = _s6.research_items[i].entryIndex;
-            gResearchItems[i].baseRideType = _s6.research_items[i].baseRideType;
-            gResearchItems[i].type = _s6.research_items[i].type;
-            gResearchItems[i].flags = _s6.research_items[i].flags;
-            gResearchItems[i].category = _s6.research_items[i].category;
+            if (_s6.research_items[i].rawValue == RCT2_RESEARCHED_ITEMS_SEPARATOR)
+            {
+                invented = false;
+                continue;
+            }
+            else if (_s6.research_items[i].rawValue == RCT2_RESEARCHED_ITEMS_END)
+            {
+                continue;
+            }
+            // There should be nothing between RCT2_RESEARCHED_ITEMS_END and RCT2_RESEARCHED_ITEMS_END_2,
+            // but read this anyway.
+            else if (_s6.research_items[i].rawValue == RCT2_RESEARCHED_ITEMS_END_2)
+            {
+                break;
+            }
+
+            uint8 entryIndex = _s6.research_items[i].entryIndex;
+            uint8 type       = _s6.research_items[i].type;
+
+            // Do not import research items that are invalid.
+            if (type == RCT2_RESEARCH_ENTRY_TYPE_RIDE && get_ride_entry(entryIndex) == nullptr)
+            {
+                continue;
+            }
+            else if (type == RCT2_RESEARCH_ENTRY_TYPE_SCENERY && get_scenery_group_entry(entryIndex) == nullptr)
+            {
+                continue;
+            }
+
+            ResearchItem tmp = {};
+            tmp.entryIndex = entryIndex;
+            tmp.baseRideType = _s6.research_items[i].baseRideType;
+            tmp.type = type;
+            tmp.flags = _s6.research_items[i].flags;
+            tmp.category = _s6.research_items[i].category;
+            rideEntrySeen[_s6.research_items[i].entryIndex] = true;
+
+            if (invented)
+            {
+                gResearchItemsAvailable.push_back(tmp);
+            }
+            else
+            {
+                gResearchItemsUnavailable.push_back(tmp);
+            }
         }
+
+        research_update_uncompleted_types();
+
+        // RCT2 removes some ride entries in order to make them appear all at once. Add these entries to the
+        // research list as well, but mark them as hidden.
+        for (sint32 i = 0; i < MAX_RIDE_OBJECTS; i++)
+        {
+            if (!rideEntrySeen[i])
+            {
+                rct_ride_entry * rideEntry = get_ride_entry(i);
+
+                if (rideEntry != nullptr)
+                {
+                    ResearchItem tmp = {};
+                    tmp.entryIndex = _s6.research_items[i].entryIndex;
+                    tmp.baseRideType = _s6.research_items[i].baseRideType;
+                    tmp.type = _s6.research_items[i].type;
+                    tmp.flags = _s6.research_items[i].flags;
+                    tmp.category = _s6.research_items[i].category;
+
+                    // If research is complete, then mark all vehicles not in the research list as invented.
+                    if (ride_entry_is_invented(i) || gResearchUncompletedCategories == 0)
+                    {
+                        gResearchItemsAvailable.push_back(tmp);
+                        ride_entry_set_invented(i);
+                    }
+                    else
+                    {
+                        gResearchItemsHidden.push_back(tmp);
+                    }
+                }
+            }
+        }
+
     }
 
     void Initialise()

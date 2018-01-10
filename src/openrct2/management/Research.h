@@ -16,16 +16,17 @@
 
 #pragma once
 
+#ifdef __cplusplus
+#include <vector>
+#endif
 #include "../common.h"
 #include "../object/ObjectLimits.h"
 #include "../ride/Ride.h"
 
 typedef struct rct_ride_entry rct_ride_entry;
 
-#pragma pack(push, 1)
 typedef struct ResearchItem
 {
-    // Bit 16 (0: scenery entry, 1: ride entry)
     union
     {
         sint32 rawValue;
@@ -33,14 +34,12 @@ typedef struct ResearchItem
         {
             uint8 entryIndex;
             uint8 baseRideType;
-            uint8 type; // 0: scenery entry, 1: ride entry
+            uint8 type;
             uint8 flags;
         };
     };
     uint8 category;
 } ResearchItem;
-assert_struct_size(ResearchItem, 5);
-#pragma pack(pop)
 
 enum
 {
@@ -50,6 +49,8 @@ enum
 
 enum
 {
+    RESEARCH_ENTRY_FLAG_HIDDEN = (1 << 0),
+    RESEARCH_ENTRY_FLAG_FIRST_OF_TYPE = (1 << 1),
     RESEARCH_ENTRY_FLAG_SCENERY_SET_ALWAYS_RESEARCHED = (1 << 5),
     RESEARCH_ENTRY_FLAG_RIDE_ALWAYS_RESEARCHED = (1 << 6),
 };
@@ -95,6 +96,10 @@ enum {
 };
 
 #ifdef __cplusplus
+extern std::vector<ResearchItem> gResearchItemsAvailable;
+extern std::vector<ResearchItem> gResearchItemsUnavailable;
+extern std::vector<ResearchItem> gResearchItemsHidden;
+
 extern "C" {
 #endif
 
@@ -108,6 +113,10 @@ extern ResearchItem gResearchLastItem;
 extern ResearchItem gResearchNextItem;
 
 extern ResearchItem gResearchItems[MAX_RESEARCH_ITEMS];
+
+
+
+
 extern uint8 gResearchUncompletedCategories;
 extern bool gSilentResearch;
 

@@ -285,6 +285,20 @@ typedef struct rct2_research_item
 } rct2_research_item;
 assert_struct_size(rct2_research_item, 5);
 #pragma pack(pop)
+
+enum
+{
+    RCT2_RESEARCH_ENTRY_TYPE_SCENERY = 0,
+    RCT2_RESEARCH_ENTRY_TYPE_RIDE    = 1,
+};
+
+// Everything before this point has been researched
+#define RCT2_RESEARCHED_ITEMS_SEPARATOR -1
+// Everything before this point and after separator still requires research
+#define RCT2_RESEARCHED_ITEMS_END -2
+// Extra end of list entry. Leftover from RCT1.
+#define RCT2_RESEARCHED_ITEMS_END_2 -3
+
 #ifdef __cplusplus
 
 /**
