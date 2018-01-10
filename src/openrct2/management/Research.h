@@ -153,6 +153,7 @@ void research_items_make_all_unresearched();
 void research_items_make_all_researched();
 void research_items_shuffle();
 bool research_item_is_always_researched(ResearchItem * researchItem);
+bool research_items_are_equal(ResearchItem * item1, ResearchItem * item2);
 
 #ifdef __cplusplus
 }

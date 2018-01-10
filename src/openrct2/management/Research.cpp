@@ -387,11 +387,11 @@ void research_reset_current_item()
         ResearchItem * inner_research = gResearchItems;
         do
         {
-            if (research->rawValue == inner_research->rawValue)
+            if (research_items_are_equal(research, inner_research))
             {
                 edx = inner_research;
             }
-            if ((research + 1)->rawValue == inner_research->rawValue)
+            if (research_items_are_equal((research + 1), inner_research))
             {
                 ebp = inner_research;
             }
@@ -886,7 +886,7 @@ void research_fix()
         }
         else
         {
-            rct_scenery_group_entry * sceneryGroupEntry = get_scenery_group_entry(researchItem->rawValue);
+            rct_scenery_group_entry * sceneryGroupEntry = get_scenery_group_entry(researchItem->entryIndex);
             if (sceneryGroupEntry == nullptr)
             {
                 research_remove(researchItem);
@@ -1011,4 +1011,12 @@ void research_items_shuffle()
 bool research_item_is_always_researched(ResearchItem * researchItem)
 {
     return (researchItem->flags & (RESEARCH_ENTRY_FLAG_RIDE_ALWAYS_RESEARCHED | RESEARCH_ENTRY_FLAG_SCENERY_SET_ALWAYS_RESEARCHED)) != 0;
+}
+
+bool research_items_are_equal(ResearchItem * item1, ResearchItem * item2)
+{
+    return
+        (item1->entryIndex == item2->entryIndex) &&
+        (item1->baseRideType == item2->baseRideType) &&
+        (item1->type == item2->type);
 }

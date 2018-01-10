@@ -30,6 +30,7 @@
 #include <openrct2/util/Util.h>
 #include <openrct2/world/scenery.h>
 #include <openrct2/windows/_legacy.h>
+#include "../../openrct2/management/Research.h"
 
 #pragma region Widgets
 
@@ -251,7 +252,10 @@ static void research_scenery_groups_setup()
         ResearchItem* research = gResearchItems;
         for (; research->rawValue != RESEARCHED_ITEMS_END; research++)
         {
-            if ((research->rawValue & 0xFFFFFF) != entryIndex)
+            ResearchItem tmp = {};
+            tmp.entryIndex = entryIndex;
+
+            if (research_items_are_equal(research, &tmp))
                 continue;
 
             research->flags |= RESEARCH_ENTRY_FLAG_SCENERY_SET_ALWAYS_RESEARCHED;
