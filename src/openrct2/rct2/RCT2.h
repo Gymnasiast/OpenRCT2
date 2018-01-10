@@ -37,6 +37,7 @@
 #define RCT2_MAX_RESEARCHED_RIDE_TYPE_QUADS    8  // With 32 bits per uint32, this means there is room for 256 types.
 #define RCT2_MAX_RESEARCHED_RIDE_ENTRY_QUADS   8  // With 32 bits per uint32, this means there is room for 256 entries.
 #define RCT2_MAX_RESEARCHED_SCENERY_ITEM_QUADS 56 // With 32 bits per uint32, this means there is room for 1792 items.
+#define RCT2_MAX_RESEARCH_ITEMS                500
 
 
 typedef struct rct2_install_info {
@@ -265,6 +266,25 @@ typedef struct rct2_ride {
 } rct2_ride;
 assert_struct_size(rct2_ride, 0x260);
 
+#pragma pack(push, 1)
+typedef struct rct2_research_item
+{
+    // Bit 16 (0: scenery entry, 1: ride entry)
+    union
+    {
+        sint32 rawValue;
+        struct
+        {
+            uint8 entryIndex;
+            uint8 baseRideType;
+            uint8 type; // 0: scenery entry, 1: ride entry
+            uint8 flags;
+        };
+    };
+    uint8 category;
+} rct2_research_item;
+assert_struct_size(rct2_research_item, 5);
+#pragma pack(pop)
 #ifdef __cplusplus
 
 /**

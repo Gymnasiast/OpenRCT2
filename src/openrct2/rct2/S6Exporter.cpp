@@ -700,7 +700,14 @@ void S6Exporter::ExportResearchedSceneryItems()
 
 void S6Exporter::ExportResearchList()
 {
-    memcpy(_s6.research_items, gResearchItems, sizeof(_s6.research_items));
+    for (size_t i = 0; i < RCT2_MAX_RESEARCH_ITEMS; i++)
+    {
+        _s6.research_items[i].entryIndex = gResearchItems[i].entryIndex;
+        _s6.research_items[i].baseRideType = gResearchItems[i].baseRideType;
+        _s6.research_items[i].type = gResearchItems[i].type;
+        _s6.research_items[i].flags = gResearchItems[i].flags;
+        _s6.research_items[i].category = gResearchItems[i].category;
+    }
 }
 
 extern "C"

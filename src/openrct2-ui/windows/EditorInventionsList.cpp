@@ -153,7 +153,7 @@ static rct_window_event_list window_editor_inventions_list_drag_events = {
 
 #pragma endregion
 
-static rct_research_item *_editorInventionsListDraggedItem;
+static ResearchItem * _editorInventionsListDraggedItem;
 
 static const rct_string_id EditorInventionsResearchCategories[] = {
     STR_RESEARCH_NEW_TRANSPORT_RIDES,
@@ -165,8 +165,8 @@ static const rct_string_id EditorInventionsResearchCategories[] = {
     STR_RESEARCH_NEW_SCENERY_AND_THEMING,
 };
 
-static void window_editor_inventions_list_drag_open(rct_research_item *researchItem);
-static void move_research_item(rct_research_item *beforeItem);
+static void window_editor_inventions_list_drag_open(ResearchItem *researchItem);
+static void move_research_item(ResearchItem *beforeItem);
 
 /**
  *
@@ -189,7 +189,7 @@ static void research_rides_setup(){
         Editor::SelectedObjects[OBJECT_TYPE_RIDE][ride->subtype] |= OBJECT_SELECTION_FLAG_SELECTED;
     }
 
-    for (rct_research_item* research = gResearchItems; research->rawValue != RESEARCHED_ITEMS_END; research++)
+    for (ResearchItem* research = gResearchItems; research->rawValue != RESEARCHED_ITEMS_END; research++)
     {
         if (research->flags & RESEARCH_ENTRY_FLAG_RIDE_ALWAYS_RESEARCHED)
             continue;
@@ -248,7 +248,7 @@ static void research_scenery_groups_setup()
         if (entry_type != OBJECT_TYPE_SCENERY_GROUP)
             continue;
 
-        rct_research_item* research = gResearchItems;
+        ResearchItem* research = gResearchItems;
         for (; research->rawValue != RESEARCHED_ITEMS_END; research++)
         {
             if ((research->rawValue & 0xFFFFFF) != entryIndex)
@@ -278,10 +278,10 @@ static void research_always_researched_setup()
  *
  *  rct2: 0x006855E7
  */
-static void move_research_item(rct_research_item *beforeItem)
+static void move_research_item(ResearchItem *beforeItem)
 {
     rct_window *w;
-    rct_research_item *researchItem, draggedItem;
+    ResearchItem *researchItem, draggedItem;
 
     if (_editorInventionsListDraggedItem + 1 == beforeItem)
         return;
@@ -319,9 +319,9 @@ static void move_research_item(rct_research_item *beforeItem)
  *
  *  rct2: 0x0068558E
  */
-static rct_research_item *window_editor_inventions_list_get_item_from_scroll_y(sint32 scrollIndex, sint32 y)
+static ResearchItem *window_editor_inventions_list_get_item_from_scroll_y(sint32 scrollIndex, sint32 y)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     researchItem = gResearchItems;
 
@@ -344,9 +344,9 @@ static rct_research_item *window_editor_inventions_list_get_item_from_scroll_y(s
  *
  *  rct2: 0x006855BB
  */
-static rct_research_item *window_editor_inventions_list_get_item_from_scroll_y_include_seps(sint32 scrollIndex, sint32 y)
+static ResearchItem *window_editor_inventions_list_get_item_from_scroll_y_include_seps(sint32 scrollIndex, sint32 y)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     researchItem = gResearchItems;
 
@@ -365,7 +365,7 @@ static rct_research_item *window_editor_inventions_list_get_item_from_scroll_y_i
     return researchItem;
 }
 
-static rct_research_item *get_research_item_at(sint32 x, sint32 y)
+static ResearchItem *get_research_item_at(sint32 x, sint32 y)
 {
     rct_window *w = window_find_by_class(WC_EDITOR_INVENTION_LIST);
     if (w != nullptr && w->x <= x && w->y < y && w->x + w->width > x && w->y + w->height > y) {
@@ -493,7 +493,7 @@ static void window_editor_inventions_list_update(rct_window *w)
  */
 static void window_editor_inventions_list_scrollgetheight(rct_window *w, sint32 scrollIndex, sint32 *width, sint32 *height)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     *height = 0;
 
@@ -517,7 +517,7 @@ static void window_editor_inventions_list_scrollgetheight(rct_window *w, sint32 
  */
 static void window_editor_inventions_list_scrollmousedown(rct_window *w, sint32 scrollIndex, sint32 x, sint32 y)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     researchItem = window_editor_inventions_list_get_item_from_scroll_y(scrollIndex, y);
     if (researchItem == nullptr)
@@ -536,7 +536,7 @@ static void window_editor_inventions_list_scrollmousedown(rct_window *w, sint32 
  */
 static void window_editor_inventions_list_scrollmouseover(rct_window *w, sint32 scrollIndex, sint32 x, sint32 y)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     researchItem = window_editor_inventions_list_get_item_from_scroll_y(scrollIndex, y);
     if (researchItem != w->research_item) {
@@ -560,7 +560,7 @@ static void window_editor_inventions_list_tooltip(rct_window* w, rct_widgetindex
  */
 static void window_editor_inventions_list_cursor(rct_window *w, rct_widgetindex widgetIndex, sint32 x, sint32 y, sint32 *cursorId)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
     sint32 scrollIndex;
 
     switch (widgetIndex) {
@@ -605,7 +605,7 @@ static void window_editor_inventions_list_invalidate(rct_window *w)
 static void window_editor_inventions_list_paint(rct_window *w, rct_drawpixelinfo *dpi)
 {
     rct_widget *widget;
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
     rct_string_id stringId;
     sint32 x, y, width;
 
@@ -691,7 +691,7 @@ static void window_editor_inventions_list_paint(rct_window *w, rct_drawpixelinfo
  */
 static void window_editor_inventions_list_scrollpaint(rct_window *w, rct_drawpixelinfo *dpi, sint32 scrollIndex)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
     sint32 left, top, bottom, itemY, disableItemMovement;
     sint32 researchItemEndMarker;
     rct_string_id stringId;
@@ -776,7 +776,7 @@ static void window_editor_inventions_list_scrollpaint(rct_window *w, rct_drawpix
  *
  *  rct2: 0x006852F4
  */
-static void window_editor_inventions_list_drag_open(rct_research_item *researchItem)
+static void window_editor_inventions_list_drag_open(ResearchItem *researchItem)
 {
     char buffer[256];
     sint32 stringWidth;
@@ -813,7 +813,7 @@ static void window_editor_inventions_list_drag_cursor(rct_window *w, rct_widgeti
 {
     rct_window *inventionListWindow = window_find_by_class(WC_EDITOR_INVENTION_LIST);
     if (inventionListWindow != nullptr) {
-        rct_research_item *researchItem = get_research_item_at(x, y);
+        ResearchItem *researchItem = get_research_item_at(x, y);
         if (researchItem != inventionListWindow->research_item) {
             inventionListWindow = (rct_window *)researchItem;
             window_invalidate(inventionListWindow);
@@ -829,7 +829,7 @@ static void window_editor_inventions_list_drag_cursor(rct_window *w, rct_widgeti
  */
 static void window_editor_inventions_list_drag_moved(rct_window* w, sint32 x, sint32 y)
 {
-    rct_research_item *researchItem;
+    ResearchItem *researchItem;
 
     researchItem = get_research_item_at(x, y);
     if (researchItem != nullptr)

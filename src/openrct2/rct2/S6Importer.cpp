@@ -746,7 +746,14 @@ public:
 
     void ImportResearchList()
     {
-        memcpy(gResearchItems, _s6.research_items, sizeof(_s6.research_items));
+        for (size_t i = 0; i < RCT2_MAX_RESEARCH_ITEMS; i++)
+        {
+            gResearchItems[i].entryIndex = _s6.research_items[i].entryIndex;
+            gResearchItems[i].baseRideType = _s6.research_items[i].baseRideType;
+            gResearchItems[i].type = _s6.research_items[i].type;
+            gResearchItems[i].flags = _s6.research_items[i].flags;
+            gResearchItems[i].category = _s6.research_items[i].category;
+        }
     }
 
     void Initialise()

@@ -299,7 +299,7 @@ typedef struct rct_window {
     union {                         // 0x494
         uint32 highlighted_item;
         uint16 ride_colour;
-        rct_research_item* research_item;
+        ResearchItem* research_item;
         rct_object_entry* object_entry;
         const scenario_index_entry* highlighted_scenario;
         struct {
