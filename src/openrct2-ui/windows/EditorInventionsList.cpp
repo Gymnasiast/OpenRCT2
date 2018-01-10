@@ -201,56 +201,26 @@ static void research_rides_setup(){
         uint8 ride_base_type = research->baseRideType;
 
         uint8 object_index = research->entryIndex;
-        rct_ride_entry* ride_entry = get_ride_entry(object_index);
+        rct_ride_entry * ride_entry = get_ride_entry(object_index);
 
-        bool master_found = false;
-        if (!(ride_entry->flags & RIDE_ENTRY_FLAG_SEPARATE_RIDE))
+        // If not in use
+        if (!(Editor::SelectedObjects[OBJECT_TYPE_RIDE][object_index] & OBJECT_SELECTION_FLAG_SELECTED))
         {
-            for (uint8 rideType = 0; rideType < object_entry_group_counts[OBJECT_TYPE_RIDE]; rideType++)
+            continue;
+        }
+
+        bool foundBaseType = false;
+        for (uint8 j = 0; j < MAX_RIDE_TYPES_PER_RIDE_ENTRY; j++)
+        {
+            if (ride_entry->ride_type[j] == ride_base_type)
             {
-                rct_ride_entry * master_ride = get_ride_entry(rideType);
-                if (master_ride == nullptr)
-                    continue;
-
-                if (master_ride->flags & RIDE_ENTRY_FLAG_SEPARATE_RIDE)
-                    continue;
-
-                // If master ride not in use
-                if (!(Editor::SelectedObjects[OBJECT_TYPE_RIDE][rideType] & OBJECT_SELECTION_FLAG_SELECTED))
-                    continue;
-
-                for (uint8 j = 0; j < MAX_RIDE_TYPES_PER_RIDE_ENTRY; j++)
-                {
-                    if (master_ride->ride_type[j] == ride_base_type)
-                    {
-                        master_found = true;
-                        break;
-                    }
-                }
-
-                if (master_found)
-                {
-                    break;
-                }
+                foundBaseType = true;
             }
         }
 
-        if (!master_found){
-            // If not in use
-            if (!(Editor::SelectedObjects[OBJECT_TYPE_RIDE][object_index] & OBJECT_SELECTION_FLAG_SELECTED)) {
-                continue;
-            }
-
-            bool foundBaseType = false;
-            for (uint8 j = 0; j < MAX_RIDE_TYPES_PER_RIDE_ENTRY; j++) {
-                if (ride_entry->ride_type[j] == ride_base_type) {
-                    foundBaseType = true;
-                }
-            }
-
-            if (!foundBaseType) {
-                continue;
-            }
+        if (!foundBaseType)
+        {
+            continue;
         }
 
         research->flags |= RESEARCH_ENTRY_FLAG_RIDE_ALWAYS_RESEARCHED;
