@@ -1627,17 +1627,22 @@ private:
                 dst->sprite_width = src->sprite_width;
                 dst->sprite_height_negative = src->sprite_height_negative;
                 dst->sprite_height_positive = src->sprite_height_positive;
+                dst->sprite_left = src->sprite_left;
+                dst->sprite_top = src->sprite_top;
+                dst->sprite_right = src->sprite_right;
+                dst->sprite_bottom = src->sprite_bottom;
+                dst->frame = src->frame;
 
                 sprite_move(src->x, src->y, src->z, (rct_sprite*)dst);
 
                 switch (src->misc_identifier) {
                 case SPRITE_MISC_STEAM_PARTICLE:
-                    ImportSteamParticle((rct_steam_particle *) dst, (rct_steam_particle *) src);
                     break;
                 case SPRITE_MISC_MONEY_EFFECT:
                     ImportMoneyEffect((rct_money_effect *) dst, (rct_money_effect *) src);
                     break;
                 case SPRITE_MISC_CRASHED_VEHICLE_PARTICLE:
+                    ImportCrashedVehicleParticle((rct_crashed_vehicle_particle *)dst, (rct_crashed_vehicle_particle *)src);
                     break;
                 case SPRITE_MISC_EXPLOSION_CLOUD:
                     break;
@@ -1671,9 +1676,19 @@ private:
         dst->wiggle = src->wiggle;
     }
 
-    void ImportSteamParticle(rct_steam_particle * dst, rct_steam_particle * src)
+    void ImportCrashedVehicleParticle(rct_crashed_vehicle_particle * dst, rct_crashed_vehicle_particle * src)
     {
-        dst->frame = src->frame;
+        // dst->name_string_idx
+        dst->time_to_live = src->time_to_live;
+        dst->colour[0] = RCT1::GetColour(src->colour[0]);
+        dst->colour[1] = RCT1::GetColour(src->colour[1]);
+        dst->crashed_sprite_base = src->crashed_sprite_base;
+        dst->velocity_x = src->velocity_x;
+        dst->velocity_y = src->velocity_y;
+        dst->velocity_z = src->velocity_z;
+        dst->acceleration_x = src->acceleration_x;
+        dst->acceleration_y = src->acceleration_y;
+        dst->acceleration_z = src->acceleration_z;
     }
 
     void ImportJumpingFountainWater(rct_jumping_fountain * dst, rct_jumping_fountain * src)
@@ -1681,7 +1696,6 @@ private:
         dst->fountain_flags = src->fountain_flags;
         dst->iteration = src->iteration;
         dst->num_ticks_alive = src->num_ticks_alive;
-        dst->frame = src->frame;
     }
 
     void ImportBalloon(rct_balloon * dst, rct_balloon * src)
