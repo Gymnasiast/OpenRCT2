@@ -5781,7 +5781,7 @@ void ride_set_name_to_track_default(Ride *ride, rct_ride_entry * rideEntry)
 
     if (RideGroupManager::RideTypeHasRideGroups(ride->type))
     {
-        const RideGroup * rideGroup = RideGroupManager::GetRideGroup(ride->type, rideEntry);
+        const RideGroup * rideGroup = RideObject::GetRideGroup(rideEntry);
         name_args.type_name = rideGroup->Naming.name;
     }
     else
@@ -5836,7 +5836,7 @@ rct_ride_name get_ride_naming(const uint8 rideType, rct_ride_entry * rideEntry)
 {
     if (RideGroupManager::RideTypeHasRideGroups(rideType))
     {
-        const RideGroup * rideGroup = RideGroupManager::GetRideGroup(rideType, rideEntry);
+        const RideGroup * rideGroup = RideObject::GetRideGroup(rideEntry);
         return rideGroup->Naming;
     }
     else if (!RideGroupManager::RideTypeIsIndependent(rideType))

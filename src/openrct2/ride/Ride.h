@@ -24,6 +24,7 @@
 #include "../world/Map.h"
 #include "RideRatings.h"
 #include "Vehicle.h"
+#include "RideGroupManager.h"
 
 #define MAX_RIDE_TYPES_PER_RIDE_ENTRY   3
 // The max number of different types of vehicle.
@@ -126,6 +127,7 @@ typedef struct rct_ride_entry {
     uint8 shop_item;                                    // 0x1C0
     uint8 shop_item_secondary;                          // 0x1C1
     rct_string_id capacity;
+    RideGroup * ride_group;
 } rct_ride_entry;
 
 #pragma pack(pop)

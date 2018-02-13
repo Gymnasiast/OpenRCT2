@@ -16,16 +16,16 @@
 
 #include <memory>
 #include <vector>
-#include "RideGroupManager.h"
 #include "../config/Config.h"
 #include "../core/String.hpp"
-
 #include "../localisation/StringIds.h"
 #include "../management/Research.h"
 #include "Ride.h"
 #include "RideData.h"
+#include "RideGroupManager.h"
 #include "Track.h"
 #include "TrackData.h"
+#include "../object/RideObject.h"
 
 static constexpr const RideGroup ride_group_corkscrew_rc = {
     /*.RideType =*/ RIDE_TYPE_CORKSCREW_ROLLER_COASTER,
@@ -198,7 +198,7 @@ bool RideGroupManager::RideGroupIsInvented(const RideGroup * rideGroup)
             continue;
 
         rct_ride_entry *rideEntry = get_ride_entry(rideEntryIndex);
-        const RideGroup * rideEntryRideGroup = GetRideGroup(rideGroup->RideType, rideEntry);
+        const RideGroup * rideEntryRideGroup = RideObject::GetRideGroup(rideEntry);
 
         if (!RideGroupsAreEqual(rideGroup, rideEntryRideGroup))
             continue;

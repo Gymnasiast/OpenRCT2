@@ -338,34 +338,7 @@ void RideObject::SetRepositoryItem(ObjectRepositoryItem * item) const
 
     uint8 flags = 0;
     item->RideFlags = flags;
-
-    // Find the first non-null ride type, to be used when checking the ride group
-    uint8 rideTypeIdx = ride_entry_get_first_non_null_ride_type((rct_ride_entry *)&_legacyType);
-
-    // Determines the ride group. Will fall back to 0 if there is none found.
-    uint8 rideGroupIndex = 0;
-
-    const RideGroup * rideGroup = RideGroupManager::GetRideGroup(rideTypeIdx, (rct_ride_entry *)&_legacyType);
-
-    // If the ride group is nullptr, the track type does not have ride groups.
-    if (rideGroup != nullptr)
-    {
-        for (uint8 i = rideGroupIndex + 1; i < MAX_RIDE_GROUPS_PER_RIDE_TYPE; i++)
-        {
-            const RideGroup * irg = RideGroupManager::RideGroupFind(rideTypeIdx, i);
-
-            if (irg != nullptr)
-            {
-                if (RideGroupManager::RideGroupsAreEqual(irg, rideGroup))
-                {
-                    rideGroupIndex = i;
-                    break;
-                }
-            }
-        }
-    }
-
-    item->RideGroupIndex = rideGroupIndex;
+    item->RideGroupIndex = FindRideGroupIndex();
 }
 
 void RideObject::ReadLegacyVehicle(IReadObjectContext * context, IStream * stream, rct_ride_entry_vehicle * vehicle)
@@ -531,4 +504,40 @@ uint8 RideObject::CalculateNumHorizontalFrames(const rct_ride_entry_vehicle * ve
     }
 
     return numHorizontalFrames;
+}
+
+uint8 RideObject::FindRideGroupIndex() const
+{
+    // Find the first non-null ride type, to be used when checking the ride group
+    const uint8 rideTypeIdx = ride_entry_get_first_non_null_ride_type(&_legacyType);
+
+    // Determines the ride group. Will fall back to 0 if there is none found.
+    uint8 rideGroupIndex = 0;
+
+    const RideGroup * rideGroup = RideGroupManager::GetRideGroup(rideTypeIdx, &_legacyType);
+
+    // If the ride group is nullptr, the track type does not have ride groups.
+    if (rideGroup != nullptr)
+    {
+        for (uint8 i = rideGroupIndex + 1; i < MAX_RIDE_GROUPS_PER_RIDE_TYPE; i++)
+        {
+            const RideGroup * irg = RideGroupManager::RideGroupFind(rideTypeIdx, i);
+
+            if (irg != nullptr)
+            {
+                if (RideGroupManager::RideGroupsAreEqual(irg, rideGroup))
+                {
+                    rideGroupIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    return rideGroupIndex;
+}
+
+const RideGroup * RideObject::GetRideGroup(const rct_ride_entry * rideEntry)
+{
+    return rideEntry->ride_group;
 }

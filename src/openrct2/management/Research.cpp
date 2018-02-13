@@ -213,7 +213,7 @@ void research_finish_item(rct_research_item * researchItem)
             // Determine if the ride group this entry belongs to was invented before.
             if (RideGroupManager::RideTypeHasRideGroups(base_ride_type))
             {
-                const RideGroup * rideGroup = RideGroupManager::GetRideGroup(base_ride_type, rideEntry);
+                const RideGroup * rideGroup = RideObject::GetRideGroup(rideEntry);
 
                 if (RideGroupManager::RideGroupIsInvented(rideGroup))
                 {

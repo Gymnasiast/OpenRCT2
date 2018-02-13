@@ -44,6 +44,8 @@ public:
     std::string GetCapacity() const;
 
     void SetRepositoryItem(ObjectRepositoryItem * item) const override;
+    uint8 FindRideGroupIndex() const;
+    static const RideGroup * GetRideGroup(const rct_ride_entry * rideEntry);
 
 private:
     void ReadLegacyVehicle(IReadObjectContext * context, IStream * stream, rct_ride_entry_vehicle * vehicle);

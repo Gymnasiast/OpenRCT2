@@ -38,6 +38,7 @@
 #include "Station.h"
 #include "Track.h"
 #include "TrackData.h"
+#include "../object/RideObject.h"
 
 uint8 gTrackGroundFlags;
 
@@ -1385,7 +1386,7 @@ static money32 track_place(sint32 rideIndex,
                 }
                 else if (RideGroupManager::RideTypeHasRideGroups(ride->type))
                 {
-                    const RideGroup * rideGroup = RideGroupManager::GetRideGroup(ride->type, rideEntry);
+                    const RideGroup * rideGroup = RideObject::GetRideGroup(rideEntry);
                     maxHeight = rideGroup->MaximumHeight;
                 }
                 else

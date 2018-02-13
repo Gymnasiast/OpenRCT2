@@ -2725,8 +2725,8 @@ static void window_ride_vehicle_mousedown(rct_window *w, rct_widgetindex widgetI
                 // Skip if vehicle does not belong to the same ride group
                 if (RideGroupManager::RideTypeHasRideGroups(ride->type) && !selectionShouldBeExpanded)
                 {
-                    rideGroup = RideGroupManager::GetRideGroup(ride->type, rideEntry);
-                    currentRideGroup = RideGroupManager::GetRideGroup(ride->type, currentRideEntry);
+                    rideGroup = RideObject::GetRideGroup(rideEntry);
+                    currentRideGroup = RideObject::GetRideGroup(currentRideEntry);
 
                     if (!RideGroupManager::RideGroupsAreEqual(rideGroup, currentRideGroup))
                         continue;

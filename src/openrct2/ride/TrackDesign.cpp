@@ -40,6 +40,7 @@
 #include "../world/Footpath.h"
 #include "../world/Scenery.h"
 #include "../world/SmallScenery.h"
+#include "../object/RideObject.h"
 
 typedef struct map_backup
 {
@@ -1893,7 +1894,7 @@ static money32 place_track_design(sint16 x, sint16 y, sint16 z, uint8 flags, uin
                     continue;
                 }
 
-                const RideGroup * irg = RideGroupManager::GetRideGroup(td6->type, ire);
+                const RideGroup * irg = RideObject::GetRideGroup(ire);
                 if (RideGroupManager::RideGroupsAreEqual(td6RideGroup, irg))
                 {
                     entryIndex = *rei;
