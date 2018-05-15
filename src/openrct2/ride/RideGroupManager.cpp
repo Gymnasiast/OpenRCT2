@@ -103,13 +103,6 @@ static constexpr const RideGroup car_ride_groups[MAX_RIDE_GROUPS_PER_RIDE_TYPE] 
 static constexpr const RideGroup twister_rc_groups[MAX_RIDE_GROUPS_PER_RIDE_TYPE] = { ride_group_steel_twister_rc, ride_group_hyper_twister };
 static constexpr const RideGroup steel_wild_mouse_groups[MAX_RIDE_GROUPS_PER_RIDE_TYPE] = { ride_group_steel_wild_mouse, ride_group_spinning_wild_mouse };
 
-bool RideGroup::Equals(const RideGroup* otherRideGroup) const
-{
-    return
-        this->Naming.name == otherRideGroup->Naming.name &&
-        this->Naming.description == otherRideGroup->Naming.description;
-}
-
 bool RideGroup::IsInvented() const
 {
     if (!ride_type_is_invented(this->RideType))
@@ -127,7 +120,7 @@ bool RideGroup::IsInvented() const
         rct_ride_entry *rideEntry = get_ride_entry(rideEntryIndex);
         const RideGroup * rideEntryRideGroup = RideGroupManager::GetRideGroup(this->RideType, rideEntry);
 
-        if (!this->Equals(rideEntryRideGroup))
+        if (this != rideEntryRideGroup)
             continue;
 
         // The ride entry is invented and belongs to the same ride group. This means the ride group is invented.

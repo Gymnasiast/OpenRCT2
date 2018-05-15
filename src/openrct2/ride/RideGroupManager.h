@@ -32,9 +32,18 @@ struct RideGroup
     uint64 AvailableTrackPieces;
     rct_ride_name Naming;
 
-    bool Equals(const RideGroup* otherRideGroup) const;
     bool IsInvented() const;
 };
+
+inline bool operator ==(const RideGroup& lhs, const RideGroup& rhs)
+{
+    return lhs.Naming == rhs.Naming;
+}
+
+inline bool operator !=(const RideGroup& lhs, const RideGroup& rhs)
+{
+    return !(lhs == rhs);
+}
 
 class RideGroupManager
 {

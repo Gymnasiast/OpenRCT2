@@ -92,6 +92,17 @@ struct rct_ride_name {
 };
 assert_struct_size(rct_ride_name, 4);
 
+inline bool operator ==(const rct_ride_name& lhs, const rct_ride_name& rhs)
+{
+    return lhs.name == rhs.name &&
+           lhs.description == rhs.description;
+}
+
+inline bool operator !=(const rct_ride_name& lhs, const rct_ride_name& rhs)
+{
+    return !(lhs == rhs);
+}
+
 /**
  * Ride type structure.
  * size: unknown
