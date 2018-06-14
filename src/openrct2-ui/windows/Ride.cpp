@@ -4813,7 +4813,8 @@ static constexpr const uint8 MusicStyleOrder[] = {
     MUSIC_STYLE_ICE,
     MUSIC_STYLE_MEDIEVAL,
     MUSIC_STYLE_URBAN,
-    MUSIC_STYLE_ORGAN
+    MUSIC_STYLE_ORGAN,
+    MUSIC_STYLE_FAIRGROUND_ORGAN,
 };
 
 static uint8 window_ride_current_music_style_order[42];
@@ -4886,17 +4887,17 @@ static void window_ride_music_mousedown(rct_window *w, rct_widgetindex widgetInd
     Ride *ride = get_ride(w->number);
 
     sint32 numItems = 0;
-    if (ride->type == RIDE_TYPE_MERRY_GO_ROUND) {
-        window_ride_current_music_style_order[numItems++] = MUSIC_STYLE_FAIRGROUND_ORGAN;
-    } else {
-        for (size_t n = 0; n < Util::CountOf(MusicStyleOrder); n++)
-            window_ride_current_music_style_order[numItems++] = MusicStyleOrder[n];
 
-        if (gRideMusicInfoList[36].length != 0)
-            window_ride_current_music_style_order[numItems++] = MUSIC_STYLE_CUSTOM_MUSIC_1;
-        if (gRideMusicInfoList[37].length != 0)
-            window_ride_current_music_style_order[numItems++] = MUSIC_STYLE_CUSTOM_MUSIC_2;
+    for (auto musicStyle : MusicStyleOrder)
+    {
+        window_ride_current_music_style_order[numItems++] = musicStyle;
     }
+
+    if (gRideMusicInfoList[36].length != 0)
+        window_ride_current_music_style_order[numItems++] = MUSIC_STYLE_CUSTOM_MUSIC_1;
+    if (gRideMusicInfoList[37].length != 0)
+        window_ride_current_music_style_order[numItems++] = MUSIC_STYLE_CUSTOM_MUSIC_2;
+
 
     for (i = 0; i < numItems; i++) {
         gDropdownItemsFormat[i] = STR_DROPDOWN_MENU_LABEL;
