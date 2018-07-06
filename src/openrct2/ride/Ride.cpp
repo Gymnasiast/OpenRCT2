@@ -8272,7 +8272,7 @@ void determine_ride_entrance_and_exit_locations()
                                 ride_set_exit_location(ride, stationIndex, { x, y, tileElement->base_height, (uint8_t)tile_element_get_direction(tileElement) });
                                 alreadyFoundExit = true;
 
-                                log_verbose("Fixed disconnected exit of ride %d, station %d to x = %d, y = %d and z = %d.", rideIndex, stationIndex, x, y, tileElement->base_height);
+                                log_info("Fixed disconnected exit of ride %d, station %d to x = %d, y = %d and z = %d.", rideIndex, stationIndex, x, y, tileElement->base_height);
                             }
                         }
                         while (!(tileElement++)->IsLastForTile());

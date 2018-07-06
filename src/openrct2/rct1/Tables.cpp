@@ -59,7 +59,7 @@ namespace RCT1
         };
         if (colour >= Util::CountOf(map))
         {
-            log_warning("Unsupported RCT1 colour.");
+            //log_warning("Unsupported RCT1 colour.");
             return COLOUR_BLACK;
         }
         return map[colour];
@@ -165,6 +165,9 @@ namespace RCT1
 
     uint8_t GetRideType(uint8_t rideType)
     {
+        if (rideType == 167)
+            return RCT1_RIDE_TYPE_INVERTED_ROLLER_COASTER;
+        
         static uint8_t map[] =
         {
             RIDE_TYPE_WOODEN_ROLLER_COASTER,
@@ -352,6 +355,9 @@ namespace RCT1
             { COPY_COLOUR_1, COPY_COLOUR_2, COLOUR_BLACK }, // RCT1_VEHICLE_TYPE_SUSPENDED_WILD_MOUSE_CARS, // Inverted Hairpin in RCT2
             { COPY_COLOUR_1, COPY_COLOUR_2, COLOUR_BLACK }, // RCT1_VEHICLE_TYPE_ENTERPRISE_WHEEL
         };
+        
+        if (vehicleType < 0 || vehicleType > Util::CountOf(map))
+            return map[0];
 
         Guard::ArgumentInRange<size_t>(vehicleType, 0, Util::CountOf(map), "Unsupported RCT1 vehicle type.");
         return map[vehicleType];

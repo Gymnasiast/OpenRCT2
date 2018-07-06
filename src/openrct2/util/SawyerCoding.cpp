@@ -376,6 +376,7 @@ int32_t sawyercoding_detect_file_type(const uint8_t *src, size_t length)
 
 int32_t sawyercoding_detect_rct1_version(int32_t gameVersion)
 {
+    return (FILE_VERSION_RCT1_LL | FILE_TYPE_SV4);
     int32_t fileType = (gameVersion) > 0 ? FILE_TYPE_SV4 : FILE_TYPE_SC4;
     gameVersion = abs(gameVersion);
 

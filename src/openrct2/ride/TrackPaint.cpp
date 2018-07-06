@@ -2171,7 +2171,7 @@ void track_paint(paint_session * session, uint8_t direction, int32_t height, con
     Ride * ride      = get_ride(rideIndex);
     if (ride->type == RIDE_TYPE_NULL)
     {
-        log_error("Attempted to paint invalid ride: %d", rideIndex);
+        //log_error("Attempted to paint invalid ride: %d", rideIndex);
         return;
     }
 

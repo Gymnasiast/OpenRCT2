@@ -107,7 +107,7 @@ class S4Importer final : public IParkImporter
 private:
     std::string  _s4Path;
     rct1_s4      _s4 = {};
-    uint8_t        _gameVersion = 0;
+    uint8_t        _gameVersion = 2;
     uint8_t        _parkValueConversionFactor = 0;
 
     // Lists of dynamic object entries
@@ -185,6 +185,7 @@ public:
     {
         Initialise();
 
+        PreFixRides();
         CreateAvailableObjectMappings();
         LoadObjects();
 
@@ -312,7 +313,7 @@ private:
             decodedSize = sawyercoding_decode_sv4(data.get(), decodedData.get(), dataSize, sizeof(rct1_s4));
         }
 
-        if (decodedSize == sizeof(rct1_s4))
+        if (true || decodedSize == sizeof(rct1_s4))
         {
             std::memcpy(s4.get(), decodedData.get(), sizeof(rct1_s4));
             return s4;
@@ -380,6 +381,154 @@ private:
         AddAvailableEntriesFromRides();
         AddAvailableEntriesFromSceneryGroups();
         AddEntryForWater();
+    }
+
+    void PreFixRides()
+    {
+        for (int32_t i = 0; i < RCT12_MAX_RIDES_IN_PARK; i++)
+        {
+            if (_s4.rides[i].operating_mode == RIDE_MODE_NORMAL)
+                _s4.rides[i].operating_mode = RIDE_MODE_CONTINUOUS_CIRCUIT;
+
+            _s4.rides[i].track_colour_supports[0] = 20; // Dark brown
+            _s4.rides[i].lifecycle_flags &= ~(RIDE_LIFECYCLE_CRASHED | RIDE_LIFECYCLE_BROKEN_DOWN | RIDE_LIFECYCLE_BREAKDOWN_PENDING);
+            _s4.rides[i].min_waiting_time = 5;
+            _s4.rides[i].max_waiting_time = 60;
+            _s4.rides[i].depart_flags = WAIT_FOR_LOAD_FULL;
+
+            memset(_s4.rides[i].entrance, 0, sizeof(_s4.rides[i].entrance));
+            memset(_s4.rides[i].exit, 0, sizeof(_s4.rides[i].exit));
+
+            _s4.rides[i].num_trains = std::max(_s4.rides[i].num_trains, (uint8_t)1);
+            _s4.rides[i].num_cars_per_train = std::max(_s4.rides[i].num_cars_per_train, (uint8_t)1);
+            _s4.rides[i].operation_option = std::max(_s4.rides[i].operation_option, (uint8_t)1);
+            //_s4.rides[i].num_stations = std::max(_s4.rides[i].num_stations, (uint8_t)1);
+
+            for (uint8_t j = 0; j < 4; j++)
+            {
+                _s4.rides[i].station_starts[j].xy = RCT_XY8_UNDEFINED;
+            }
+
+
+            if (_s4.rides[i].type >= RCT1_RIDE_TYPE_COUNT)
+                _s4.rides[i].type = RCT1_RIDE_TYPE_WOODEN_ROLLER_COASTER;
+
+            if (i == 72)
+            {
+                _s4.rides[i].type = RIDE_TYPE_DINGHY_SLIDE;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_DINGHIES;
+
+            }
+            if (i == 170 || i == 94)
+            {
+                _s4.rides[i].type = RIDE_TYPE_MINI_GOLF;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_GOLFERS;
+            }
+            if (i == 118 || i == 91 || i == 92 || i == 0 || i == 1 || i == 24)
+            {
+                _s4.rides[i].type = RIDE_TYPE_CORKSCREW_ROLLER_COASTER;
+                _s4.rides[i].operating_mode = RIDE_MODE_REVERSE_INCLINE_LAUNCHED_SHUTTLE;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_CORKSCREW_ROLLER_COASTER_TRAIN;
+            }
+            if (i == 41)
+            {
+                _s4.rides[i].type = RIDE_TYPE_CORKSCREW_ROLLER_COASTER;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_CORKSCREW_ROLLER_COASTER_TRAIN;
+            }
+            if (i == 134 || i == 128)
+            {
+                _s4.rides[i].type = RIDE_TYPE_GO_KARTS;
+            }
+            if (i == 101 || i == 171 || i == 82 || i == 75 || i == 14)
+            {
+                _s4.rides[i].type = RIDE_TYPE_OBSERVATION_TOWER;
+                _s4.rides[i].operating_mode = RIDE_MODE_ROTATING_LIFT;
+
+            }
+            if (i == 178 || i == 58 || i == 80 || i == 81 || i == 38 || i == 43 || i == 56)
+            {
+                _s4.rides[i].type = RIDE_TYPE_DODGEMS;
+                _s4.rides[i].track_colour_main[0] = 24;
+            }
+            if (i == 45 || i == 27 || i == 46)
+            {
+                _s4.rides[i].type = RIDE_TYPE_BOAT_HIRE;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_ROWING_BOATS;
+            }
+            if (i == 73)
+            {
+                _s4.rides[i].type = RIDE_TYPE_HEARTLINE_TWISTER_COASTER;
+            }
+            if (i == 78 || i == 158 || i == 177)
+            {
+                _s4.rides[i].type = RIDE_TYPE_SWINGING_SHIP;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_SWINGING_SHIP;
+                _s4.rides[i].operating_mode = RIDE_MODE_SWING;
+            }
+            if (i == 147 || i == 71 || i == 21)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_MINIATURE_RAILWAY;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_STEAM_TRAIN;
+            }
+            if (i == 169  || i == 26)
+            {
+                _s4.rides[i].type = RIDE_TYPE_CAR_RIDE;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_SPORTSCARS;
+                _s4.rides[i].track_colour_main[0] = 20; // Dark brown
+            }
+            if (i >= 129 && i <= 133 || i == 117 || i == 116 || i == 96 || i == 97)
+            {
+                _s4.rides[i].type = RIDE_TYPE_REVERSE_FREEFALL_COASTER;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_REVERSE_FREEFALL_ROLLER_COASTER_CAR;
+                _s4.rides[i].operating_mode = RIDE_MODE_LIM_POWERED_LAUNCH;
+
+                _s4.rides[i].track_colour_main[0] = 2;
+            }
+            if (i == 70 || i == 32)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_STEEL_TWISTER_ROLLER_COASTER;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_STEEL_TWISTER_ROLLER_COASTER_TRAIN;
+            }
+            if (i == 34 || i == 144 || i == 44 || i == 139 || i == 174 || i == 79 || i == 59 || i == 93 || i == 157 || i == 33 || i == 4 || i == 99 || i == 61)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_TWIST;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_TWIST_ARMS_AND_CARS;
+                _s4.rides[i].operating_mode = RIDE_MODE_ROTATION;
+                _s4.rides[i].track_colour_main[0] = 24;
+                _s4.rides[i].track_colour_additional[0] = 14;
+            }
+            if (i == 159 || i == 60 || i == 12)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_FERRIS_WHEEL;
+                _s4.rides[i].vehicle_type = RCT1_VEHICLE_TYPE_FERRIS_WHEEL;
+                _s4.rides[i].operating_mode = RIDE_MODE_FORWARD_ROTATION;
+            }
+            if (i == 5)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_STEEL_ROLLER_COASTER;
+            }
+            if (i == 13)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_STEEL_ROLLER_COASTER;
+                _s4.rides[i].operating_mode = RCT1_RIDE_MODE_POWERED_LAUNCH;
+            }
+            if (i == 2 || i == 35 || i == 137 || i == 106)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_INFORMATION_KIOSK;
+                _s4.rides[i].operating_mode = RIDE_MODE_SHOP_STALL;
+            }
+            if (i == 138)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_TOILETS;
+                _s4.rides[i].operating_mode = RIDE_MODE_SHOP_STALL;
+            }
+            if (i == 62)
+            {
+                _s4.rides[i].type = RCT1_RIDE_TYPE_SPIRAL_SLIDE;
+                _s4.rides[i].operating_mode = RIDE_MODE_SINGLE_RIDE_PER_ADMISSION;
+                _s4.rides[i].operation_option = 5;
+            }
+        }
     }
 
     void AddDefaultEntries()
@@ -599,6 +748,8 @@ private:
 
     void AddEntryForVehicleType(uint8_t rideType, uint8_t vehicleType)
     {
+        if (vehicleType >= Util::CountOf(_vehicleTypeToRideEntryMap))
+            return;
         assert(vehicleType < Util::CountOf(_vehicleTypeToRideEntryMap));
         if (_vehicleTypeToRideEntryMap[vehicleType] == 255)
         {
@@ -740,9 +891,18 @@ private:
         // This can happen with hacked parks
         if (rideEntry == nullptr)
         {
-            log_warning("Discarding ride with invalid ride entry");
-            dst->type = RIDE_TYPE_NULL;
-            return;
+//            log_warning("Discarding ride with invalid ride entry");
+//            dst->type = RIDE_TYPE_NULL;
+//            return;
+            dst->subtype = _vehicleTypeToRideEntryMap[0];
+            rideEntry = get_ride_entry(dst->subtype);
+            
+            if (rideEntry == nullptr)
+            {
+                log_warning("Really discarding ride with invalid ride entry");
+                dst->type = RIDE_TYPE_NULL;
+                return;
+            }
         }
 
         // Ride name
@@ -764,7 +924,7 @@ private:
             ride_set_name_to_default(dst, rideEntry);
         }
 
-        dst->status = src->status;
+        dst->status = RIDE_STATUS_CLOSED; //src->status;
 
         // Flags
         dst->lifecycle_flags = src->lifecycle_flags;
@@ -799,9 +959,9 @@ private:
             else
                 ride_set_exit_location(dst, i, { src->exit[i].x, src->exit[i].y, src->station_height[i] / 2, 0});
 
-            dst->queue_time[i] = src->queue_time[i];
-            dst->last_peep_in_queue[i] = src->last_peep_in_queue[i];
-            dst->queue_length[i] = src->num_peeps_in_queue[i];
+            dst->queue_time[i] = 0; //src->queue_time[i];
+            dst->last_peep_in_queue[i] = 0xFF; //src->last_peep_in_queue[i];
+            dst->queue_length[i] = 0; //src->num_peeps_in_queue[i];
 
             dst->time[i] = src->time[i];
             dst->length[i] = src->length[i];
@@ -1096,7 +1256,7 @@ private:
 
     void ImportSprites()
     {
-        ImportVehicles();
+        //ImportVehicles();
         ImportPeeps();
         ImportLitter();
         ImportMiscSprites();
@@ -1112,7 +1272,7 @@ private:
             if (_s4.sprites[i].unknown.sprite_identifier == SPRITE_IDENTIFIER_VEHICLE)
             {
                 rct1_vehicle * srcVehicle = &_s4.sprites[i].vehicle;
-                if (srcVehicle->x != LOCATION_NULL)
+                if (srcVehicle->x != LOCATION_NULL && get_ride(srcVehicle->ride) != nullptr)
                 {
                     rct_vehicle * vehicle = (rct_vehicle *)create_sprite(SPRITE_IDENTIFIER_VEHICLE);
                     spriteIndexMap[i] = vehicle->sprite_index;
@@ -1313,11 +1473,14 @@ private:
             if (_s4.sprites[i].unknown.sprite_identifier == SPRITE_IDENTIFIER_PEEP)
             {
                 rct1_peep * srcPeep = &_s4.sprites[i].peep;
-                rct_peep * peep = (rct_peep*)create_sprite(SPRITE_IDENTIFIER_PEEP);
-                move_sprite_to_list((rct_sprite*)peep, SPRITE_LIST_PEEP * 2);
-                spriteIndexMap[i] = peep->sprite_index;
+                if (srcPeep->state != PEEP_STATE_ON_RIDE && srcPeep->state != PEEP_STATE_QUEUING && srcPeep->state != PEEP_STATE_QUEUING_FRONT && srcPeep->state != PEEP_STATE_LEAVING_RIDE && srcPeep->state != PEEP_STATE_ENTERING_RIDE && srcPeep->state <= PEEP_STATE_INSPECTING)
+                {
+                    rct_peep * peep = (rct_peep*)create_sprite(SPRITE_IDENTIFIER_PEEP);
+                    move_sprite_to_list((rct_sprite*)peep, SPRITE_LIST_PEEP * 2);
+                    spriteIndexMap[i] = peep->sprite_index;
 
-                ImportPeep(peep, srcPeep);
+                    ImportPeep(peep, srcPeep);
+                }
             }
         }
         for (size_t i = 0; i < MAX_SPRITES; i++)
@@ -1756,14 +1919,19 @@ private:
 
     void ImportPeepSpawns()
     {
-        for (size_t i = 0; i < RCT12_MAX_PEEP_SPAWNS; i++)
-        {
-            gPeepSpawns[i] = {
-                _s4.peep_spawn[i].x, _s4.peep_spawn[i].y, _s4.peep_spawn[i].z * 16, _s4.peep_spawn[i].direction
-            };
-        }
+//        for (size_t i = 0; i < RCT12_MAX_PEEP_SPAWNS; i++)
+//        {
+//            gPeepSpawns[i] = {
+//                _s4.peep_spawn[i].x, _s4.peep_spawn[i].y, _s4.peep_spawn[i].z * 16, _s4.peep_spawn[i].direction
+//            };
+//        }
 
-        for (size_t i = RCT12_MAX_PEEP_SPAWNS; i < MAX_PEEP_SPAWNS; i++)
+        gPeepSpawns[0].x = (64 * 32) + 16;
+        gPeepSpawns[0].y = (127 * 32) - 1;
+        gPeepSpawns[0].z = 12 * 8;
+        gPeepSpawns[0].direction = 1;
+
+        for (size_t i = 1; i < MAX_PEEP_SPAWNS; i++)
         {
             gPeepSpawns[i].x = PEEP_SPAWN_UNDEFINED;
         }
@@ -1773,12 +1941,20 @@ private:
     {
         // This is sketchy, ideally we should try to re-create them
         rct_map_animation * s4Animations = _s4.map_animations;
+        uint16_t j = 0;
         for (size_t i = 0; i < RCT1_MAX_ANIMATED_OBJECTS; i++)
         {
-            gAnimatedObjects[i] = s4Animations[i];
-            gAnimatedObjects[i].baseZ /= 2;
+            if (s4Animations[i].type < MAP_ANIMATION_TYPE_COUNT &&
+                s4Animations[i].x != 0 &&
+                    s4Animations[i].y <= (128 * 32))
+            {
+                gAnimatedObjects[j] = s4Animations[i];
+                gAnimatedObjects[j].baseZ /= 2;
+                j++;
+            }
         }
-        gNumMapAnimations = _s4.num_map_animations;
+        gNumMapAnimations = j;
+        log_info("%d out of %d map animations imported.", j, _s4.num_map_animations);
     }
 
     void ImportFinance()
@@ -1787,12 +1963,12 @@ private:
         gLandPrice = _s4.land_price;
         gConstructionRightsPrice = _s4.construction_rights_price;
 
-        gCash = _s4.cash;
-        gBankLoan = _s4.loan;
-        gMaxBankLoan = _s4.max_loan;
+        gCash = MONEY(100000,00); // _s4.cash;
+        gBankLoan = 0; //_s4.loan;
+        gMaxBankLoan = 0; //_s4.max_loan;
         // It's more like 1.33%, but we can only use integers. Can be fixed once we have our own save format.
         gBankLoanInterestRate = 1;
-        gInitialCash = _s4.cash;
+        gInitialCash = MONEY(100000,00); //_s4.cash;
 
         gCompanyValue = _s4.company_value;
         gParkValue = CorrectRCT1ParkValue(_s4.park_value);
@@ -2248,6 +2424,8 @@ private:
             gParkFlags |= PARK_FLAGS_NO_MONEY_SCENARIO;
         }
 
+        gParkFlags += PARK_FLAGS_PARK_OPEN;
+
         gParkSize = _s4.park_size;
         gTotalRideValueForMoney = _s4.total_ride_value_for_money;
     }
@@ -2370,8 +2548,8 @@ private:
 
     void ImportSavedView()
     {
-        gSavedViewX = _s4.view_x;
-        gSavedViewY = _s4.view_y;
+        gSavedViewX = 64 * 32; // _s4.view_x;
+        gSavedViewY = 64 * 32; //_s4.view_y;
         gSavedViewZoom = _s4.view_zoom;
         gSavedViewRotation = _s4.view_rotation;
     }
@@ -2733,6 +2911,40 @@ private:
                 scenery_large_set_type(tileElement, _largeSceneryTypeToEntryMap[type]);
                 break;
             }
+            case TILE_ELEMENT_TYPE_TRACK:
+            {
+                uint8_t rideIndex = tile_element_get_ride_index(tileElement);
+                uint8_t sequenceIndex = tile_element_get_track_sequence(tileElement);
+                uint8_t trackIndex = track_element_get_type(tileElement);
+
+                Ride* ride = get_ride(rideIndex);
+                if (!ride_type_has_flag(ride->type, RIDE_TYPE_FLAG_HAS_TRACK))
+                {
+                    if (sequenceIndex == 0)
+                    {
+                        ride->station_starts[0].x = it.x;
+                        ride->station_starts[0].y = it.y;
+                        ride->station_heights[0] = tileElement->base_height;
+                    }
+                }
+                else if (trackIndex == TRACK_ELEM_END_STATION)
+                {
+                    uint8_t stationIndex = tile_element_get_station(tileElement);
+                    ride->station_starts[stationIndex].x = it.x;
+                    ride->station_starts[stationIndex].y = it.y;
+                    ride->station_heights[stationIndex] = tileElement->base_height;
+                }
+                break;
+            }
+            case TILE_ELEMENT_TYPE_ENTRANCE:
+                if (entrance_element_get_type(tileElement) != ENTRANCE_TYPE_PARK_ENTRANCE)
+                {
+                    uint8_t rideIndex = tile_element_get_ride_index(tileElement);
+                    uint8_t stationIndex = tile_element_get_station(tileElement);
+
+                    Ride* ride = get_ride(rideIndex);
+                    ride->num_stations = std::max(ride->num_stations, uint8_t(stationIndex + 1));
+                }
             }
         }
     }

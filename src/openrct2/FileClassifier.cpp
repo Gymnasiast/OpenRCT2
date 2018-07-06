@@ -102,9 +102,9 @@ static bool TryClassifyAsS4(IStream * stream, ClassifiedFileInfo * result)
         int32_t fileTypeVersion = sawyercoding_detect_file_type(data.get(), dataLength);
 
         int32_t type = fileTypeVersion & FILE_TYPE_MASK;
-        int32_t version = fileTypeVersion & FILE_VERSION_MASK;
+        int32_t version = 2; //fileTypeVersion & FILE_VERSION_MASK;
 
-        if (type == FILE_TYPE_SV4)
+        if (true || type == FILE_TYPE_SV4)
         {
             result->Type = FILE_TYPE::SAVED_GAME;
             result->Version = version;
