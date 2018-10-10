@@ -165,6 +165,12 @@ void map_invalidate_selection_rect();
 void map_reorganise_elements();
 bool map_check_free_elements_and_reorganise(int32_t num_elements);
 rct_tile_element* tile_element_insert(int32_t x, int32_t y, int32_t z, int32_t flags);
+template<typename TType, TileElementType TClass> TType* tile_element_insert_type(int32_t x, int32_t y, int32_t z, int32_t flags)
+{
+    rct_tile_element* tileElement = tile_element_insert(x, y, z, flags);
+    tileElement->SetType((uint8_t)TClass);
+    return (TType*)tileElement;
+}
 
 using CLEAR_FUNC = int32_t (*)(rct_tile_element** tile_element, int32_t x, int32_t y, uint8_t flags, money32* price);
 
