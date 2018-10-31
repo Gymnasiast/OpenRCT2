@@ -1572,9 +1572,18 @@ static void window_park_objective_paint(rct_window* w, rct_drawpixelinfo* dpi)
     y += LIST_ROW_HEIGHT;
 
     // Objective
-    set_format_arg(0, uint16_t, gScenarioObjectiveNumGuests);
-    set_format_arg(2, int16_t, date_get_total_months(MONTH_OCTOBER, gScenarioObjectiveYear));
-    set_format_arg(4, money32, gScenarioObjectiveCurrency);
+    if (gScenarioObjectiveType == OBJECTIVE_BUILD_THE_BEST)
+    {
+        auto rideEntry = get_ride_entry(0);
+        const auto naming = get_ride_naming(ride_entry_get_first_non_null_ride_type(rideEntry), rideEntry);
+        set_format_arg(0, rct_string_id, naming.name);
+    }
+    else
+    {
+        set_format_arg(0, uint16_t, gScenarioObjectiveNumGuests);
+        set_format_arg(2, int16_t, date_get_total_months(MONTH_OCTOBER, gScenarioObjectiveYear));
+        set_format_arg(4, money32, gScenarioObjectiveCurrency);
+    }
 
     y += gfx_draw_string_left_wrapped(dpi, gCommonFormatArgs, x, y, 221, ObjectiveNames[gScenarioObjectiveType], COLOUR_BLACK);
     y += 5;

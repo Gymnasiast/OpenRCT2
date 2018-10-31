@@ -496,9 +496,17 @@ static void window_scenarioselect_paint(rct_window* w, rct_drawpixelinfo* dpi)
 
     // Scenario objective
     set_format_arg(0, rct_string_id, ObjectiveNames[scenario->objective_type]);
-    set_format_arg(2, int16_t, scenario->objective_arg_3);
-    set_format_arg(4, int16_t, date_get_total_months(MONTH_OCTOBER, scenario->objective_arg_1));
-    set_format_arg(6, int32_t, scenario->objective_arg_2);
+    if (gScenarioObjectiveType == OBJECTIVE_BUILD_THE_BEST)
+    {
+        // TODO: Replace!!!!
+        set_format_arg(2, rct_string_id, 5203);
+    }
+    else
+    {
+        set_format_arg(2, int16_t, scenario->objective_arg_3);
+        set_format_arg(4, int16_t, date_get_total_months(MONTH_OCTOBER, scenario->objective_arg_1));
+        set_format_arg(6, int32_t, scenario->objective_arg_2);
+    }
     y += gfx_draw_string_left_wrapped(dpi, gCommonFormatArgs, x, y, 170, STR_OBJECTIVE, COLOUR_BLACK) + 5;
 
     // Scenario score
