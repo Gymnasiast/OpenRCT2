@@ -603,6 +603,7 @@ enum
 
 enum
 {
+    TILE_ELEMENT_FLAG_DRAW_PATH_OVER_SUPPORTS = (1 << 3),
     TILE_ELEMENT_FLAG_GHOST = (1 << 4),
     TILE_ELEMENT_FLAG_LAST_TILE = (1 << 7)
 };
