@@ -315,7 +315,7 @@ void ImageTable::Read(IReadObjectContext* context, OpenRCT2::IStream* stream)
         uint64_t remainingBytes = stream->GetLength() - stream->GetPosition() - headerTableSize;
         if (remainingBytes > imageDataSize)
         {
-            context->LogWarning(ObjectError::BadImageTable, "Image table size longer than expected.");
+            // context->LogWarning(ObjectError::BadImageTable, "Image table size longer than expected.");
             imageDataSize = static_cast<uint32_t>(remainingBytes);
         }
 
@@ -323,7 +323,7 @@ void ImageTable::Read(IReadObjectContext* context, OpenRCT2::IStream* stream)
         auto data = std::make_unique<uint8_t[]>(dataSize);
         if (data == nullptr)
         {
-            context->LogError(ObjectError::BadImageTable, "Image table too large.");
+            // context->LogError(ObjectError::BadImageTable, "Image table too large.");
             throw std::runtime_error("Image table too large.");
         }
 
@@ -355,7 +355,7 @@ void ImageTable::Read(IReadObjectContext* context, OpenRCT2::IStream* stream)
         if (unreadBytes > 0)
         {
             std::fill_n(data.get() + readBytes, unreadBytes, 0);
-            context->LogWarning(ObjectError::BadImageTable, "Image table size shorter than expected.");
+            // context->LogWarning(ObjectError::BadImageTable, "Image table size shorter than expected.");
         }
 
         _data = std::move(data);

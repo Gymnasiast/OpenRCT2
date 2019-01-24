@@ -430,8 +430,8 @@ private:
         }
         else
         {
-            Console::Error::WriteLine("Object conflict: '%s'", conflict->Path.c_str());
-            Console::Error::WriteLine("               : '%s'", item.Path.c_str());
+            // Console::Error::WriteLine("Object conflict: '%s'", conflict->Path.c_str());
+            // Console::Error::WriteLine("               : '%s'", item.Path.c_str());
             return false;
         }
     }

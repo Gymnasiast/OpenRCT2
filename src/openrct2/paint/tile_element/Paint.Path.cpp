@@ -428,7 +428,7 @@ static void sub_6A4101(
 
         CoordsXYZ boundBoxOffsets = CoordsXYZ(BannerBoundBoxes[direction][0], height + 2);
 
-        uint32_t imageId = (direction << 1) + base_image_id + 28;
+        uint32_t imageId = ((direction << 1) + base_image_id + 28) | CONSTRUCTION_MARKER;
 
         // Draw pole in the back
         PaintAddImageAsParent(

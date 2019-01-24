@@ -29,6 +29,7 @@
 #include "Object.h"
 #include "ObjectLimits.h"
 #include "ObjectList.h"
+#include "PathRailingsObject.h"
 #include "RideObject.h"
 #include "SceneryGroupObject.h"
 #include "SmallSceneryObject.h"
@@ -341,6 +342,9 @@ namespace ObjectFactory
             case ObjectType::Music:
                 result = std::make_unique<MusicObject>(entry);
                 break;
+            case ObjectType::PathRailings:
+                result = std::make_unique<PathRailingsObject>(entry);
+                break;
             default:
                 throw std::runtime_error("Invalid object type");
         }
@@ -377,6 +381,8 @@ namespace ObjectFactory
             return ObjectType::Station;
         if (s == "music")
             return ObjectType::Music;
+        if (s == "footpath_railings")
+            return ObjectType::PathRailings;
         return ObjectType::None;
     }
 
