@@ -21,6 +21,7 @@
 #include "../RideData.h"
 #include "../TrackData.h"
 #include "../TrackPaint.h"
+#include "../../object/StationObject.h"
 
 #include <algorithm>
 
@@ -1647,13 +1648,17 @@ void junior_rc_paint_station(
     uint32_t imageId;
 
     bool isBraked = tileElement->AsTrack()->BlockBrakeClosed();
+    auto stationObj = ride_get_station_object(get_ride(rideIndex));
 
     if (direction == 0 || direction == 2)
     {
-        // height -= 2 (height - 2)
-        imageId = SPR_STATION_BASE_B_SW_NE | session->TrackColours[SCHEME_MISC];
-        sub_98197C(session, imageId, 0, 0, 32, 28, 1, height - 2, 0, 2, height);
-
+        if (!(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
+        {
+            // height -= 2 (height - 2)
+            imageId = SPR_STATION_BASE_B_SW_NE | session->TrackColours[SCHEME_MISC];
+            sub_98197C(session, imageId, 0, 0, 32, 28, 1, height - 2, 0, 2, height);
+        }
+        
         // height += 2 (height)
         if (tileElement->AsTrack()->GetTrackType() == TRACK_ELEM_END_STATION && rideType == RIDE_TYPE_JUNIOR_ROLLER_COASTER)
         {
@@ -1672,9 +1677,12 @@ void junior_rc_paint_station(
     }
     else if (direction == 1 || direction == 3)
     {
-        // height -= 2 (height - 2)
-        imageId = SPR_STATION_BASE_B_NW_SE | session->TrackColours[SCHEME_MISC];
-        sub_98197C(session, imageId, 0, 0, 28, 32, 1, height - 2, 2, 0, height);
+        if (!(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
+        {
+            // height -= 2 (height - 2)
+            imageId = SPR_STATION_BASE_B_NW_SE | session->TrackColours[SCHEME_MISC];
+            sub_98197C(session, imageId, 0, 0, 28, 32, 1, height - 2, 2, 0, height);   
+        }
 
         // height += 2 (height)
         if (tileElement->AsTrack()->GetTrackType() == TRACK_ELEM_END_STATION && rideType == RIDE_TYPE_JUNIOR_ROLLER_COASTER)

@@ -13,6 +13,7 @@
 #include "../../world/Sprite.h"
 #include "../Track.h"
 #include "../TrackPaint.h"
+#include "../../object/StationObject.h"
 
 /** rct2: 0x0142805C */
 static constexpr const uint32_t merry_go_round_rider_offsets[] = { 0, 32, 64, 96, 16, 48, 80, 112 };
@@ -115,11 +116,15 @@ static void paint_merry_go_round(
 
     wooden_a_supports_paint_setup(session, (direction & 1), 0, height, session->TrackColours[SCHEME_MISC], nullptr);
 
-    track_paint_util_paint_floor(session, edges, session->TrackColours[SCHEME_TRACK], height, floorSpritesCork);
+    auto stationObj = ride_get_station_object(ride);
+    if (!(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
+    {
+        track_paint_util_paint_floor(session, edges, session->TrackColours[SCHEME_TRACK], height, floorSpritesCork);
 
-    track_paint_util_paint_fences(
-        session, edges, position, tileElement, ride, session->TrackColours[SCHEME_MISC], height, fenceSpritesRope,
-        session->CurrentRotation);
+        track_paint_util_paint_fences(
+            session, edges, position, tileElement, ride, session->TrackColours[SCHEME_MISC], height, fenceSpritesRope,
+            session->CurrentRotation);    
+    }
 
     switch (trackSequence)
     {

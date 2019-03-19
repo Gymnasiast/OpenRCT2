@@ -88,7 +88,8 @@ void StationObject::ReadJson(IReadObjectContext* context, const json_t* root)
         properties,
         { { "hasPrimaryColour", STATION_OBJECT_FLAGS::HAS_PRIMARY_COLOUR },
           { "hasSecondaryColour", STATION_OBJECT_FLAGS::HAS_SECONDARY_COLOUR },
-          { "isTransparent", STATION_OBJECT_FLAGS::IS_TRANSPARENT } });
+          { "isTransparent", STATION_OBJECT_FLAGS::IS_TRANSPARENT },
+          { "noPlatforms", STATION_OBJECT_FLAGS::NO_PLATFORMS } });
 
     ObjectJsonHelpers::LoadStrings(root, GetStringTable());
     ObjectJsonHelpers::LoadImages(context, root, GetImageTable());
