@@ -16,6 +16,7 @@
 #include "../Track.h"
 #include "../TrackPaint.h"
 #include "../VehiclePaint.h"
+#include "../../object/StationObject.h"
 
 enum
 {
@@ -460,13 +461,14 @@ static void paint_monorail_station(
     const TileElement* tileElement)
 {
     uint32_t imageId;
+    StationObject* stationObj = ride_get_station_object(get_ride(rideIndex));
 
-    if (direction == 0 || direction == 2)
+    if ((direction == 0 || direction == 2) && !(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
     {
         imageId = SPR_STATION_BASE_B_SW_NE | session->TrackColours[SCHEME_MISC];
         sub_98197C(session, imageId, 0, 0, 32, 28, 2, height - 2, 0, 2, height);
     }
-    else if (direction == 1 || direction == 3)
+    else if ((direction == 1 || direction == 3) && !(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
     {
         imageId = SPR_STATION_BASE_B_NW_SE | session->TrackColours[SCHEME_MISC];
         sub_98197C(session, imageId, 0, 0, 28, 32, 2, height - 2, 2, 0, height);
@@ -491,15 +493,18 @@ static void paint_monorail_station(
         paint_util_push_tunnel_right(session, height, TUNNEL_6);
     }
 
-    if (direction == 0 || direction == 2)
+    if (!(stationObj->Flags & STATION_OBJECT_FLAGS::NO_PLATFORMS))
     {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-    }
-    else
-    {
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 6, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
-        metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        if (direction == 0 || direction == 2)
+        {
+            metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 5, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 8, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        }
+        else
+        {
+            metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 6, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+            metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 7, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
+        }    
     }
 
     track_paint_util_draw_station(session, rideIndex, direction, height, tileElement);
