@@ -653,10 +653,7 @@ private:
         return input;
 #else
         UErrorCode err = (UErrorCode)0;
-        // Force a hard left-to-right at the beginning (will mess up mixed strings' word order otherwise)
-        std::string text2 = std::string(u8"\xE2\x80\xAA") + input;
-
-        icu::UnicodeString ustr = icu::UnicodeString::fromUTF8(icu::StringPiece(text2));
+        icu::UnicodeString ustr = icu::UnicodeString::fromUTF8(icu::StringPiece(input));
 
         int32_t length = ustr.length();
         icu::UnicodeString reordered;
