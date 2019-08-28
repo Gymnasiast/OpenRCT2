@@ -1992,31 +1992,50 @@ private:
 
     void ImportTileElements()
     {
-        gMapBaseZ = 7;
-
-        for (uint32_t index = 0, dstOffset = 0; index < RCT1_MAX_TILE_ELEMENTS; index++)
+        // Build tile pointer cache (needed to get the first element at a certain location)
+        RCT12TileElement* tilePointers[MAX_TILE_TILE_ELEMENT_POINTERS];
+        for (size_t i = 0; i < MAX_TILE_TILE_ELEMENT_POINTERS; i++)
         {
-            auto src = &_s4.tile_elements[index];
-            auto dst = &gTileElements[index + dstOffset];
-            if (src->base_height == 0xFF)
-            {
-                std::memcpy(dst, src, sizeof(*src));
-            }
-            else
-            {
-                ImportTileElement(dst, src);
-            }
+            tilePointers[i] = TILE_UNDEFINED_TILE_ELEMENT;
         }
 
-        ClearExtraTileEntries();
+        RCT12TileElement* tileElement = _s4.tile_elements;
+        RCT12TileElement** tile = tilePointers;
+        for (size_t y = 0; y < RCT1_MAX_MAP_SIZE; y++)
+        {
+            for (size_t x = 0; x < RCT1_MAX_MAP_SIZE; x++)
+            {
+                *tile++ = tileElement;
+                while (!(tileElement++)->IsLastForTile())
+                    ;
+            }
+        }
+        
+        for (int32_t y = 0; y < RCT1_MAX_MAP_SIZE; y++)
+        {
+            for (int32_t x = 0; x < RCT1_MAX_MAP_SIZE; x++)
+            {
+                // This is the equivalent of map_get_first_element_at(x, y), but on S4 data.
+                RCT12TileElement* src = tilePointers[x + y * RCT1_MAX_MAP_SIZE];
+                do
+                {
+                    if (src->base_height != 0xFF)
+                        ImportTileElement(src, { x, y });
+                }
+                while (!(src++)->IsLastForTile());
+            }
+        }
+        
+        //ClearExtraTileEntries();
         FixWalls();
         FixEntrancePositions();
     }
 
-    void ImportTileElement(TileElement* dst, const RCT12TileElement* src)
+    void ImportTileElement(const RCT12TileElement* src, TileCoordsXY coordsXy)
     {
         // Todo: allow for changing definition of OpenRCT2 tile element types - replace with a map
         uint8_t tileElementType = src->GetType();
+        auto dst = tile_element_insert({ coordsXy.x, coordsXy.y, src->base_height / 2}, src->flags & TILE_ELEMENT_OCCUPIED_QUADRANTS_MASK);
         dst->ClearAs(tileElementType);
         dst->SetDirection(src->GetDirection());
         dst->flags = src->flags;
