@@ -2033,12 +2033,18 @@ private:
 
     void ImportTileElement(const RCT12TileElement* src, TileCoordsXY coordsXy)
     {
+        TileElement* dst;
         // Todo: allow for changing definition of OpenRCT2 tile element types - replace with a map
         uint8_t tileElementType = src->GetType();
-        auto dst = tile_element_insert({ coordsXy.x, coordsXy.y, src->base_height / 2}, src->flags & TILE_ELEMENT_OCCUPIED_QUADRANTS_MASK);
-        dst->ClearAs(tileElementType);
+        if (tileElementType == TILE_ELEMENT_TYPE_SURFACE)
+            dst = reinterpret_cast<TileElement*>(map_get_surface_element_at({ coordsXy.x * 32, coordsXy.y * 32 }));
+        else
+            dst = tile_element_insert(
+                { coordsXy.x, coordsXy.y, src->base_height / 2 }, src->flags & TILE_ELEMENT_OCCUPIED_QUADRANTS_MASK);
+
+        dst->SetType(tileElementType);
         dst->SetDirection(src->GetDirection());
-        dst->flags = src->flags;
+        dst->flags |= (src->flags & ~TILE_ELEMENT_FLAG_LAST_TILE);
         dst->base_height = src->base_height / 2;
         dst->clearance_height = src->clearance_height / 2;
 
