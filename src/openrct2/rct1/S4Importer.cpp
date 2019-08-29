@@ -2025,9 +2025,9 @@ private:
                 while (!(src++)->IsLastForTile());
             }
         }
-        
-        //ClearExtraTileEntries();
-        FixWalls();
+
+        // ClearExtraTileEntries();
+        // FixWalls();
         FixEntrancePositions();
     }
 
@@ -2217,13 +2217,41 @@ private:
             }
             case TILE_ELEMENT_TYPE_WALL:
             {
-                auto dst2 = dst->AsWall();
+                bool createNewDst = false;
                 auto src2 = src->AsWall();
 
-                dst2->SetEntryIndex(src2->GetEntryIndex());
-                dst2->SetSlope(src2->GetSlope());
-                dst2->SetPrimaryColour(RCT1::GetColour(src2->GetRCT1WallColour()));
-                dst2->SetRawRCT1Data(src2->GetRawRCT1WallTypeData());
+                for (int32_t edge = 0; edge < 4; edge++)
+                {
+                    int32_t type = src2->GetRCT1WallType(edge);
+
+                    if (type != -1)
+                    {
+                        if (createNewDst)
+                        {
+                            dst = tile_element_insert(
+                                { coordsXy.x, coordsXy.y, src->base_height / 2 },
+                                src->flags & TILE_ELEMENT_OCCUPIED_QUADRANTS_MASK);
+                            dst->SetType(TILE_ELEMENT_TYPE_WALL);
+                        }
+                        createNewDst = true;
+
+                        int32_t colourA = RCT1::GetColour(src2->GetRCT1WallColour());
+                        int32_t colourB = COLOUR_BLACK;
+                        ConvertWall(&type, &colourA, &colourB);
+
+                        type = _wallTypeToEntryMap[type];
+
+                        auto dst2 = dst->AsWall();
+                        dst2->SetEntryIndex(type);
+                        dst2->SetDirection(edge);
+                        // Still need to convert to wall slope
+                        auto slope = map_get_surface_element_at({ coordsXy.x * 32, coordsXy.y * 32 })->GetSlope();
+                        dst2->SetSlope(slope);
+                        dst2->SetPrimaryColour(colourA);
+                        dst2->SetSecondaryColour(colourB);
+                        dst2->SetTertiaryColour(COLOUR_BLACK);
+                    }
+                }
 
                 break;
             }
