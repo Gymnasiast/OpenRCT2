@@ -70,7 +70,7 @@ endif ()
 # Outputs
 set(PROJECT libopenrct2)
 project(${PROJECT} CXX)
-add_library(${PROJECT} ${OPENRCT2_CORE_SOURCES} ${OPENRCT2_CORE_MM_SOURCES} ${RCT2_SECTIONS})
+add_library(${PROJECT} ${OPENRCT2_CORE_SOURCES} ${OPENRCT2_CORE_MM_SOURCES})
 set_target_properties(${PROJECT} PROPERTIES PREFIX "")
 
 # Libraries
@@ -85,6 +85,11 @@ else ()
                                      ${ZLIB_LIBRARIES}
                                      ${LIBZIP_LIBRARIES})
 endif ()
+
+if (MINGW)
+    # Hardcode libraries used by libzip on mingw
+    target_link_libraries(${PROJECT_NAME} crypto ws2_32)
+endif()
 
 if (UNIX AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "BSD")
     # Include libdl for dlopen

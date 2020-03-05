@@ -77,6 +77,21 @@ if (WIN32)
     # mingw complains about "%zu" not being a valid format specifier for printf, unless we
     # tell it that it is
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__USE_MINGW_ANSI_STDIO=1")
+    target_link_libraries(${PROJECT} comdlg32)
+    if (MSVC)
+        target_link_libraries(${PROJECT} SDL2::SDL2-static)
+        target_include_directories(${PROJECT} SYSTEM PRIVATE SDL2::SDL2-static)
+    else ()
+        # mingw does not provide proper CMake information like other configurations
+        find_path(SDL2_INCLUDE_DIRS SDL2/SDL.h)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            find_library(SDL2_LDFLAGS sdl2d)
+        else ()
+            find_library(SDL2_LDFLAGS sdl2)
+        endif ()
+         # Hardcode some of the libraries used by mingw builds
+        target_link_libraries(${PROJECT} imm32 winmm setupapi version)
+    endif ()
 endif ()
 if (MSVC)
     # Add DPI-aware manifest

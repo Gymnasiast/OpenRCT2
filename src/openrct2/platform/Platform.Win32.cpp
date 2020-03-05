@@ -22,12 +22,14 @@
 #include <shlobj.h>
 #undef GetEnvironmentVariable
 
-#if !defined(__MINGW32__) && ((NTDDI_VERSION >= NTDDI_VISTA) && !defined(_USING_V110_SDK71_) && !defined(_ATL_XP_TARGETING))
-    #define __USE_SHGETKNOWNFOLDERPATH__
-    #define __USE_GETDATEFORMATEX__
-#else
-    #define ENABLE_VIRTUAL_TERMINAL_PROCESSING  0x0004
-#endif
+#    if !defined(__MINGW32__) && ((NTDDI_VERSION >= NTDDI_VISTA) && !defined(_USING_V110_SDK71_) && !defined(_ATL_XP_TARGETING))
+#        define __USE_SHGETKNOWNFOLDERPATH__
+#        define __USE_GETDATEFORMATEX__
+#    else
+#        ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#            define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#        endif
+#    endif
 
 #include "../core/Path.hpp"
 #include "../core/String.hpp"

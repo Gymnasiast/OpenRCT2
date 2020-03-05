@@ -16,10 +16,10 @@
 
 #ifdef _WIN32
 
-#ifdef __MINGW32__
+#    if defined(__MINGW32__) && !defined(WINVER) && !defined(_WIN32_WINNT)
 // 0x0600 == vista
-#define WINVER 0x0501
-#define _WIN32_WINNT 0x0501
+#define WINVER 0x0600
+#define _WIN32_WINNT 0x0600
 #endif // __MINGW32__
 
 #include <sstream>
