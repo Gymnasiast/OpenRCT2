@@ -411,7 +411,7 @@ namespace ObjectJsonHelpers
                 auto image = Imaging::ReadFromBuffer(imageData, IMAGE_FORMAT::PNG_32);
 
                 ImageImporter importer;
-                auto importResult = importer.Import(image, 0, 0, ImageImporter::IMPORT_FLAGS::RLE);
+                auto importResult = importer.Import(image, 0, 0, ImageImporter::IMPORT_FLAGS::NONE);
 
                 result.push_back(std::make_unique<RequiredImage>(importResult.Element));
                 std::free(importResult.Buffer);
