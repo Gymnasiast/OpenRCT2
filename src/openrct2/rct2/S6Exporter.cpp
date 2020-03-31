@@ -1414,8 +1414,7 @@ void S6Exporter::ExportTileElements()
         else
         {
             auto tileElementType = (RCT12TileElementType)src->GetType();
-            if (tileElementType == RCT12TileElementType::Corrupt || tileElementType == RCT12TileElementType::EightCarsCorrupt14
-                || tileElementType == RCT12TileElementType::EightCarsCorrupt15)
+            if (tileElementType >= RCT12TileElementType::Corrupt)
                 std::memcpy(dst, src, sizeof(*dst));
             else
                 ExportTileElement(dst, src);

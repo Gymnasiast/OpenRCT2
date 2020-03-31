@@ -1020,9 +1020,7 @@ public:
             {
                 auto tileElementType = (RCT12TileElementType)src->GetType();
                 // Todo: replace with setting invisibility bit
-                if (tileElementType == RCT12TileElementType::Corrupt
-                    || tileElementType == RCT12TileElementType::EightCarsCorrupt14
-                    || tileElementType == RCT12TileElementType::EightCarsCorrupt15)
+                if (tileElementType >= RCT12TileElementType::Corrupt)
                     std::memcpy(dst, src, sizeof(*src));
                 else
                     ImportTileElement(dst, src);
