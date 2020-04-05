@@ -1568,7 +1568,7 @@ PathSurfaceIndex PathElement::GetSurfaceEntryIndex() const
 
 PathRailingsIndex PathElement::GetRailingEntryIndex() const
 {
-    return flags & 0b00000111;
+    return Flags & 0b00000111;
 }
 
 PathSurfaceEntry* PathElement::GetSurfaceEntry() const
@@ -1591,9 +1591,8 @@ void PathElement::SetSurfaceEntryIndex(PathSurfaceIndex newIndex)
 
 void PathElement::SetRailingEntryIndex(PathRailingsIndex newEntryIndex)
 {
-    flags &= ~0b00000111;
-    flags |= (newEntryIndex & 0b00000111);
-    log_verbose("Setting railing entry index to %d", newEntryIndex);
+    Flags &= ~0b00000111;
+    Flags |= (newEntryIndex & 0b00000111);
 }
 
 uint8_t PathElement::GetQueueBannerDirection() const
@@ -1609,7 +1608,7 @@ void PathElement::SetQueueBannerDirection(uint8_t direction)
 
 bool PathElement::ShouldDrawPathOverSupports()
 {
-    return flags & TILE_ELEMENT_FLAG_DRAW_PATH_OVER_SUPPORTS;
+    return Flags & TILE_ELEMENT_FLAG_DRAW_PATH_OVER_SUPPORTS;
     // return (GetRailingEntry()->flags & RAILING_ENTRY_FLAG_DRAW_PATH_OVER_SUPPORTS);
 }
 
