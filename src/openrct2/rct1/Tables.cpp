@@ -125,11 +125,11 @@ namespace RCT1
             TERRAIN_MARTIAN,
             TERRAIN_CHECKERBOARD,
             TERRAIN_GRASS_CLUMPS,
-            TERRAIN_DIRT,                 // Originally TERRAIN_ROOF_BROWN
+            TERRAIN_ROOF_RED,
             TERRAIN_ICE,
-            TERRAIN_DIRT,                 // Originally TERRAIN_ROOF_LOG
-            TERRAIN_DIRT,                 // Originally TERRAIN_ROOF_IRON
-            TERRAIN_ROCK,                 // Originally TERRAIN_ROOF_GREY
+            TERRAIN_ROOF_LOG,
+            TERRAIN_ROOF_IRON,
+            TERRAIN_ROOF_GREY,
             TERRAIN_GRID_RED,
             TERRAIN_GRID_YELLOW,
             TERRAIN_GRID_BLUE,
@@ -1265,10 +1265,10 @@ namespace RCT1
             "        ",
             "        ",
 
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_PINK
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_GRAY
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_RED
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_GREEN
+            "#RCT1PTB",  // RCT1_FOOTPATH_TYPE_TILE_PINK
+            "#RCT1PTS",  // RCT1_FOOTPATH_TYPE_TILE_GRAY
+            "#RCT1PTR",  // RCT1_FOOTPATH_TYPE_TILE_RED
+            "#RCT1PTG",  // RCT1_FOOTPATH_TYPE_TILE_GREEN
         };
         return map[pathType];
     }

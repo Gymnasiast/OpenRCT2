@@ -332,6 +332,7 @@ private:
             PathElement* pathElement = tileElement->AsPath();
             pathElement->SetClearanceZ(zHigh);
             pathElement->SetSurfaceEntryIndex(_type & ~FOOTPATH_ELEMENT_INSERT_QUEUE);
+            pathElement->SetRailingEntryIndex(_type & ~FOOTPATH_ELEMENT_INSERT_QUEUE);
             pathElement->SetSlopeDirection(_slope & FOOTPATH_PROPERTIES_SLOPE_DIRECTION_MASK);
             if (_slope & FOOTPATH_PROPERTIES_FLAG_IS_SLOPED)
             {
@@ -349,6 +350,13 @@ private:
             {
                 pathElement->SetGhost(true);
             }
+            bool pathOverSupports = true;
+            auto railingEntry = pathElement->GetRailingEntry();
+            if (railingEntry != nullptr)
+            {
+                pathOverSupports = railingEntry->flags & RAILING_ENTRY_FLAG_DRAW_PATH_OVER_SUPPORTS;
+            }
+            pathElement->SetShouldDrawPathOverSupports(pathOverSupports);
             footpath_queue_chain_reset();
 
             if (!(GetFlags() & GAME_COMMAND_FLAG_PATH_SCENERY))

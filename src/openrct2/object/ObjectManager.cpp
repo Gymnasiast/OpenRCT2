@@ -235,6 +235,10 @@ public:
         LoadObject("#RCT2SIG");
         LoadObject("#RCT2SSR");
         LoadObject("#RCT2SSA");
+        LoadObject("#RCT1SRR");
+        LoadObject("#RCT1SRG");
+        LoadObject("#RCT1SWO");
+        LoadObject("#RCT1SRU");
 
         // Edges
         LoadObject("#RCT2ERO");
