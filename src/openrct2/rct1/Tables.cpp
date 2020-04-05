@@ -1240,12 +1240,12 @@ namespace RCT1
     {
         static constexpr const char * map[] =
         {
-            "TARMAC  ",  // RCT1_FOOTPATH_TYPE_QUEUE_BLUE
+            "ROAD    ",  // RCT1_FOOTPATH_TYPE_QUEUE_BLUE
             "PATHSPCE",  // RCT1_FOOTPATH_TYPE_QUEUE_RED
             "PATHDIRT",  // RCT1_FOOTPATH_TYPE_QUEUE_YELLOW
             "TARMACG ",  // RCT1_FOOTPATH_TYPE_QUEUE_GREEN
 
-            "TARMAC  ",  // RCT1_FOOTPATH_TYPE_TARMAC_GRAY
+            "ROAD    ",  // RCT1_FOOTPATH_TYPE_TARMAC_GRAY
             "PATHSPCE",  // RCT1_FOOTPATH_TYPE_TARMAC_RED
             "TARMACB ",  // RCT1_FOOTPATH_TYPE_TARMAC_BROWN
             "TARMACG ",  // RCT1_FOOTPATH_TYPE_TARMAC_GREEN

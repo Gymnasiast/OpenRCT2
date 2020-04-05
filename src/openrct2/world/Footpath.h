@@ -51,6 +51,23 @@ struct rct_footpath_entry
     uint8_t scrolling_mode;               // 0x0C
 };
 assert_struct_size(rct_footpath_entry, 13);
+
+struct FootpathStyleEntry
+{
+    rct_string_id string_idx;
+    uint32_t image;
+    uint8_t flags;
+};
+
+struct FootpathRailingEntry
+{
+    rct_string_id string_idx;
+    uint32_t image;
+    uint32_t bridge_image;
+    uint8_t support_type;
+    uint8_t flags;
+    uint8_t scrolling_mode;
+};
 #pragma pack(pop)
 
 struct PathSurfaceEntry
