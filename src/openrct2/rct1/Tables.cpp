@@ -1265,10 +1265,10 @@ namespace RCT1
             "        ",
             "        ",
 
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_PINK
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_GRAY
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_RED
-            "PATHCRZY",  // RCT1_FOOTPATH_TYPE_TILE_GREEN
+            "#RCT1PTB",  // RCT1_FOOTPATH_TYPE_TILE_PINK
+            "#RCT1PTS",  // RCT1_FOOTPATH_TYPE_TILE_GRAY
+            "#RCT1PTR",  // RCT1_FOOTPATH_TYPE_TILE_RED
+            "#RCT1PTG",  // RCT1_FOOTPATH_TYPE_TILE_GREEN
         };
         return map[pathType];
     }
