@@ -1069,6 +1069,7 @@ public:
                 auto src2 = src->AsPath();
 
                 dst2->SetSurfaceEntryIndex(src2->GetEntryIndex());
+                dst2->SetRailingEntryIndex(src2->GetEntryIndex());
                 dst2->SetQueueBannerDirection(src2->GetQueueBannerDirection());
                 dst2->SetSloped(src2->IsSloped());
                 dst2->SetSlopeDirection(src2->GetSlopeDirection());
@@ -1084,6 +1085,14 @@ public:
                 dst2->SetAdditionStatus(src2->GetAdditionStatus());
                 dst2->SetIsBroken(src2->IsBroken());
                 dst2->SetIsBlockedByVehicle(src2->IsBlockedByVehicle());
+                
+                bool pathOverSupports = true;
+                auto railingEntry = dst2->GetRailingEntry();
+                if (railingEntry != nullptr)
+                {
+                    pathOverSupports = railingEntry->flags & RAILING_ENTRY_FLAG_DRAW_PATH_OVER_SUPPORTS;
+                }
+                dst2->SetShouldDrawPathOverSupports(pathOverSupports);
 
                 break;
             }

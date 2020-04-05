@@ -1614,7 +1614,10 @@ bool PathElement::ShouldDrawPathOverSupports()
 
 void PathElement::SetShouldDrawPathOverSupports(bool on)
 {
-    log_verbose("Setting 'draw path over supports' to %d", (size_t)on);
+    if (on)
+        Flags |= TILE_ELEMENT_FLAG_DRAW_PATH_OVER_SUPPORTS;
+    else
+        Flags &= ~TILE_ELEMENT_FLAG_DRAW_PATH_OVER_SUPPORTS;
 }
 
 /**
