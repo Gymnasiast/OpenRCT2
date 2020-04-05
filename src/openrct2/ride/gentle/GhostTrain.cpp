@@ -127,6 +127,11 @@ static constexpr const uint32_t ghost_train_track_pieces_brakes[4] = {
     SPR_GHOST_TRAIN_TRACK_BRAKES_NW_SE,
 };
 
+static inline uint8_t paint_ghost_train_track_get_tunnel_door([[maybe_unused]] const TileElement* tileElement)
+{
+    return TUNNEL_DOORS_4;    
+}
+
 /** rct2: 0x00770BEC */
 static void paint_ghost_train_track_flat(
     paint_session* session, ride_id_t rideIndex, uint8_t trackSequence, uint8_t direction, int32_t height,
@@ -145,11 +150,11 @@ static void paint_ghost_train_track_flat(
 
     if (direction == 0 || direction == 2)
     {
-        paint_util_push_tunnel_left(session, height, TUNNEL_0);
+        paint_util_push_tunnel_left(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
     else
     {
-        paint_util_push_tunnel_right(session, height, TUNNEL_0);
+        paint_util_push_tunnel_right(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
 
     if (track_paint_util_should_paint_supports(session->MapPosition))
@@ -246,7 +251,7 @@ static void paint_ghost_train_track_flat_to_25_deg_up(
     switch (direction)
     {
         case 0:
-            paint_util_push_tunnel_left(session, height, TUNNEL_0);
+            paint_util_push_tunnel_left(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
         case 1:
             paint_util_push_tunnel_right(session, height, TUNNEL_2);
@@ -255,7 +260,7 @@ static void paint_ghost_train_track_flat_to_25_deg_up(
             paint_util_push_tunnel_left(session, height, TUNNEL_2);
             break;
         case 3:
-            paint_util_push_tunnel_right(session, height, TUNNEL_0);
+            paint_util_push_tunnel_right(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
     }
 
@@ -311,10 +316,10 @@ static void paint_ghost_train_track_25_deg_up_to_flat(
             paint_util_push_tunnel_left(session, height - 8, TUNNEL_0);
             break;
         case 1:
-            paint_util_push_tunnel_right(session, height + 8, TUNNEL_12);
+            paint_util_push_tunnel_right(session, height + 8, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
         case 2:
-            paint_util_push_tunnel_left(session, height + 8, TUNNEL_12);
+            paint_util_push_tunnel_left(session, height + 8, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
         case 3:
             paint_util_push_tunnel_right(session, height - 8, TUNNEL_0);
@@ -344,10 +349,10 @@ static void paint_ghost_train_track_flat_to_25_deg_down(
             paint_util_push_tunnel_left(session, height - 8, TUNNEL_0);
             break;
         case 1:
-            paint_util_push_tunnel_right(session, height + 8, TUNNEL_0);
+            paint_util_push_tunnel_right(session, height + 8, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
         case 2:
-            paint_util_push_tunnel_left(session, height + 8, TUNNEL_0);
+            paint_util_push_tunnel_left(session, height + 8, paint_ghost_train_track_get_tunnel_door(tileElement));
             break;
         case 3:
             paint_util_push_tunnel_right(session, height - 8, TUNNEL_0);
@@ -426,7 +431,7 @@ static void paint_ghost_train_track_right_quarter_turn_3_tiles(
         session, 3, height, direction, trackSequence, session->TrackColours[SCHEME_TRACK],
         ghost_train_track_pieces_quarter_turn_3_tiles, nullptr, defaultRightQuarterTurn3TilesBoundLengths,
         defaultRightQuarterTurn3TilesBoundOffsets);
-    track_paint_util_right_quarter_turn_3_tiles_tunnel(session, height, direction, trackSequence, TUNNEL_0);
+    track_paint_util_right_quarter_turn_3_tiles_tunnel(session, height, direction, trackSequence, paint_ghost_train_track_get_tunnel_door(tileElement));
 
     switch (trackSequence)
     {
@@ -471,7 +476,7 @@ static void paint_ghost_train_track_left_quarter_turn_1_tile(
 {
     track_paint_util_left_quarter_turn_1_tile_paint(
         session, 3, height, 0, direction, session->TrackColours[SCHEME_TRACK], ghost_train_track_pieces_quarter_turn_1_tile);
-    track_paint_util_left_quarter_turn_1_tile_tunnel(session, direction, height, 0, TUNNEL_0, 0, TUNNEL_0);
+    track_paint_util_left_quarter_turn_1_tile_tunnel(session, direction, height, 0, paint_ghost_train_track_get_tunnel_door(tileElement), 0, paint_ghost_train_track_get_tunnel_door(tileElement));
 
     metal_a_supports_paint_setup(session, METAL_SUPPORTS_BOXED, 4, 0, height, session->TrackColours[SCHEME_SUPPORTS]);
     paint_util_set_segment_support_height(session, SEGMENTS_ALL, 0xFFFF, 0);
@@ -507,11 +512,11 @@ static void paint_ghost_train_track_spinning_tunnel(
 
     if (direction == 0 || direction == 2)
     {
-        paint_util_push_tunnel_left(session, height, TUNNEL_0);
+        paint_util_push_tunnel_left(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
     else
     {
-        paint_util_push_tunnel_right(session, height, TUNNEL_0);
+        paint_util_push_tunnel_right(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
 
     wooden_a_supports_paint_setup(session, (direction & 1), 0, height, session->TrackColours[SCHEME_MISC], nullptr);
@@ -538,11 +543,11 @@ static void paint_ghost_train_track_brakes(
 
     if (direction == 0 || direction == 2)
     {
-        paint_util_push_tunnel_left(session, height, TUNNEL_0);
+        paint_util_push_tunnel_left(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
     else
     {
-        paint_util_push_tunnel_right(session, height, TUNNEL_0);
+        paint_util_push_tunnel_right(session, height, paint_ghost_train_track_get_tunnel_door(tileElement));
     }
 
     if (track_paint_util_should_paint_supports(session->MapPosition))
