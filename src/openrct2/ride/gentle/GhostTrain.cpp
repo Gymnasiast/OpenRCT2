@@ -129,7 +129,7 @@ static constexpr const uint32_t ghost_train_track_pieces_brakes[4] = {
 
 static inline uint8_t paint_ghost_train_track_get_tunnel_door([[maybe_unused]] const TileElement* tileElement)
 {
-    return TUNNEL_DOORS_4;    
+    return TUNNEL_DOORS_2;    
 }
 
 /** rct2: 0x00770BEC */
