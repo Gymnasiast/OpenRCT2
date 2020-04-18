@@ -5554,10 +5554,10 @@ static void vehicle_update_sound(Vehicle* vehicle)
 
         loc_6D7A97:
             vehicle->scream_sound_id = SoundId::Null;
-            if (ride->type < std::size(RideLiftData))
+            if (ride->type < std::size(RideTypeDescriptors))
             {
                 // Get lift hill sound
-                screamId = RideLiftData[ride->type].sound_id;
+                screamId = RideTypeDescriptors[ride->type].LiftData.sound_id;
                 screamVolume = 243;
                 if (!(vehicle->sound2_flags & VEHICLE_SOUND2_FLAGS_LIFT_HILL))
                     screamId = SoundId::Null;
