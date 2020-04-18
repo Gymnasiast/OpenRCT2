@@ -161,11 +161,6 @@ static constexpr const RideGroup steel_wild_mouse_groups[MAX_RIDE_GROUPS_PER_RID
     ride_group_spinning_wild_mouse,
 };
 
-bool RideGroup::Equals(const RideGroup* otherRideGroup) const
-{
-    return this->Naming.name == otherRideGroup->Naming.name && this->Naming.description == otherRideGroup->Naming.description;
-}
-
 bool RideGroup::IsInvented() const
 {
     if (!ride_type_is_invented(this->RideType))
@@ -179,7 +174,7 @@ bool RideGroup::IsInvented() const
         {
             auto rideEntry = get_ride_entry(rideEntryIndex);
             auto rideEntryRideGroup = RideGroupManager::GetRideGroup(this->RideType, rideEntry);
-            if (this->Equals(rideEntryRideGroup))
+            if (this == rideEntryRideGroup)
             {
                 // The ride entry is invented and belongs to the same ride group. This means the ride group is invented.
                 return true;
@@ -221,21 +216,6 @@ const RideGroup* RideGroupManager::GetRideGroup(const uint8_t rideType, const rc
                 return &ride_group_spinning_wild_mouse;
         default:
             return nullptr;
-    }
-}
-
-bool RideGroupManager::RideTypeHasRideGroups(const uint8_t rideType)
-{
-    switch (rideType)
-    {
-        case RIDE_TYPE_CORKSCREW_ROLLER_COASTER:
-        case RIDE_TYPE_JUNIOR_ROLLER_COASTER:
-        case RIDE_TYPE_CAR_RIDE:
-        case RIDE_TYPE_TWISTER_ROLLER_COASTER:
-        case RIDE_TYPE_STEEL_WILD_MOUSE:
-            return true;
-        default:
-            return false;
     }
 }
 

@@ -103,6 +103,16 @@ struct rct_ride_name
 {
     rct_string_id name;
     rct_string_id description;
+
+    inline bool operator==(const rct_ride_name& other) const
+    {
+        return name == other.name && description == other.description;
+    }
+
+    inline bool operator!=(const rct_ride_name& other) const
+    {
+        return !(*this == other);
+    }
 };
 assert_struct_size(rct_ride_name, 4);
 

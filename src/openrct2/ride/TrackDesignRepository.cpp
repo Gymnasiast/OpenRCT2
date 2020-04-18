@@ -194,7 +194,7 @@ public:
             uint8_t rideGroupIndex = (ori != nullptr) ? ori->RideInfo.RideGroupIndex : 0;
             const RideGroup* itemRideGroup = RideGroupManager::RideGroupFind(rideType, rideGroupIndex);
 
-            if (itemRideGroup != nullptr && itemRideGroup->Equals(rideGroup))
+            if (itemRideGroup != nullptr && itemRideGroup == rideGroup)
             {
                 count++;
             }
@@ -257,7 +257,7 @@ public:
             uint8_t rideGroupIndex = (ori != nullptr) ? ori->RideInfo.RideGroupIndex : 0;
             const RideGroup* itemRideGroup = RideGroupManager::RideGroupFind(rideType, rideGroupIndex);
 
-            if (itemRideGroup != nullptr && itemRideGroup->Equals(rideGroup))
+            if (itemRideGroup != nullptr && itemRideGroup == rideGroup)
             {
                 track_design_file_ref ref;
                 ref.name = String::Duplicate(GetNameFromTrackPath(item.Path));

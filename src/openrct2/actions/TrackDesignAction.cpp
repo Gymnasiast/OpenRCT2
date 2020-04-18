@@ -52,7 +52,7 @@ GameActionResult::Ptr TrackDesignAction::Query() const
     }
 
     // The rest of the cases are handled by the code in ride_create()
-    if (RideGroupManager::RideTypeHasRideGroups(_td.type) && entryIndex == OBJECT_ENTRY_INDEX_NULL)
+    if (RideTypeDescriptors[_td.type].HasFlag(RIDE_TYPE_FLAG_HAS_RIDE_GROUPS) && entryIndex == OBJECT_ENTRY_INDEX_NULL)
     {
         const ObjectRepositoryItem* ori = object_repository_find_object_by_name(rideEntryObject->name);
         if (ori != nullptr)
@@ -71,7 +71,7 @@ GameActionResult::Ptr TrackDesignAction::Query() const
 
                 auto rideEntry = get_ride_entry(rideEntryIndex);
                 auto rideGroup = RideGroupManager::GetRideGroup(_td.type, rideEntry);
-                if (td6RideGroup->Equals(rideGroup))
+                if (td6RideGroup == rideGroup)
                 {
                     entryIndex = rideEntryIndex;
                     break;
@@ -144,7 +144,7 @@ GameActionResult::Ptr TrackDesignAction::Execute() const
     }
 
     // The rest of the cases are handled by the code in ride_create()
-    if (RideGroupManager::RideTypeHasRideGroups(_td.type) && entryIndex == OBJECT_ENTRY_INDEX_NULL)
+    if (RideTypeDescriptors[_td.type].HasFlag(RIDE_TYPE_FLAG_HAS_RIDE_GROUPS) && entryIndex == OBJECT_ENTRY_INDEX_NULL)
     {
         const ObjectRepositoryItem* ori = object_repository_find_object_by_name(rideEntryObject->name);
         if (ori != nullptr)
@@ -163,7 +163,7 @@ GameActionResult::Ptr TrackDesignAction::Execute() const
 
                 auto rideEntry = get_ride_entry(rideEntryIndex);
                 auto rideGroup = RideGroupManager::GetRideGroup(_td.type, rideEntry);
-                if (td6RideGroup->Equals(rideGroup))
+                if (td6RideGroup == rideGroup)
                 {
                     entryIndex = rideEntryIndex;
                     break;

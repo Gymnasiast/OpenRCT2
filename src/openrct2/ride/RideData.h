@@ -176,6 +176,7 @@ enum ride_type_flags : uint64_t
     RIDE_TYPE_FLAG_START_CONSTRUCTION_INVERTED = (1ULL << 47), // This is only set on the Flying RC and its alternative type.
 
     RIDE_TYPE_FLAG_LIST_VEHICLES_SEPARATELY = (1ULL << 48),
+    RIDE_TYPE_FLAG_HAS_RIDE_GROUPS = (1ULL << 49),
 };
 
 // Set on ride types that have a main colour, additional colour and support colour.

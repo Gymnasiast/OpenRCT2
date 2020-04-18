@@ -2548,7 +2548,7 @@ void window_ride_construction_update_enabled_track_pieces()
         return;
     }
 
-    if (RideGroupManager::RideTypeHasRideGroups(rideType))
+    if (RideTypeDescriptors[rideType].HasFlag(RIDE_TYPE_FLAG_HAS_RIDE_GROUPS))
     {
         const RideGroup* rideGroup = RideGroupManager::GetRideGroup(rideType, rideEntry);
         _enabledRidePieces = rideGroup->AvailableTrackPieces;
