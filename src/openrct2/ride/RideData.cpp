@@ -2505,3 +2505,17 @@ bool RideTypeDescriptor::HasFlag(uint64_t flag) const
 {
     return Flags & flag;
 }
+
+uint64_t RideTypeDescriptor::GetAvailableTrackPieces() const
+{
+    if (gCheatsEnableAllDrawableTrackPieces)
+    {
+        return EnabledTrackPieces | ExtraTrackPieces;
+    }
+    return EnabledTrackPieces;
+}
+
+bool RideTypeDescriptor::SupportsTrackPiece(const uint64_t trackPiece) const
+{
+    return GetAvailableTrackPieces() & (1ULL << trackPiece);
+}
