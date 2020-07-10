@@ -19,6 +19,7 @@ struct Banner;
 struct CoordsXY;
 struct rct_scenery_entry;
 struct rct_footpath_entry;
+struct RCT12TileElement;
 using track_type_t = uint16_t;
 
 constexpr const uint8_t MAX_ELEMENT_HEIGHT = 255;
@@ -372,6 +373,8 @@ public:
     void SetDoorBState(uint8_t newState);
 
     bool IsStation() const;
+
+    RCT12TileElement ToRCT12TileElement() const;
 };
 assert_struct_size(TrackElement, 16);
 

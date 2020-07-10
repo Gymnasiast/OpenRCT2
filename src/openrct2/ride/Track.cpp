@@ -1459,3 +1459,38 @@ void TrackElement::SetHighlight(bool on)
     if (on)
         Flags2 |= TRACK_ELEMENT_FLAGS2_HIGHLIGHT;
 }
+
+RCT12TileElement TrackElement::ToRCT12TileElement() const
+{
+    RCT12TileElement dst = {};
+    dst.SetType(TILE_ELEMENT_TYPE_TRACK);
+    auto dst2 = dst.AsTrack();
+
+    dst2->SetTrackType(GetTrackType());
+    dst2->SetSequenceIndex(GetSequenceIndex());
+    dst2->SetRideIndex(GetRideIndex());
+    dst2->SetColourScheme(GetColourScheme());
+    dst2->SetStationIndex(GetStationIndex());
+    dst2->SetHasGreenLight(HasGreenLight());
+    dst2->SetHasChain(HasChain());
+    dst2->SetHasCableLift(HasCableLift());
+    dst2->SetInverted(IsInverted());
+    dst2->SetBrakeBoosterSpeed(GetBrakeBoosterSpeed());
+    dst2->SetPhotoTimeout(GetPhotoTimeout());
+    dst2->SetBlockBrakeClosed(BlockBrakeClosed());
+    dst2->SetIsIndestructible(IsIndestructible());
+    dst2->SetSeatRotation(GetSeatRotation());
+    // Skipping IsHighlighted()
+
+    // This has to be done last, since the maze entry shares fields with the colour and sequence fields.
+    auto ride = get_ride(dst2->GetRideIndex());
+    if (ride)
+    {
+        if (ride->type == RIDE_TYPE_MAZE)
+        {
+            dst2->SetMazeEntry(GetMazeEntry());
+        }
+    }
+
+    return dst;
+}

@@ -1024,3 +1024,9 @@ RCT12ObjectEntryIndex OpenRCT2EntryIndexToRCTEntryIndex(ObjectEntryIndex index)
 
     return index;
 }
+
+void RCT12TileElementBase::SetType(uint8_t newType)
+{
+    this->type &= ~TILE_ELEMENT_TYPE_MASK;
+    this->type |= (newType & TILE_ELEMENT_TYPE_MASK);
+}

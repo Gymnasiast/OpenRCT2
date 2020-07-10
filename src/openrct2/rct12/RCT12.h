@@ -289,6 +289,7 @@ struct RCT12TileElementBase
     void SetLastForTile(bool on);
     bool IsGhost() const;
     void SetGhost(bool isGhost);
+    void SetType(uint8_t newType);
 };
 /**
  * Map element structure

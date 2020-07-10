@@ -22,6 +22,7 @@
 #include <openrct2/world/Location.hpp>
 #include <openrct2/world/Sprite.h>
 #include <openrct2/world/Surface.h>
+#include <openrct2/world/TileElement.h>
 
 class StationObject;
 
@@ -844,4 +845,159 @@ void ride_ratings_calculate_lim_launched_roller_coaster([[maybe_unused]] Ride* r
 
 void ride_ratings_calculate_drink_stall([[maybe_unused]] Ride* ride)
 {
+}
+
+RCT12TileElement TrackElement::ToRCT12TileElement() const
+{
+    RCT12TileElement dst = {};
+    dst.SetType(TILE_ELEMENT_TYPE_TRACK);
+    auto dst2 = dst.AsTrack();
+
+    dst2->SetTrackType(GetTrackType());
+    dst2->SetSequenceIndex(GetSequenceIndex());
+    dst2->SetRideIndex(GetRideIndex());
+    dst2->SetColourScheme(GetColourScheme());
+    dst2->SetStationIndex(GetStationIndex());
+    dst2->SetHasGreenLight(HasGreenLight());
+    dst2->SetHasChain(HasChain());
+    dst2->SetHasCableLift(HasCableLift());
+    dst2->SetInverted(IsInverted());
+    dst2->SetBrakeBoosterSpeed(GetBrakeBoosterSpeed());
+    dst2->SetPhotoTimeout(GetPhotoTimeout());
+    dst2->SetBlockBrakeClosed(BlockBrakeClosed());
+    dst2->SetIsIndestructible(IsIndestructible());
+    dst2->SetSeatRotation(GetSeatRotation());
+    // Skipping IsHighlighted()
+
+    // This has to be done last, since the maze entry shares fields with the colour and sequence fields.
+    auto ride = get_ride(dst2->GetRideIndex());
+    if (ride)
+    {
+        if (ride->type == RIDE_TYPE_MAZE)
+        {
+            dst2->SetMazeEntry(GetMazeEntry());
+        }
+    }
+
+    return dst;
+}
+
+void RCT12TrackElement::SetTrackType(uint8_t newType)
+{
+    trackType = newType;
+}
+
+void RCT12TrackElement::SetSequenceIndex(uint8_t newSequenceIndex)
+{
+    sequence &= ~RCT12_TRACK_ELEMENT_SEQUENCE_SEQUENCE_MASK;
+    sequence |= (newSequenceIndex & RCT12_TRACK_ELEMENT_SEQUENCE_SEQUENCE_MASK);
+}
+
+void RCT12TrackElement::SetStationIndex(uint8_t newStationIndex)
+{
+    if (track_type_is_station(trackType) || trackType == TRACK_ELEM_TOWER_BASE)
+    {
+        sequence &= ~RCT12_TRACK_ELEMENT_SEQUENCE_STATION_INDEX_MASK;
+        sequence |= (newStationIndex << 4);
+    }
+}
+
+void RCT12TrackElement::SetRideIndex(uint8_t newRideIndex)
+{
+    rideIndex = newRideIndex;
+}
+
+void RCT12TrackElement::SetColourScheme(uint8_t newColourScheme)
+{
+    colour &= ~0x3;
+    colour |= (newColourScheme & 0x3);
+}
+
+void RCT12TrackElement::SetHasCableLift(bool on)
+{
+    colour &= ~RCT12_TRACK_ELEMENT_COLOUR_FLAG_CABLE_LIFT;
+    if (on)
+        colour |= RCT12_TRACK_ELEMENT_COLOUR_FLAG_CABLE_LIFT;
+}
+
+void RCT12TrackElement::SetInverted(bool inverted)
+{
+    if (inverted)
+    {
+        colour |= RCT12_TRACK_ELEMENT_COLOUR_FLAG_INVERTED;
+    }
+    else
+    {
+        colour &= ~RCT12_TRACK_ELEMENT_COLOUR_FLAG_INVERTED;
+    }
+}
+
+void RCT12TrackElement::SetBrakeBoosterSpeed(uint8_t speed)
+{
+    if (track_element_has_speed_setting(GetTrackType()))
+    {
+        sequence &= ~0b11110000;
+        sequence |= ((speed >> 1) << 4);
+    }
+}
+
+bool RCT12TrackElement::BlockBrakeClosed() const
+{
+    return (flags & RCT12_TILE_ELEMENT_FLAG_BLOCK_BRAKE_CLOSED) != 0;
+}
+
+void RCT12TrackElement::SetBlockBrakeClosed(bool isClosed)
+{
+    if (isClosed)
+    {
+        flags |= RCT12_TILE_ELEMENT_FLAG_BLOCK_BRAKE_CLOSED;
+    }
+    else
+    {
+        flags &= ~RCT12_TILE_ELEMENT_FLAG_BLOCK_BRAKE_CLOSED;
+    }
+}
+
+void RCT12TrackElement::SetHasGreenLight(uint8_t greenLight)
+{
+    if (track_type_is_station(trackType))
+    {
+        sequence &= ~MAP_ELEM_TRACK_SEQUENCE_GREEN_LIGHT;
+        if (greenLight)
+        {
+            sequence |= MAP_ELEM_TRACK_SEQUENCE_GREEN_LIGHT;
+        }
+    }
+}
+
+void RCT12TrackElement::SetHasChain(bool on)
+{
+    if (on)
+    {
+        type |= RCT12_TRACK_ELEMENT_TYPE_FLAG_CHAIN_LIFT;
+    }
+    else
+    {
+        type &= ~RCT12_TRACK_ELEMENT_TYPE_FLAG_CHAIN_LIFT;
+    }
+}
+
+void RCT12TrackElement::SetSeatRotation(uint8_t newSeatRotation)
+{
+    colour &= 0x0F;
+    colour |= (newSeatRotation << 4);
+}
+
+void RCT12TrackElement::SetMazeEntry(uint16_t newMazeEntry)
+{
+    mazeEntry = newMazeEntry;
+}
+
+void RCT12TrackElement::SetPhotoTimeout(uint8_t value)
+{
+    if (GetTrackType() == TRACK_ELEM_ON_RIDE_PHOTO)
+    {
+        sequence &= RCT12_TRACK_ELEMENT_SEQUENCE_SEQUENCE_MASK;
+        sequence |= (value << 4);
+    }
 }

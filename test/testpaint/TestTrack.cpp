@@ -179,7 +179,8 @@ public:
 };
 
 static void CallOriginal(
-    uint8_t rideType, uint8_t trackType, uint8_t direction, uint8_t trackSequence, uint16_t height, TileElement* tileElement)
+    uint8_t rideType, uint8_t trackType, uint8_t direction, uint8_t trackSequence, uint16_t height,
+    RCT12TileElement* tileElement)
 {
     uint32_t* trackDirectionList = (uint32_t*)RideTypeTrackPaintFunctionsOld[rideType][trackType];
     const uint8_t rideIndex = 0;
@@ -347,6 +348,7 @@ static uint8_t TestTrackElementPaintCalls(uint8_t rideType, uint8_t trackType, u
                 rideType, trackType, variant, &tileElement, &surfaceElement, &(gRideList[0]), gRideEntries[0]);
         }
 
+        auto rct12Element = tileElement.AsTrack()->ToRCT12TileElement();
         for (int currentRotation = 0; currentRotation < 4; currentRotation++)
         {
             gCurrentRotation = currentRotation;
@@ -365,7 +367,7 @@ static uint8_t TestTrackElementPaintCalls(uint8_t rideType, uint8_t trackType, u
                 TestPaint::ResetSupportHeights();
                 gWoodenSupportsPrependTo = nullptr;
 
-                CallOriginal(rideType, trackType, direction, trackSequence, height, &tileElement);
+                CallOriginal(rideType, trackType, direction, trackSequence, height, &rct12Element);
 
                 callCount = PaintIntercept::GetCalls(callBuffer);
                 std::vector<function_call> oldCalls;
@@ -451,11 +453,12 @@ static uint8_t TestTrackElementSegmentSupportHeight(
 
     std::vector<SegmentSupportCall> tileSegmentSupportCalls[4];
 
+    auto rct12Element = tileElement.AsTrack()->ToRCT12TileElement();
     for (int direction = 0; direction < 4; direction++)
     {
         TestPaint::ResetSupportHeights();
 
-        CallOriginal(rideType, trackType, direction, trackSequence, height, &tileElement);
+        CallOriginal(rideType, trackType, direction, trackSequence, height, &rct12Element);
 
         tileSegmentSupportCalls[direction] = SegmentSupportHeightCall::getSegmentCalls(gSupportSegments, direction);
     }
@@ -537,11 +540,12 @@ static uint8_t TestTrackElementGeneralSupportHeight(
     std::string state = String::Format("[trackSequence:%d chainLift:%d]", trackSequence, 0);
 
     SupportCall tileGeneralSupportCalls[4];
+    auto rct12Element = tileElement.AsTrack()->ToRCT12TileElement();
     for (int direction = 0; direction < 4; direction++)
     {
         TestPaint::ResetSupportHeights();
 
-        CallOriginal(rideType, trackType, direction, trackSequence, height, &tileElement);
+        CallOriginal(rideType, trackType, direction, trackSequence, height, &rct12Element);
 
         tileGeneralSupportCalls[direction].height = -1;
         tileGeneralSupportCalls[direction].slope = -1;
@@ -635,13 +639,14 @@ static uint8_t TestTrackElementSideTunnels(uint8_t rideType, uint8_t trackType, 
 
     // TODO: test inverted tracks
 
+    auto rct12Element = tileElement.AsTrack()->ToRCT12TileElement();
     for (int direction = 0; direction < 4; direction++)
     {
         TestPaint::ResetTunnels();
 
         for (int8_t offset = -8; offset <= 8; offset += 8)
         {
-            CallOriginal(rideType, trackType, direction, trackSequence, height + offset, &tileElement);
+            CallOriginal(rideType, trackType, direction, trackSequence, height + offset, &rct12Element);
         }
 
         uint8_t rightIndex = (direction + 1) % 4;
@@ -761,6 +766,7 @@ static uint8_t TestTrackElementVerticalTunnels(uint8_t rideType, uint8_t trackTy
 
     uint16_t verticalTunnelHeights[4];
 
+    auto rct12Element = tileElement.AsTrack()->ToRCT12TileElement();
     for (int direction = 0; direction < 4; direction++)
     {
         uint8_t tunnelHeights[3] = { 0 };
@@ -768,7 +774,7 @@ static uint8_t TestTrackElementVerticalTunnels(uint8_t rideType, uint8_t trackTy
         for (uint8_t i = 0; i < 3; i++)
         {
             gVerticalTunnelHeight = 0;
-            CallOriginal(rideType, trackType, direction, trackSequence, height - 8 + i * 8, &tileElement);
+            CallOriginal(rideType, trackType, direction, trackSequence, height - 8 + i * 8, &rct12Element);
             tunnelHeights[i] = gVerticalTunnelHeight;
         }
 
