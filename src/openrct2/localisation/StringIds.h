@@ -3949,6 +3949,10 @@ enum
 
     STR_RIDE_OBJECT_SHOP_SELLS = 6452,
 
+    STR_RIDE_NAME_CLASSIC_WOODEN_ROLLER_COASTER = 6453,
+    STR_RIDE_DESCRIPTION_CLASSIC_WOODEN_ROLLER_COASTER = 6454,
+
+
     // Have to include resource strings (from scenarios and objects) for the time being now that language is partially working
     /* MAX_STR_COUNT = 32768 */ // MAX_STR_COUNT - upper limit for number of strings, not the current count strings
 };
