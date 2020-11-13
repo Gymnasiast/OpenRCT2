@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo su
           mkdir bin && cd bin
-          cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=../CMakeLists_mingw.txt -DCMAKE_BUILD_TYPE=MinSizeRel -DDISABLE_IPO=on -DDISABLE_NETWORK=ON -DDISABLE_HTTP=ON -DDISABLE_HTTP_TWITCH=on -DFORCE32=on -DENABLE_SCRIPTING=Off -DCMAKE_CXX_FLAGS="-Wno-error=unused-function" -DSTATIC=on -DMINGW_TARGET_NT5_1=ON -DPORTABLE=ON
+          cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=../CMakeLists_mingw.txt -DCMAKE_BUILD_TYPE=MinSizeRel -DDISABLE_IPO=on -DDISABLE_NETWORK=ON -DDISABLE_HTTP=ON -DDISABLE_HTTP_TWITCH=on -DDISABLE_TTF=On -DFORCE32=on -DENABLE_SCRIPTING=Off -DCMAKE_CXX_FLAGS="-Wno-error=unused-function -static-libgcc" -DSTATIC=on -DMINGW_TARGET_NT5_1=ON -DPORTABLE=ON -DBUILD_SHARED_LIBS=ON
           ninja -k0
       - name: Upload artifacts (CI)
         uses: actions/upload-artifact@v2-preview
