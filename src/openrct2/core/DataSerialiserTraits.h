@@ -756,34 +756,63 @@ template<> struct DataSerializerTraits_t<ObjectEntryDescriptor>
     static void encode(OpenRCT2::IStream* stream, const ObjectEntryDescriptor& val)
     {
         stream->Write(&val.Generation);
-        if (val.Generation == ObjectGeneration::DAT)
+        switch (val.Generation)
         {
-            DataSerializerTraits<rct_object_entry> s;
-            s.encode(stream, val.Entry);
-        }
-        else
-        {
-            DataSerializerTraits<std::string> s;
-            s.encode(stream, val.JsonEntry.Identifier);
+            case ObjectGeneration::DAT:
+            {
+                DataSerializerTraits<rct_object_entry> s;
+                s.encode(stream, val.Entry);
+                break;
+            }
+            case ObjectGeneration::JSON:
+            {
+                DataSerializerTraits<std::string> s;
+                s.encode(stream, val.JsonEntry.Identifier);
+                break;
+            }
+            case ObjectGeneration::Hybrid:
+            {
+                DataSerializerTraits<std::string> s1;
+                s1.encode(stream, val.JsonEntry.Identifier);
+                DataSerializerTraits<rct_object_entry> s2;
+                s2.encode(stream, val.Entry);
+                break;
+            }
         }
     }
     static void decode(OpenRCT2::IStream* stream, ObjectEntryDescriptor& val)
     {
         ObjectGeneration generation;
         stream->Read(&generation);
-        if (generation == ObjectGeneration::DAT)
+        switch (val.Generation)
         {
-            rct_object_entry obj;
-            DataSerializerTraits<rct_object_entry> s;
-            s.decode(stream, obj);
-            val = ObjectEntryDescriptor(obj);
-        }
-        else
-        {
-            std::string id;
-            DataSerializerTraits<std::string> s;
-            s.decode(stream, id);
-            val = ObjectEntryDescriptor(id);
+            case ObjectGeneration::DAT:
+            {
+                rct_object_entry obj;
+                DataSerializerTraits<rct_object_entry> s;
+                s.decode(stream, obj);
+                val = ObjectEntryDescriptor(obj);
+                break;
+            }
+            case ObjectGeneration::JSON:
+            {
+                std::string id;
+                DataSerializerTraits<std::string> s;
+                s.decode(stream, id);
+                val = ObjectEntryDescriptor(id);
+                break;
+            }
+            case ObjectGeneration::Hybrid:
+            {
+                std::string id;
+                DataSerializerTraits<std::string> s1;
+                s1.decode(stream, id);
+                rct_object_entry obj;
+                DataSerializerTraits<rct_object_entry> s2;
+                s2.decode(stream, obj);
+                val = ObjectEntryDescriptor({ id, ObjectType::None, "" }, obj);
+                break;
+            }
         }
     }
     static void log(OpenRCT2::IStream* stream, const ObjectEntryDescriptor& val)

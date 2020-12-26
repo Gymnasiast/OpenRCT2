@@ -153,6 +153,7 @@ enum class ObjectGeneration : uint8_t
 {
     DAT,
     JSON,
+    Hybrid
 };
 
 struct JsonObject
@@ -191,6 +192,13 @@ struct ObjectEntryDescriptor
     {
         Generation = ObjectGeneration::JSON;
         JsonEntry = newObject;
+    }
+
+    explicit ObjectEntryDescriptor(JsonObject newObject, const rct_object_entry& newEntry)
+    {
+        Generation = ObjectGeneration::JSON;
+        JsonEntry = newObject;
+        Entry = newEntry;
     }
 };
 
