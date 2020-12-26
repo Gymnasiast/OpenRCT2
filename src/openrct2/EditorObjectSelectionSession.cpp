@@ -555,7 +555,7 @@ bool window_editor_object_selection_select_object(uint8_t isMasterObject, int32_
     if (entry.Generation == ObjectGeneration::DAT)
         return window_editor_object_selection_select_object(isMasterObject, flags, &entry.Entry);
 
-    return window_editor_object_selection_select_object(isMasterObject, flags, entry.Identifier);
+    return window_editor_object_selection_select_object(isMasterObject, flags, entry.JsonEntry.Identifier);
 }
 
 bool editor_check_object_group_at_least_one_selected(ObjectType checkObjectType)

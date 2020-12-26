@@ -244,7 +244,7 @@ public:
         if (entry.Generation == ObjectGeneration::DAT)
             return FindObject(&entry.Entry);
 
-        return FindObject(entry.Identifier);
+        return FindObject(entry.JsonEntry.Identifier);
     }
 
     std::unique_ptr<Object> LoadObject(const ObjectRepositoryItem* ori) override

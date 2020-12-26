@@ -764,7 +764,7 @@ template<> struct DataSerializerTraits_t<ObjectEntryDescriptor>
         else
         {
             DataSerializerTraits<std::string> s;
-            s.encode(stream, val.Identifier);
+            s.encode(stream, val.JsonEntry.Identifier);
         }
     }
     static void decode(OpenRCT2::IStream* stream, ObjectEntryDescriptor& val)
