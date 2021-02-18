@@ -1103,7 +1103,8 @@ static void WidgetTextBoxDraw(rct_drawpixelinfo* dpi, rct_window* w, rct_widgeti
         {
             safe_strcpy(wrapped_string, w->widgets[widgetIndex].string, 512);
             gfx_wrap_string(wrapped_string, bottomRight.x - topLeft.x - 5, &no_lines, &font_height);
-            gfx_draw_string_no_formatting(dpi, wrapped_string, w->colours[1], { topLeft.x + 2, topLeft.y });
+            TextPaint textPaint = { w->colours[1], FONT_SPRITE_BASE_MEDIUM, false, TextAlignment::LEFT };
+            DrawText(dpi, { topLeft.x + 2, topLeft.y }, textPaint, wrapped_string, true);
         }
         return;
     }
@@ -1114,7 +1115,8 @@ static void WidgetTextBoxDraw(rct_drawpixelinfo* dpi, rct_window* w, rct_widgeti
     // +13 for cursor when max length.
     gfx_wrap_string(wrapped_string, bottomRight.x - topLeft.x - 5 - 6, &no_lines, &font_height);
 
-    gfx_draw_string_no_formatting(dpi, wrapped_string, w->colours[1], { topLeft.x + 2, topLeft.y });
+    TextPaint textPaint = { w->colours[1], FONT_SPRITE_BASE_MEDIUM, false, TextAlignment::LEFT };
+    DrawText(dpi, { topLeft.x + 2, topLeft.y }, textPaint, wrapped_string, true);
 
     size_t string_length = get_string_size(wrapped_string) - 1;
 

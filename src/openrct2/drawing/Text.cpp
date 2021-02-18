@@ -12,12 +12,6 @@
 #include "../localisation/Localisation.h"
 #include "Drawing.h"
 
-static void DrawText(
-    rct_drawpixelinfo* dpi, const ScreenCoordsXY& coords, const TextPaint& paint, const_utf8string text,
-    bool noFormatting = false);
-static void DrawText(
-    rct_drawpixelinfo* dpi, const ScreenCoordsXY& coords, const TextPaint& paint, rct_string_id format, const void* args);
-
 StaticLayout::StaticLayout(utf8string source, const TextPaint& paint, int32_t width)
 {
     Buffer = source;
@@ -74,7 +68,7 @@ int32_t StaticLayout::GetLineCount()
     return LineCount;
 }
 
-static void DrawText(
+void DrawText(
     rct_drawpixelinfo* dpi, const ScreenCoordsXY& coords, const TextPaint& paint, const_utf8string text, bool noFormatting)
 {
     int32_t width = noFormatting ? gfx_get_string_width_no_formatting(text) : gfx_get_string_width(text);
@@ -108,7 +102,7 @@ static void DrawText(
     }
 }
 
-static void DrawText(
+void DrawText(
     rct_drawpixelinfo* dpi, const ScreenCoordsXY& coords, const TextPaint& paint, rct_string_id format, const void* args)
 {
     utf8 buffer[512];
@@ -150,13 +144,6 @@ void gfx_draw_string(rct_drawpixelinfo* dpi, const_utf8string buffer, uint8_t co
 {
     TextPaint textPaint = { colour, gCurrentFontSpriteBase, false, TextAlignment::LEFT };
     DrawText(dpi, coords, textPaint, buffer);
-}
-
-void gfx_draw_string_no_formatting(
-    rct_drawpixelinfo* dpi, const_utf8string buffer, uint8_t colour, const ScreenCoordsXY& coords)
-{
-    TextPaint textPaint = { colour, gCurrentFontSpriteBase, false, TextAlignment::LEFT };
-    DrawText(dpi, coords, textPaint, buffer, true);
 }
 
 // Basic

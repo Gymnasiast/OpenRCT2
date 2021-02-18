@@ -26,9 +26,14 @@ using namespace OpenRCT2::Ui;
 
 static InGameConsole _inGameConsole;
 
+static int16_t InGameConsoleGetFontSpriteBase()
+{
+    return (gConfigInterface.console_small_font ? FONT_SPRITE_BASE_SMALL : FONT_SPRITE_BASE_MEDIUM);
+}
+
 static int32_t InGameConsoleGetLineHeight()
 {
-    auto fontSpriteBase = (gConfigInterface.console_small_font ? FONT_SPRITE_BASE_SMALL : FONT_SPRITE_BASE_MEDIUM);
+    auto fontSpriteBase = InGameConsoleGetFontSpriteBase();
     return font_get_line_height(fontSpriteBase);
 }
 
@@ -326,7 +331,9 @@ void InGameConsole::Draw(rct_drawpixelinfo* dpi) const
 
     // Draw current line
     lineBuffer = colourFormatStr + _consoleCurrentLine;
-    gfx_draw_string_no_formatting(dpi, lineBuffer.c_str(), TEXT_COLOUR_255, screenCoords);
+
+    TextPaint textPaint = { TEXT_COLOUR_255, InGameConsoleGetFontSpriteBase(), false, TextAlignment::LEFT };
+    DrawText(dpi, screenCoords, textPaint, lineBuffer.c_str(), true);
 
     // Draw caret
     if (_consoleCaretTicks < CONSOLE_CARET_FLASH_THRESHOLD)
