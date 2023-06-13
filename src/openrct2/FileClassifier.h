@@ -22,6 +22,7 @@ enum class FileExtension
     sv6,
     td6,
     park,
+    zoo,
 };
 
 #include <string>
@@ -39,6 +40,7 @@ enum class FileType
     scenario,
     trackDesign,
     park,
+    zoo,
 };
 
 struct ClassifiedFileInfo
