@@ -27,6 +27,7 @@ static bool TryClassifyAsPark(OpenRCT2::IStream* stream, ClassifiedFileInfo* res
 static bool TryClassifyAsS6(OpenRCT2::IStream* stream, ClassifiedFileInfo* result);
 static bool TryClassifyAsS4(OpenRCT2::IStream* stream, ClassifiedFileInfo* result);
 static bool TryClassifyAsTD4_TD6(OpenRCT2::IStream* stream, ClassifiedFileInfo* result);
+static bool TryClassifyAsZT1Zoo(OpenRCT2::IStream* stream, ClassifiedFileInfo* result);
 
 bool TryClassifyFile(const std::string& path, ClassifiedFileInfo* result)
 {
@@ -68,6 +69,11 @@ bool TryClassifyFile(OpenRCT2::IStream* stream, ClassifiedFileInfo* result)
 
     // TD6 detection
     if (TryClassifyAsTD4_TD6(stream, result))
+    {
+        return true;
+    }
+
+    if (TryClassifyAsZT1Zoo(stream, result))
     {
         return true;
     }
@@ -198,6 +204,30 @@ static bool TryClassifyAsTD4_TD6(OpenRCT2::IStream* stream, ClassifiedFileInfo* 
     return success;
 }
 
+static bool TryClassifyAsZT1Zoo(OpenRCT2::IStream* stream, ClassifiedFileInfo* result)
+{
+    bool success = false;
+
+    uint64_t originalPosition = stream->GetPosition();
+    try
+    {
+        char buffer[4];
+        // size_t dataLength = static_cast<size_t>(stream->GetLength());
+        stream->Read4(buffer);
+        stream->SetPosition(originalPosition);
+
+        success = (std::string(buffer) == "TZFB");
+        result->Type = FILE_TYPE::ZOO;
+        result->Version = 0;
+    }
+    catch (const std::exception& e)
+    {
+        Console::Error::WriteLine(e.what());
+    }
+
+    return success;
+}
+
 FileExtension GetFileExtensionType(u8string_view path)
 {
     auto extension = Path::GetExtension(path);
@@ -221,5 +251,7 @@ FileExtension GetFileExtensionType(u8string_view path)
         return FileExtension::TD6;
     if (String::IEquals(extension, ".park"))
         return FileExtension::PARK;
+    if (String::Equals(extension, ".zoo", true))
+        return FileExtension::ZOO;
     return FileExtension::Unknown;
 }

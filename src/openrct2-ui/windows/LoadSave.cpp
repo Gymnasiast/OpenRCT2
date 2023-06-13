@@ -208,10 +208,10 @@ namespace OpenRCT2::Ui::Windows
         switch (type & 0x0E)
         {
             case LOADSAVETYPE_GAME:
-                return isSave ? "*.park" : "*.park;*.sv6;*.sc6;*.sc4;*.sv4;*.sv7;*.sea";
+            return isSave ? "*.park" : "*.park;*.sv6;*.sc6;*.sc4;*.sv4;*.sv7;*.sea;*.zoo";
 
             case LOADSAVETYPE_LANDSCAPE:
-                return isSave ? "*.park" : "*.park;*.sc6;*.sv6;*.sc4;*.sv4;*.sv7;*.sea";
+            return isSave ? "*.park" : "*.park;*.sc6;*.sv6;*.sc4;*.sv4;*.sv7;*.sea;*.zoo";
 
             case LOADSAVETYPE_SCENARIO:
                 return isSave ? "*.park" : "*.park;*.sc6;*.sc4";

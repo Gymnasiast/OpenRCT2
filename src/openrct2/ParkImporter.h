@@ -66,6 +66,7 @@ namespace OpenRCT2::ParkImporter
     [[nodiscard]] std::unique_ptr<IParkImporter> CreateS4();
     [[nodiscard]] std::unique_ptr<IParkImporter> CreateS6(IObjectRepository& objectRepository);
     [[nodiscard]] std::unique_ptr<IParkImporter> CreateParkFile(IObjectRepository& objectRepository);
+    [[nodiscard]] std::unique_ptr<IParkImporter> CreateZoo();
 
     bool ExtensionIsOpenRCT2ParkFile(std::string_view extension);
     bool ExtensionIsRCT1(std::string_view extension);

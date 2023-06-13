@@ -760,7 +760,8 @@ namespace OpenRCT2
                     throw std::runtime_error("Unable to detect file type");
                 }
 
-                if (info.Type != FILE_TYPE::PARK && info.Type != FILE_TYPE::SAVED_GAME && info.Type != FILE_TYPE::SCENARIO)
+                if (info.Type != FILE_TYPE::PARK && info.Type != FILE_TYPE::SAVED_GAME && info.Type != FILE_TYPE::SCENARIO
+                    && info.Type != FILE_TYPE::ZOO)
                 {
                     throw std::runtime_error("Invalid file type.");
                 }
@@ -769,6 +770,10 @@ namespace OpenRCT2
                 if (info.Type == FILE_TYPE::PARK)
                 {
                     parkImporter = ParkImporter::CreateParkFile(*_objectRepository);
+                }
+                else if (info.Type == FILE_TYPE::ZOO)
+                {
+                    parkImporter = ParkImporter::CreateZoo();
                 }
                 else if (info.Version <= kFileTypeS4Cutoff)
                 {

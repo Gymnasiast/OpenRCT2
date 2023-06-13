@@ -22,6 +22,7 @@ enum class FileExtension
     SV6,
     TD6,
     PARK,
+    ZOO,
 };
 
 #include <string>
@@ -39,6 +40,7 @@ enum class FILE_TYPE
     SCENARIO,
     TRACK_DESIGN,
     PARK,
+    ZOO,
 };
 
 struct ClassifiedFileInfo
