@@ -14,7 +14,6 @@
 #include <algorithm>
 #include <cmath>
 #include <openrct2/audio/AudioSource.h>
-#include <speex/speex_resampler.h>
 
 namespace OpenRCT2::Audio
 {
@@ -25,7 +24,7 @@ namespace OpenRCT2::Audio
 
     private:
         AudioSource_* _source = nullptr;
-        SpeexResamplerState* _resampler = nullptr;
+        ResamplerState* _resampler = nullptr;
 
         MixerGroup _group = MixerGroup::Sound;
         double _rate = 0;
@@ -56,7 +55,8 @@ namespace OpenRCT2::Audio
         {
             if (_resampler != nullptr)
             {
-                speex_resampler_destroy(_resampler);
+                ma_resampler_uninit(_resampler, nullptr);
+                free(_resampler);
                 _resampler = nullptr;
             }
         }
@@ -66,13 +66,16 @@ namespace OpenRCT2::Audio
             return _source;
         }
 
-        [[nodiscard]] SpeexResamplerState* GetResampler() const override
+        [[nodiscard]] ResamplerState* GetResampler() const override
         {
             return _resampler;
         }
 
-        void SetResampler(SpeexResamplerState* value) override
+        void SetResampler(ResamplerState* value) override
         {
+            if (_resampler != nullptr)
+                free(_resampler);
+
             _resampler = value;
         }
 

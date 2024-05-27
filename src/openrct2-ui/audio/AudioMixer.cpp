@@ -8,12 +8,13 @@
  *****************************************************************************/
 
 #include "AudioMixer.h"
+#include "MiniAudio.h"
 
 #include <algorithm>
 #include <iterator>
 #include <openrct2/OpenRCT2.h>
 #include <openrct2/config/Config.h>
-#include <speex/speex_resampler.h>
+#include <openrct2/Diagnostic.h>
 
 using namespace OpenRCT2::Audio;
 
@@ -263,19 +264,25 @@ size_t AudioMixer::ApplyResample(
     int32_t outputByteRate = _outputFormat.GetByteRate();
 
     // Create resampler
-    SpeexResamplerState* resampler = channel->GetResampler();
+    ResamplerState* resampler = channel->GetResampler();
     if (resampler == nullptr)
     {
-        resampler = speex_resampler_init(_outputFormat.channels, _outputFormat.freq, _outputFormat.freq, 0, nullptr);
+        ma_resampler_config config = ma_resampler_config_init(
+            ma_format_s16, _outputFormat.channels, _outputFormat.freq, _outputFormat.freq, ma_resample_algorithm_linear);
+
+        resampler = static_cast<ResamplerState*>(malloc(sizeof(ResamplerState)));
+        ma_result result = ma_resampler_init(&config, nullptr, resampler);
+        if (result != MA_SUCCESS)
+        {
+            LOG_ERROR("Cannot initialise resampler! Error no: %d", result);
+        }
         channel->SetResampler(resampler);
     }
-    speex_resampler_set_rate(resampler, inRate, outRate);
+    ma_resampler_set_rate(resampler, inRate, outRate);
 
-    uint32_t inLen = srcSamples;
-    uint32_t outLen = dstSamples;
-    speex_resampler_process_interleaved_int(
-        resampler, static_cast<const spx_int16_t*>(srcBuffer), &inLen, reinterpret_cast<spx_int16_t*>(_effectBuffer.data()),
-        &outLen);
+    ma_uint64 inLen = srcSamples;
+    ma_uint64 outLen = dstSamples;
+    ma_resampler_process_pcm_frames(resampler, srcBuffer, &inLen, _effectBuffer.data(), &outLen);
 
     return outLen * outputByteRate;
 }
