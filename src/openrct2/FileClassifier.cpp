@@ -221,5 +221,7 @@ FileExtension GetFileExtensionType(u8string_view path)
         return FileExtension::TD6;
     if (String::iequals(extension, ".park"))
         return FileExtension::PARK;
+    if (String::IEquals(extension, ".ntdf"))
+        return FileExtension::NTDF;
     return FileExtension::Unknown;
 }

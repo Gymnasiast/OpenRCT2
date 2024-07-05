@@ -26,6 +26,7 @@
 #include <openrct2/core/Guard.hpp>
 #include <openrct2/core/Path.hpp>
 #include <openrct2/core/String.hpp>
+#include <openrct2/design/DesignFile.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/network/network.h>
@@ -218,7 +219,7 @@ namespace OpenRCT2::Ui::Windows
                 return isSave ? "*.park" : "*.park;*.sc6;*.sc4";
 
             case LOADSAVETYPE_TRACK:
-                return isSave ? "*.td6" : "*.td6;*.td4";
+                return isSave ? "*.ntdf" : "*.ntdf;*.td6;*.td4";
 
             case LOADSAVETYPE_HEIGHTMAP:
                 return "*.bmp;*.png";
@@ -389,12 +390,20 @@ namespace OpenRCT2::Ui::Windows
             {
                 SetAndSaveConfigPath(Config::Get().general.LastSaveTrackDirectory, pathBuffer);
 
-                const auto withExtension = Path::WithExtension(pathBuffer, ".td6");
+                const auto withExtension = Path::WithExtension(pathBuffer, ".ntdf");
                 String::set(pathBuffer, sizeof(pathBuffer), withExtension.c_str());
 
-                RCT2::T6Exporter t6Export{ *_trackDesign };
-
-                auto success = t6Export.SaveTrack(pathBuffer);
+                auto exporter = std::make_unique<DesignFileExporter>();
+                auto success = false;
+                try
+                {
+                    exporter->Export(*_trackDesign, pathBuffer);
+                    success = true;
+                }
+                catch (const std::exception& e)
+                {
+                    LOG_ERROR(e.what());
+                }
 
                 if (success)
                 {
@@ -444,7 +453,7 @@ namespace OpenRCT2::Ui::Windows
                 break;
 
             case LOADSAVETYPE_TRACK:
-                extension = u8".td6";
+                extension = u8".ntdf";
                 title = isSave ? STR_FILE_DIALOG_TITLE_SAVE_TRACK : STR_FILE_DIALOG_TITLE_INSTALL_NEW_TRACK_DESIGN;
                 desc.Filters.emplace_back(
                     LanguageGetString(STR_OPENRCT2_TRACK_DESIGN_FILE), GetFilterPatternByType(_type, isSave));

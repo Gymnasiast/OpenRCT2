@@ -22,6 +22,7 @@ enum class FileExtension
     SV6,
     TD6,
     PARK,
+    NTDF,
 };
 
 #include <string>

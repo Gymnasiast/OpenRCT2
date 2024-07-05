@@ -207,8 +207,8 @@ struct TrackDesign
     TrackDesignAppearanceSettings appearance{};
     TrackDesignStatistics statistics{};
 
-    std::vector<TrackDesignMazeElement> mazeElements;
     std::vector<TrackDesignTrackElement> trackElements;
+    std::vector<TrackDesignMazeElement> mazeElements;
     std::vector<TrackDesignEntranceElement> entranceElements;
     std::vector<TrackDesignSceneryElement> sceneryElements;
 

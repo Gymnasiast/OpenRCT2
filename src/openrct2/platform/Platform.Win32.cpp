@@ -339,6 +339,7 @@ namespace OpenRCT2::Platform
         SetUpFileAssociation(".sea", "RCTC Saved Game (.sea)", "Play", "\"%1\"", 0);
         SetUpFileAssociation(".td4", "RCT1 Track Design (.td4)", "Install", "\"%1\"", 0);
         SetUpFileAssociation(".td6", "RCT2 Track Design (.td6)", "Install", "\"%1\"", 0);
+        SetUpFileAssociation(".ntdf", "OpenRCT2 Track Design (.ntdf)", "Install", "\"%1\"", 0);
 
         // Refresh explorer
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
@@ -479,6 +480,7 @@ namespace OpenRCT2::Platform
         RemoveFileAssociation(".sea");
         RemoveFileAssociation(".td4");
         RemoveFileAssociation(".td6");
+        RemoveFileAssociation(".ntdf");
 
         // Refresh explorer
         SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
