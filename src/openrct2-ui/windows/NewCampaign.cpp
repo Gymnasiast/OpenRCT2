@@ -47,12 +47,15 @@ namespace OpenRCT2::Ui::Windows
     // clang-format off
     static Widget window_new_campaign_widgets[] = {
         WINDOW_SHIM(WINDOW_TITLE, WW, WH),
-        MakeWidget        ({ 14, 24}, {126, 12}, WindowWidgetType::Label,    WindowColour::Primary, STR_EMPTY                                  ), // ride label
-        MakeWidget        ({100, 24}, {242, 12}, WindowWidgetType::DropdownMenu, WindowColour::Primary, STR_EMPTY                                  ), // ride dropdown
+        MakeWidget        ({ 14, 24}, {126, 14}, WindowWidgetType::Label,    WindowColour::Primary, STR_EMPTY                                  ), // ride label
+        MakeWidget        ({100, 24}, {242, 14}, WindowWidgetType::DropdownMenu, WindowColour::Primary, STR_EMPTY                              ), // ride dropdown
         MakeWidget        ({330, 25}, { 11, 10}, WindowWidgetType::Button,   WindowColour::Primary, STR_DROPDOWN_GLYPH                         ), // ride dropdown button
         MakeWidget        ({ 14, 41}, {126, 14}, WindowWidgetType::Label,    WindowColour::Primary, STR_LENGTH_OF_TIME                         ), // weeks label
-        MakeSpinnerWidgets({120, 41}, {100, 14}, WindowWidgetType::Spinner,  WindowColour::Primary, STR_EMPTY                                  ), // weeks (3 widgets)
+        MakeSpinnerWidgets({100, 41}, {100, 14}, WindowWidgetType::Spinner,  WindowColour::Primary, STR_EMPTY                                  ), // weeks (3 widgets)
+        //MakeWidget        ({ 14, 58}, {100, 14}, WindowWidgetType::Label,    WindowColour::Primary, STR_MARKETING_COST_PER_WEEK                ), // costs per week
+        //MakeWidget        ({ 14, 73}, {100, 14}, WindowWidgetType::Label,    WindowColour::Primary, STR_MARKETING_TOTAL_COST                   ), // costs per week
         MakeWidget        ({ 14, 89}, {322, 14}, WindowWidgetType::Button,   WindowColour::Primary, STR_MARKETING_START_THIS_MARKETING_CAMPAIGN), // start button
+        
         kWidgetsEnd,
     };
     // clang-format on
@@ -373,8 +376,8 @@ namespace OpenRCT2::Ui::Windows
                 dpi, windowPos + ScreenCoordsXY{ spinnerWidget->left + 1, spinnerWidget->top },
                 Campaign.no_weeks == 1 ? STR_MARKETING_1_WEEK : STR_X_WEEKS, ft, { colours[0] });
 
-            screenCoords = windowPos + ScreenCoordsXY{ 14, 60 };
-
+            screenCoords = windowPos + ScreenCoordsXY{ 14, spinnerWidget->bottom + 6 };
+            
             // Price per week
             ft = Formatter();
             ft.Add<money64>(AdvertisingCampaignPricePerWeek[Campaign.campaign_type]);
