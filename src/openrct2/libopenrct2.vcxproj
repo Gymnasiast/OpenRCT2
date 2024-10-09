@@ -435,6 +435,7 @@
     <ClInclude Include="ride\rtd\coaster\ClassicMiniRollerCoaster.h" />
     <ClInclude Include="ride\rtd\coaster\ClassicStandUpRollerCoaster.h" />
     <ClInclude Include="ride\rtd\coaster\ClassicWoodenRollerCoaster.h" />
+    <ClInclude Include="ride\rtd\coaster\ClassicWoodenTwisterRollerCoaster.h" />
     <ClInclude Include="ride\rtd\coaster\CompactInvertedCoaster.h" />
     <ClInclude Include="ride\rtd\coaster\CorkscrewRollerCoaster.h" />
     <ClInclude Include="ride\rtd\coaster\FlyingRollerCoaster.h" />
@@ -916,6 +917,7 @@
     <ClCompile Include="paint\track\coaster\BobsleighCoaster.cpp" />
     <ClCompile Include="paint\track\coaster\ClassicStandUpRollerCoaster.cpp" />
     <ClCompile Include="paint\track\coaster\ClassicWoodenRollerCoaster.cpp" />
+    <ClCompile Include="paint\track\coaster\ClassicWoodenTwisterRollerCoaster.cpp" />
     <ClCompile Include="paint\track\coaster\CompactInvertedCoaster.cpp" />
     <ClCompile Include="paint\track\coaster\CorkscrewRollerCoaster.cpp" />
     <ClCompile Include="paint\track\coaster\FlyingRollerCoaster.cpp" />
