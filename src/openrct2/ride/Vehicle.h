@@ -386,10 +386,12 @@ private:
         restart,
         stop,
     };
+    using Loc6DC462Status = UpdateMiniGolfFlagsStatus;
     UpdateMiniGolfFlagsStatus UpdateTrackMotionMiniGolfFlagsStatus(const Ride& curRide);
     void UpdateTrackMotionPreUpdate(
         Vehicle& car, const Ride& curRide, const RideObjectEntry& rideEntry, const CarEntry* carEntry);
     void UpdateMiniGolfFlagsAndProgress(const Ride& curRide, CoordsXYZ& trackPos);
+    Loc6DC462Status Loc6DC462(const Ride& curRide, CoordsXYZ& trackPos);
 };
 static_assert(sizeof(Vehicle) <= 512);
 
