@@ -389,6 +389,7 @@ private:
     UpdateMiniGolfFlagsStatus UpdateTrackMotionMiniGolfFlagsStatus(const Ride& curRide);
     void UpdateTrackMotionPreUpdate(
         Vehicle& car, const Ride& curRide, const RideObjectEntry& rideEntry, const CarEntry* carEntry);
+    void UpdateMiniGolfFlagsAndProgress(const Ride& curRide, CoordsXYZ& trackPos);
 };
 static_assert(sizeof(Vehicle) <= 512);
 
