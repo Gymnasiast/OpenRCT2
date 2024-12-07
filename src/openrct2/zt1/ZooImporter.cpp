@@ -13,13 +13,18 @@
 #include "../GameState.h"
 #include "../ParkImporter.h"
 #include "../actions/ParkEntrancePlaceAction.h"
+#include "../actions/RideCreateAction.h"
+#include "../actions/TrackPlaceAction.h"
 #include "../core/FileStream.h"
+#include "../interface/Viewport.h"
 #include "../object/DefaultObjects.h"
+#include "../object/ObjectManager.h"
 #include "../object/ObjectRepository.h"
 #include "../rct1/RCT1.h"
 #include "../rct1/Tables.h"
 #include "../rct12/EntryList.h"
 #include "../rct12/RCT12.h"
+#include "../ride/RideData.h"
 #include "../scenario/ScenarioRepository.h"
 #include "../world/Entrance.h"
 #include "../world/Park.h"
@@ -27,7 +32,10 @@
 #include "../world/tile_element/EntranceElement.h"
 #include "../world/tile_element/PathElement.h"
 #include "../world/tile_element/Slope.h"
+#include "../world/tile_element/SmallSceneryElement.h"
 #include "../world/tile_element/SurfaceElement.h"
+#include "../world/tile_element/TrackElement.h"
+#include "../world/tile_element/WallElement.h"
 
 using namespace OpenRCT2;
 
@@ -43,6 +51,29 @@ const std::string_view ZooEntrances[] = {
     "building/building/fgate",
     "building/building/dgate",
     "building/building/aqgate",
+};
+static const std::unordered_map<std::string, std::string> kFacilities = {
+    { "building/building/bathroom", "rct2.ride.tlt1" },  // Small restroom
+    { "building/building/fbatroom", "rct2.ride.tlt1" },  // Family restroom
+    { "building/building/acbath", "rct2.ride.tlt1" },    // Aquatic restroom
+    { "building/building/bgrstnd", "rct2.ride.burgb" },  // Burger Stand
+    { "building/building/pizzstnd", "rct2.ride.pizzs" }, // Pizza Stand
+    { "building/building/drkstnd", "rct2.ride.drnks" },  // Drinks Stand
+    { "objects/other/parkmap", "rct2.ride.infok" },      // Zoo Map
+    { "building/building/hdogstnd", "rct2.ride.hotds" }, // Hot Dog Stall
+    { "building/building/giftcart", "rct2.ride.souvs" }, // Gift Stand
+};
+static const std::unordered_map<std::string, std::string> kSmallScenery = {
+    { "objects/foliage/weepwill", "rct2.scenery_small.tww" }, // Weeping willow
+    { "objects/other/flower5", "rct2.scenery_small.tg6" },
+    { "objects/other/flower6", "rct2.scenery_small.tg4" },
+    { "objects/other/flower7", "rct2.scenery_small.tg13" },
+    { "objects/foliage/birch", "rct2.scenery_small.tsb" },   // Birch Tree
+    { "objects/foliage/fir", "rct2.scenery_small.tns" },     // Fir Tree
+    { "objects/foliage/wtrreed", "rct2.scenery_small.tbr" }, // Water Reed
+};
+static const std::unordered_map<std::string, std::string> kWall = {
+    { "fences/postrope/f", "rct2.scenery_wall.wpf" }, // Post and Rope Fence
 };
 
 enum ZooTerrainType : uint8_t
@@ -139,6 +170,7 @@ struct ZooTerrainElement
     ZooTerrainType Type;
     int32_t Unk;
 };
+static_assert(sizeof(ZooTerrainElement) == 10);
 
 struct ZT1CoordsXYZD
 {
@@ -149,19 +181,20 @@ struct ZT1CoordsXYZD
 
     constexpr uint8_t GetRCTDirection()
     {
-        switch (Rotation)
-        {
-            case 0:
-                return 2;
-            case 2:
-                return 3;
-            case 4:
-                return 0;
-            case 6:
-                return 1;
-        }
-
-        return 0;
+        return Rotation / 2;
+        //        switch (Rotation)
+        //        {
+        //            case 0:
+        //                return 2;
+        //            case 2:
+        //                return 3;
+        //            case 4:
+        //                return 0;
+        //            case 6:
+        //                return 1;
+        //        }
+        //
+        //        return 0;
     }
 
     constexpr CoordsXYZD ToCoordsXYZD()
@@ -176,7 +209,7 @@ struct ZT1CoordsXYZD
         return TileCoordsXYZD(ToCoordsXYZD());
     }
 };
-static_assert(sizeof(ZooTerrainElement) == 10);
+static_assert(sizeof(ZT1CoordsXYZD) == 16);
 #pragma pack(pop)
 
 struct ZooTileElement
@@ -312,6 +345,9 @@ namespace ZT1
             _stream->Seek(sizeof(int32_t) * 4, STREAM_SEEK_CURRENT);
             ImportTerrain();
             ImportTileElements(gameState);
+            ResearchItemsMakeAllResearched();
+            SetEveryRideTypeInvented();
+            SetEveryRideEntryInvented();
             CheatsReset();
             ClearRestrictedScenery();
         }
@@ -360,37 +396,29 @@ namespace ZT1
         {
             ObjectList result;
 
-            //            std::vector<std::string> defaultObjects = {};
-            //            for (auto defaultSelectedObject : DefaultSelectedObjects)
-            //            {
-            //                ObjectEntryDescriptor desc = {};
-            //                desc.Generation = ObjectGeneration::JSON;
-            //                desc.Identifier = defaultSelectedObject;
-            //                result.Add(desc);
-            //            }
-
-            //            AppendRequiredObjects(result, ObjectType::Ride, _rideEntries);
+            AppendRequiredObjects(result, ObjectType::Ride, _rideEntries);
             AppendRequiredObjects(result, ObjectType::SmallScenery, _smallSceneryEntries);
             AppendRequiredObjects(result, ObjectType::LargeScenery, _largeSceneryEntries);
             AppendRequiredObjects(result, ObjectType::Walls, _wallEntries);
             AppendRequiredObjects(result, ObjectType::Paths, _pathEntries);
             AppendRequiredObjects(result, ObjectType::PathAdditions, _pathAdditionEntries);
             AppendRequiredObjects(result, ObjectType::SceneryGroup, _sceneryGroupEntries);
-            //            AppendRequiredObjects(
-            //                    result, ObjectType::Banners,
-            //                    std::vector<std::string>({
-            //                                                     "rct2.footpath_banner.bn1",
-            //                                                     "rct2.footpath_banner.bn2",
-            //                                                     "rct2.footpath_banner.bn3",
-            //                                                     "rct2.footpath_banner.bn4",
-            //                                                     "rct2.footpath_banner.bn5",
-            //                                                     "rct2.footpath_banner.bn6",
-            //                                                     "rct2.footpath_banner.bn7",
-            //                                                     "rct2.footpath_banner.bn8",
-            //                                                     "rct2.footpath_banner.bn9",
-            //                                             }));
+            AppendRequiredObjects(
+                result, ObjectType::Banners,
+                std::vector<std::string>({
+                    "rct2.footpath_banner.bn1",
+                    "rct2.footpath_banner.bn2",
+                    "rct2.footpath_banner.bn3",
+                    "rct2.footpath_banner.bn4",
+                    "rct2.footpath_banner.bn5",
+                    "rct2.footpath_banner.bn6",
+                    "rct2.footpath_banner.bn7",
+                    "rct2.footpath_banner.bn8",
+                    "rct2.footpath_banner.bn9",
+                }));
             AppendRequiredObjects(result, ObjectType::ParkEntrance, std::vector<std::string>({ "rct2.park_entrance.pkent1" }));
             AppendRequiredObjects(result, ObjectType::Water, std::vector<std::string>({ "rct2.water.wtrcyan" }));
+            AppendRequiredObjects(result, ObjectType::PeepNames, std::vector<std::string>({ "rct2.peep_names.original" }));
             AppendRequiredObjects(result, ObjectType::TerrainSurface, _terrainSurfaceEntries);
             AppendRequiredObjects(result, ObjectType::TerrainEdge, std::vector<std::string>({ "rct2.terrain_edge.rock" }));
             //            AppendRequiredObjects(result, ObjectType::TerrainEdge, _terrainEdgeEntries);
@@ -420,6 +448,13 @@ namespace ZT1
 
         void AddDefaultEntries()
         {
+            _rideEntries.AddRange({
+                "rct2.ride.twist1", "rct2.ride.ptct1", "rct2.ride.zldb",  "rct2.ride.lfb1",  "rct2.ride.vcr",
+                "rct2.ride.mgr1",   "rct2.ride.tlt1",  "rct2.ride.atm1",  "rct2.ride.faid1", "rct2.ride.infok",
+                "rct2.ride.drnks",  "rct2.ride.cndyf", "rct2.ride.burgb", "rct2.ride.balln", "rct2.ride.arrt1",
+                "rct2.ride.rboat",  "rct2.ride.pizzs", "rct2.ride.hotds", "rct2.ride.souvs",
+            });
+
             // Add default scenery groups
             _sceneryGroupEntries.AddRange({
                 "rct2.scenery_group.scgtrees",
@@ -524,6 +559,8 @@ namespace ZT1
                     const auto surfaceIndentifier = GetTerrainSurfaceObject(tileElement.Type);
                     auto entryIndex = _terrainSurfaceEntries.GetOrAddEntry(surfaceIndentifier);
                     surface->SetSurfaceObjectIndex(entryIndex);
+
+                    surface->SetOwnership(OWNERSHIP_OWNED);
                 }
             }
         }
@@ -557,11 +594,28 @@ namespace ZT1
                 for (auto id : ZooEntrances)
                 {
                     if (id == combinedId)
+                    {
                         ImportZooEntrance(gameState);
+                    }
                 }
                 if (ids[0] == "paths")
                 {
                     ImportPath(combinedId);
+                }
+                for (auto mapping : kFacilities)
+                {
+                    if (mapping.first == combinedId)
+                        ImportFacility(mapping.second);
+                }
+                for (auto mapping : kSmallScenery)
+                {
+                    if (mapping.first == combinedId)
+                        ImportSmallScenery(mapping.second);
+                }
+                for (auto mapping : kWall)
+                {
+                    if (mapping.first == combinedId)
+                        ImportWall(mapping.second);
                 }
 
                 _stream->SetPosition(savedPos);
@@ -571,33 +625,62 @@ namespace ZT1
             }
         }
 
+        uint8_t GetEdgeFromDirection(Direction direction)
+        {
+            uint8_t ret = 0;
+            switch (direction)
+            {
+                case 0:
+                    ret = 8;
+                    break;
+                case 1:
+                    ret = 1;
+                    break;
+                case 2:
+                    ret = 2;
+                    break;
+                case 3:
+                    ret = 4;
+                    break;
+            }
+
+            return ret;
+        }
+
         void ImportZooWall()
         {
+            // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
-            auto x = _stream->ReadValue<int32_t>();
-            auto y = _stream->ReadValue<int32_t>();
-            [[maybe_unused]] auto height = _stream->ReadValue<int32_t>();
-            auto rotation = _stream->ReadValue<int32_t>();
 
-            auto coords = TileCoordsXY((y / kZooCoordsXYStep) + 1, (x / kZooCoordsXYStep) + 1);
+            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
+
             auto* surface = MapGetSurfaceElementAt(coords);
             auto fences = surface->GetParkFences();
 
-            switch (rotation)
-            {
-                case 0:
-                    fences |= 8;
-                    break;
-                case 2:
-                    fences |= 1;
-                    break;
-                case 4:
-                    fences |= 2;
-                    break;
-                case 6:
-                    fences |= 4;
-                    break;
-            }
+            fences |= GetEdgeFromDirection(coords.direction);
+
+            //            switch (coords.direction)
+            //            {
+            //                case 0:
+            //                    fences |= 8;
+            //                    break;
+            //                case 1:
+            //                    fences |= 1;
+            //                    break;
+            //                case 2:
+            //                    fences |= 2;
+            //                    break;
+            //                case 3:
+            //                    fences |= 4;
+            //                    break;
+            //            }
 
             surface->SetParkFences(fences);
         }
@@ -606,40 +689,53 @@ namespace ZT1
         {
             // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
+
             auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
-            // Skip age
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
             _stream->Seek(4, STREAM_SEEK_CURRENT);
 
-            auto parkName = ReadZTString(*_stream);
-            gameState.Park.Name = parkName;
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
 
-            TileCoordsXYZD tileCoords[3] = { ztCoords.ToTileCoordsXYZD(), ztCoords.ToTileCoordsXYZD(),
-                                             ztCoords.ToTileCoordsXYZD() };
-            tileCoords[0] = tileCoords[1] = tileCoords[0];
-            tileCoords[2] = tileCoords[0];
-            auto peepSpawnCoords = ztCoords.ToCoordsXYZD().ToTileCentre();
-            peepSpawnCoords.direction = (peepSpawnCoords.direction + 2) % kNumOrthogonalDirections;
-            switch (tileCoords[0].direction)
+            gameState.Park.Name = name;
+
+            coords.direction = DirectionReverse(coords.direction);
+            auto asTileCoords = TileCoordsXYZD(coords);
+            TileCoordsXYZD segmentTileCoords[3] = { asTileCoords, asTileCoords, asTileCoords };
+            auto peepSpawnCoords = coords.ToTileStart();
+            auto firstOwnedSquareCoords = coords.ToTileCentre();
+            peepSpawnCoords.direction = DirectionReverse(peepSpawnCoords.direction);
+            switch (segmentTileCoords[0].direction)
             {
                 case 0:
-                    tileCoords[1].y -= 1;
-                    tileCoords[2].y += 1;
+                    segmentTileCoords[1].y -= 1;
+                    segmentTileCoords[2].y += 1;
                     peepSpawnCoords.x -= kCoordsXYStep;
+                    peepSpawnCoords.y += 16;
+                    firstOwnedSquareCoords.x += kCoordsXYStep;
                     break;
                 case 1:
-                    tileCoords[1].x -= 1;
-                    tileCoords[2].x += 1;
+                    segmentTileCoords[1].x -= 1;
+                    segmentTileCoords[2].x += 1;
                     peepSpawnCoords.y -= kCoordsXYStep;
+                    peepSpawnCoords.x += 16;
+                    firstOwnedSquareCoords.y += kCoordsXYStep;
                     break;
                 case 2:
-                    tileCoords[1].y += 1;
-                    tileCoords[2].y -= 1;
+                    segmentTileCoords[1].y += 1;
+                    segmentTileCoords[2].y -= 1;
                     peepSpawnCoords.x += kCoordsXYStep;
+                    peepSpawnCoords.y += 16;
+                    firstOwnedSquareCoords.x -= kCoordsXYStep;
                     break;
                 case 3:
-                    tileCoords[1].x += 1;
-                    tileCoords[2].x -= 1;
+                    segmentTileCoords[1].x += 1;
+                    segmentTileCoords[2].x -= 1;
                     peepSpawnCoords.y += kCoordsXYStep;
+                    peepSpawnCoords.x += 16;
+                    firstOwnedSquareCoords.y -= kCoordsXYStep;
                     break;
             }
 
@@ -648,9 +744,9 @@ namespace ZT1
 
             //            LOG_ERROR("Placing entrance at x %d, y %d", tileCoords[0].x, tileCoords[0].y);
 
-            for (uint32_t sequenceIndex = 0; sequenceIndex < std::size(tileCoords); sequenceIndex++)
+            for (uint32_t sequenceIndex = 0; sequenceIndex < std::size(segmentTileCoords); sequenceIndex++)
             {
-                const auto& current = tileCoords[sequenceIndex];
+                const auto& current = segmentTileCoords[sequenceIndex];
                 EntranceElement* tileElement;
                 auto* pathElement = MapGetPathElementAt(current);
                 if (pathElement != nullptr)
@@ -674,15 +770,209 @@ namespace ZT1
                 if (sequenceIndex == 0)
                 {
                     MapAnimationCreate(MAP_ANIMATION_TYPE_PARK_ENTRANCE, current.ToCoordsXYZ());
-                    gameState.PeepSpawns.push_back(peepSpawnCoords);
                 }
             }
 
-            gameState.Park.Entrances.push_back(tileCoords[0].ToCoordsXYZD());
+            gameState.PeepSpawns.push_back(peepSpawnCoords);
+            auto* peepSpawnSurface = MapGetSurfaceElementAt(peepSpawnCoords);
+            peepSpawnSurface->SetOwnership(OWNERSHIP_UNOWNED);
+
+            gameState.Park.Entrances.push_back(segmentTileCoords[0].ToCoordsXYZD());
+            gameState.SavedView = Translate3DTo2DWithZ(segmentTileCoords[0].direction, segmentTileCoords[0].ToCoordsXYZ());
+            gameState.SavedViewRotation = segmentTileCoords[0].direction;
+            auto* surface = MapGetSurfaceElementAt(firstOwnedSquareCoords);
+            surface->SetOwnership(OWNERSHIP_OWNED);
+        }
+
+        void ImportFacility(const std::string& objectIdentifier)
+        {
+            // Skip unk
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
+
+            auto subtypeId = _rideEntries.GetOrAddEntry(objectIdentifier);
+            // auto& objManager = GetContext()->GetObjectManager();
+            // const auto* object = objManager.GetLoadedObject<RideObject>(subtypeId);
+
+            auto rideIndex = GetNextFreeRideId();
+            auto* ride = RideAllocateAtIndex(rideIndex);
+            if (ride == nullptr)
+            {
+                LOG_ERROR("Ride not allocated!");
+                return;
+            }
+            const auto* rideEntry = GetRideEntryByIndex(subtypeId);
+            if (rideEntry == nullptr)
+            {
+                LOG_ERROR("Ride entry not allocated!");
+                // return;
+            }
+            auto rideTypeId = rideEntry->GetFirstNonNullRideType();
+            ride->type = rideTypeId;
+            ride->subtype = subtypeId;
+            ride->SetColourPreset(0);
+            ride->overall_view = coords;
+            ride->custom_name = name;
+
+            for (auto& station : ride->GetStations())
+            {
+                station.Start.SetNull();
+                station.Entrance.SetNull();
+                station.Exit.SetNull();
+                station.TrainAtStation = RideStation::kNoTrain;
+                station.QueueTime = 0;
+                station.SegmentLength = 0;
+                station.QueueLength = 0;
+                station.Length = 0;
+                station.Height = 0;
+            }
+
+            ride->status = RideStatus::Closed;
+            ride->NumTrains = 1;
+            ride->ProposedNumTrains = 1;
+            ride->max_trains = OpenRCT2::Limits::kMaxTrainsPerRide;
+            ride->num_cars_per_train = 1;
+            ride->proposed_num_cars_per_train = 1; // rideEntry->max_cars_in_train;
+            ride->min_waiting_time = 10;
+            ride->max_waiting_time = 60;
+            ride->depart_flags = RIDE_DEPART_WAIT_FOR_MINIMUM_LENGTH | 3;
+            const auto& rtd = ride->GetRideTypeDescriptor();
+            const auto& operatingSettings = rtd.OperatingSettings;
+            ride->operation_option = (operatingSettings.MinValue * 3 + operatingSettings.MaxValue) / 4;
+
+            ride->lift_hill_speed = rtd.LiftData.minimum_speed;
+
+            ride->ratings.setNull();
+            for (auto i = 0; i < RCT2::ObjectLimits::MaxShopItemsPerRideEntry; i++)
+            {
+                ride->price[i] = rtd.DefaultPrices[i];
+            }
+            //            ride->price[0] = GetShopItemDescriptor(rideEntry->shop_item[0]).DefaultPrice;
+            //            if (rideEntry->shop_item[1] != ShopItem::None)
+            //            {
+            //                ride->price[1] = GetShopItemDescriptor(rideEntry->shop_item[1]).DefaultPrice;
+            //            }
+            ride->value = RIDE_VALUE_UNDEFINED;
+            ride->satisfaction = 255;
+            ride->popularity = 255;
+            ride->build_date = GetDate().GetMonthsElapsed();
+            ride->music_tune_id = TUNE_ID_NULL;
+
+            ride->breakdown_reason = 255;
+            ride->upkeep_cost = kMoney64Undefined;
+            ride->reliability = kRideInitialReliability;
+            ride->unreliability_factor = 1;
+            ride->inspection_interval = RIDE_INSPECTION_EVERY_30_MINUTES;
+            ride->last_crash_type = RIDE_CRASH_TYPE_NONE;
+            ride->income_per_hour = kMoney64Undefined;
+            ride->profit = kMoney64Undefined;
+
+            ride->entrance_style = OBJECT_ENTRY_INDEX_NULL;
+            if (rtd.HasFlag(RtdFlag::hasEntranceAndExit))
+            {
+                ride->entrance_style = 0;
+            }
+
+            ride->num_circuits = 1;
+            ride->mode = ride->GetDefaultMode();
+            ride->MinCarsPerTrain = 1; // rideEntry->min_cars_in_train;
+            ride->MaxCarsPerTrain = 1; // rideEntry->max_cars_in_train;
+
+            //            SelectedLiftAndInverted liftState{};
+            //            auto trackPlaceAction = TrackPlaceAction(
+            //                rideIndex, rtd.StartTrackPiece, ride->type, coords, 0, EnumValue(RideColourScheme::main),
+            //                DEFAULT_SEAT_ROTATION, liftState, false);
+            //            GameActions::Execute(&trackPlaceAction);
+
+            auto& station0 = ride->GetStation(StationIndex::FromUnderlying(0));
+            station0.Start = coords;
+            station0.SetBaseZ(coords.z);
+            ride->status = RideStatus::Open;
+
+            auto* trackElement = TileElementInsert<TrackElement>(coords, 0b1111);
+            if (trackElement != nullptr)
+            {
+                trackElement->SetDirection(coords.direction);
+                trackElement->SetClearanceZ(trackElement->GetBaseZ() + (4 * kCoordsZStep));
+                trackElement->SetRideIndex(rideIndex);
+                trackElement->SetTrackType(rtd.StartTrackPiece);
+                trackElement->SetRideType(rideTypeId);
+                trackElement->SetColourScheme(RideColourScheme::main);
+            }
+        }
+
+        void ImportSmallScenery(const std::string& objectIdentifier)
+        {
+            // Skip unk
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
+
+            auto* smallSceneryElement = TileElementInsert<SmallSceneryElement>(coords, 0b1111);
+            if (smallSceneryElement != nullptr)
+            {
+                auto entryIndex = _smallSceneryEntries.GetOrAddEntry(objectIdentifier);
+
+                smallSceneryElement->SetDirection(coords.direction);
+                smallSceneryElement->SetClearanceZ(smallSceneryElement->GetBaseZ() + (4 * kCoordsZStep));
+                smallSceneryElement->SetEntryIndex(entryIndex);
+            }
+        }
+
+        void ImportWall(const std::string& objectIdentifier)
+        {
+            // Skip unk
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
+
+            auto* wallElement = TileElementInsert<WallElement>(coords, 0b1111);
+            if (wallElement != nullptr)
+            {
+                auto entryIndex = _wallEntries.GetOrAddEntry(objectIdentifier);
+
+                wallElement->SetDirection(coords.direction);
+                wallElement->SetClearanceZ(wallElement->GetBaseZ() + (2 * kCoordsZStep));
+                wallElement->SetEntryIndex(entryIndex);
+            }
         }
 
         void ImportPath(std::string_view combinedId)
         {
+            // Skip unk
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+            auto coords = ztCoords.ToCoordsXYZD();
+
+            // Skip age(?)
+            _stream->Seek(4, STREAM_SEEK_CURRENT);
+
+            auto name = ReadZTString(*_stream);
+            LOG_ERROR("Name: %s", name.c_str());
+
             ObjectEntryIndex entryIndex = 0;
             if (combinedId == "paths/paths/brkpath")
             {
@@ -693,16 +983,10 @@ namespace ZT1
                 entryIndex = 7;
             }
 
-            // Skip unk
-            _stream->Seek(4, STREAM_SEEK_CURRENT);
-            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
-            // Skip age
-            _stream->Seek(4, STREAM_SEEK_CURRENT);
-
-            if (MapGetParkEntranceElementAt(ztCoords.ToCoordsXYZD(), false))
+            if (MapGetParkEntranceElementAt(coords, false))
                 return;
 
-            auto pathElement = TileElementInsert<PathElement>(ztCoords.ToCoordsXYZD(), 0b1111);
+            auto pathElement = TileElementInsert<PathElement>(coords, 0b1111);
             pathElement->SetSurfaceEntryIndex(entryIndex);
             pathElement->SetRailingsEntryIndex(0);
 
