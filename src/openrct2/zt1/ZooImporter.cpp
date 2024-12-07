@@ -73,7 +73,26 @@ static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/wtrreed", "rct2.scenery_small.tbr" }, // Water Reed
 };
 static const std::unordered_map<std::string, std::string> kWall = {
-    { "fences/postrope/f", "rct2.scenery_wall.wpf" }, // Post and Rope Fence
+    { "fences/postrope/f", "rct2.scenery_wall.wpf" },       // Post and Rope Fence
+    { "fences/woodslat/f", "couger.scenery_wall.acwwf32" }, // Wooden Slat Fence
+};
+static constexpr uint8_t DefaultPathSlope[] = {
+    0,
+    SLOPE_IS_IRREGULAR_FLAG,
+    SLOPE_IS_IRREGULAR_FLAG,
+    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 2,
+    SLOPE_IS_IRREGULAR_FLAG,
+    SLOPE_IS_IRREGULAR_FLAG,
+    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 3,
+    RAISE_FOOTPATH_FLAG,
+    SLOPE_IS_IRREGULAR_FLAG,
+    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 1,
+    SLOPE_IS_IRREGULAR_FLAG,
+    RAISE_FOOTPATH_FLAG,
+    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 0,
+    RAISE_FOOTPATH_FLAG,
+    RAISE_FOOTPATH_FLAG,
+    SLOPE_IS_IRREGULAR_FLAG,
 };
 
 enum ZooTerrainType : uint8_t
@@ -455,6 +474,10 @@ namespace ZT1
                 "rct2.ride.rboat",  "rct2.ride.pizzs", "rct2.ride.hotds", "rct2.ride.souvs",
             });
 
+            //            _wallEntries.AddRange({
+            //                "couger.scenery_wall.acwwf32",
+            //            });
+
             // Add default scenery groups
             _sceneryGroupEntries.AddRange(
                 {
@@ -600,10 +623,6 @@ namespace ZT1
                         ImportZooEntrance(gameState);
                     }
                 }
-                if (ids[0] == "paths")
-                {
-                    ImportPath(combinedId);
-                }
                 for (auto mapping : kFacilities)
                 {
                     if (mapping.first == combinedId)
@@ -619,6 +638,14 @@ namespace ZT1
                     if (mapping.first == combinedId)
                         ImportWall(mapping.second);
                 }
+                if (ids[0] == "paths")
+                {
+                    ImportPath(combinedId);
+                }
+                //                if (ids[0] == "guests")
+                //                {
+                //                    ImportGuest();
+                //                }
 
                 _stream->SetPosition(savedPos);
 
@@ -991,11 +1018,42 @@ namespace ZT1
             auto pathElement = TileElementInsert<PathElement>(coords, 0b1111);
             pathElement->SetSurfaceEntryIndex(entryIndex);
             pathElement->SetRailingsEntryIndex(0);
+            pathElement->SetClearanceZ(coords.z + kPathHeightStep);
+
+            auto* surfaceElement = MapGetSurfaceElementAt(coords);
+            auto pathSlope = DefaultPathSlope[surfaceElement->GetSlope() & kTileSlopeRaisedCornersMask];
+            auto isSloped = pathSlope & FOOTPATH_PROPERTIES_FLAG_IS_SLOPED;
+            pathElement->SetSloped(isSloped);
+            if (isSloped)
+            {
+                pathElement->SetSlopeDirection(pathSlope & ~FOOTPATH_PROPERTIES_FLAG_IS_SLOPED);
+                pathElement->SetBaseZ(pathElement->GetBaseZ() - kCoordsZStep);
+                pathElement->SetClearanceZ(pathElement->GetClearanceZ() - kCoordsZStep);
+            }
+            pathElement->SetAddition(0);
+            pathElement->SetRideIndex(RideId::GetNull());
+            pathElement->SetAdditionStatus(255);
+            pathElement->SetIsBroken(false);
 
             // ZT does not save footpath edges. Autoconnect them. This will need rework once fences are imported.
-            // FootpathRemoveEdgesAt(ztCoords.ToCoordsXYZD(), pathElement->as<TileElement>());
-            pathElement->SetEdgesAndCorners(0b11111111);
+            FootpathConnectEdges(
+                coords, pathElement->as<TileElement>(), GAME_COMMAND_FLAG_APPLY | GAME_COMMAND_FLAG_ALLOW_DURING_PAUSED);
         }
+
+        //        void ImportGuest()
+        //        {
+        //            _stream->Seek(384, STREAM_SEEK_CURRENT);
+        //
+        //            auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
+        //            auto coords = ztCoords.ToCoordsXYZD();
+        //
+        //            // Skip ???
+        //            _stream->Seek(4, STREAM_SEEK_CURRENT);
+        //
+        //            auto name = ReadZTString(*_stream);
+        //
+        //            auto* guest = Guest::Generate(coords);
+        //        }
 
         void AddAvailableEntriesFromSceneryGroups()
         {
