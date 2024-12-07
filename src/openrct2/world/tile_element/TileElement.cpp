@@ -97,6 +97,8 @@ RideId TileElement::GetRideIndex() const
 
 void TileElement::ClearAs(TileElementType newType)
 {
+    auto wasLastForTile = IsLastForTile();
+
     Type = 0;
     SetType(newType);
     Flags = 0;
@@ -105,6 +107,7 @@ void TileElement::ClearAs(TileElementType newType)
     Owner = 0;
     std::fill_n(Pad05, sizeof(Pad05), 0x00);
     std::fill_n(Pad08, sizeof(Pad08), 0x00);
+    SetLastForTile(wasLastForTile);
 }
 
 bool TileElementIsUnderground(TileElement* tileElement)
