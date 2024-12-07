@@ -24,12 +24,15 @@
 #include "../world/Entrance.h"
 #include "../world/Park.h"
 #include "../world/Scenery.h"
-#include "../world/Surface.h"
+#include "../world/tile_element/EntranceElement.h"
+#include "../world/tile_element/PathElement.h"
+#include "../world/tile_element/Slope.h"
+#include "../world/tile_element/SurfaceElement.h"
 
 using namespace OpenRCT2;
 
-static constexpr const uint8_t ZOO_COORDS_XY_STEP = 64;
-// static constexpr const uint8_t ZOO_COORDS_Z_STEP = 8;
+static constexpr const uint8_t kZooCoordsXYStep = 64;
+// static constexpr const uint8_t ZOO_kCoordsZStep = 8;
 
 const std::string_view ZooWalls[] = {
     "fences/zoowall/f",
@@ -77,27 +80,27 @@ static ShapeMap GetConvertedShape(uint8_t ztShape)
 
     if (ztShape & 0b00000001)
     {
-        shape |= TILE_ELEMENT_SLOPE_S_CORNER_UP;
+        shape |= kTileSlopeSCornerUp;
         heightOffset -= 2;
     }
     if (ztShape & 0b00000100)
-        shape |= TILE_ELEMENT_SLOPE_E_CORNER_UP;
+        shape |= kTileSlopeECornerUp;
     if (ztShape & 0b00010000)
-        shape |= TILE_ELEMENT_SLOPE_N_CORNER_UP;
+        shape |= kTileSlopeNCornerUp;
     if (ztShape & 0b01000000)
-        shape |= TILE_ELEMENT_SLOPE_W_CORNER_UP;
+        shape |= kTileSlopeWCornerUp;
 
     if (ztShape & 0b00000010)
     {
-        shape |= TILE_ELEMENT_SLOPE_S_CORNER_UP | TILE_ELEMENT_SLOPE_DOUBLE_HEIGHT;
+        shape |= kTileSlopeSCornerUp | kTileSlopeDiagonalFlag;
         heightOffset -= 4;
     }
     if (ztShape & 0b00001000)
-        shape |= TILE_ELEMENT_SLOPE_E_CORNER_UP | TILE_ELEMENT_SLOPE_DOUBLE_HEIGHT;
+        shape |= kTileSlopeECornerUp | kTileSlopeDiagonalFlag;
     if (ztShape & 0b00100000)
-        shape |= TILE_ELEMENT_SLOPE_N_CORNER_UP | TILE_ELEMENT_SLOPE_DOUBLE_HEIGHT;
+        shape |= kTileSlopeNCornerUp | kTileSlopeDiagonalFlag;
     if (ztShape & 0b10000000)
-        shape |= TILE_ELEMENT_SLOPE_W_CORNER_UP | TILE_ELEMENT_SLOPE_DOUBLE_HEIGHT;
+        shape |= kTileSlopeWCornerUp | kTileSlopeDiagonalFlag;
 
     return { shape, heightOffset };
 
@@ -164,8 +167,8 @@ struct ZT1CoordsXYZD
     constexpr CoordsXYZD ToCoordsXYZD()
     {
         return CoordsXYZD(
-            (Y + ZOO_COORDS_XY_STEP) * COORDS_XY_STEP / ZOO_COORDS_XY_STEP,
-            (X + ZOO_COORDS_XY_STEP) * COORDS_XY_STEP / ZOO_COORDS_XY_STEP, Height + (26 * COORDS_Z_STEP), GetRCTDirection());
+            (Y + kZooCoordsXYStep) * kCoordsXYStep / kZooCoordsXYStep,
+            (X + kZooCoordsXYStep) * kCoordsXYStep / kZooCoordsXYStep, Height + (26 * kCoordsZStep), GetRCTDirection());
     }
 
     constexpr TileCoordsXYZD ToTileCoordsXYZD()
@@ -173,7 +176,7 @@ struct ZT1CoordsXYZD
         return TileCoordsXYZD(ToCoordsXYZD());
     }
 };
-assert_struct_size(ZooTerrainElement, 10);
+static_assert(sizeof(ZooTerrainElement) == 10);
 #pragma pack(pop)
 
 struct ZooTileElement
@@ -298,17 +301,17 @@ namespace ZT1
             return ParkLoadResult(GetRequiredObjects());
         }
 
-        void Import() override
+        void Import(GameState_t& gameState) override
         {
             _header = _stream->ReadValue<ZooHeader>();
-            Initialise();
+            Initialise(gameState);
 
             CreateAvailableObjectMappings();
 
             ImportExhibits();
             _stream->Seek(sizeof(int32_t) * 4, STREAM_SEEK_CURRENT);
             ImportTerrain();
-            ImportTileElements();
+            ImportTileElements(gameState);
             CheatsReset();
             ClearRestrictedScenery();
         }
@@ -475,20 +478,19 @@ namespace ZT1
                 OBJECT_ENTRY_INDEX_NULL);
         }
 
-        void Initialise()
+        void Initialise(GameState_t& gameState)
         {
-            gScenarioFileName = "";
+            gameState.ScenarioFileName = "";
 
             // Do map initialisation, same kind of stuff done when loading scenario editor
-            auto context = OpenRCT2::GetContext();
-            context->GetGameState()->InitAll({ _header.MapSizeX + 2, _header.MapSizeY + 2 });
-            gEditorStep = EditorStep::ObjectSelection;
-            gScenarioCategory = SCENARIO_CATEGORY_OTHER;
+            gameStateInitAll(gameState, { _header.MapSizeX + 2, _header.MapSizeY + 2 });
+            gameState.EditorStep = EditorStep::ObjectSelection;
+            gameState.ScenarioCategory = SCENARIO_CATEGORY_OTHER;
         }
 
         void ImportTerrain()
         {
-            gMapBaseZ = 7;
+            // gMapBaseZ = 7;
 
             //            assert(_stream->GetPosition() == 0x24D);
             //            _stream->SetPosition(0x24D);
@@ -505,7 +507,7 @@ namespace ZT1
                     auto height = (tileElement.Height + 13) * 2;
                     if (tileElement.Type == ZooTerrainType::FreshWater || tileElement.Type == ZooTerrainType::SaltWater)
                     {
-                        surface->SetWaterHeight(height * COORDS_Z_STEP);
+                        surface->SetWaterHeight(height * kCoordsZStep);
                         height -= 2;
                     }
 
@@ -521,19 +523,19 @@ namespace ZT1
                     surface->ClearanceHeight = height + shapeAndHeightOffset.HeightOffset;
                     const auto surfaceIndentifier = GetTerrainSurfaceObject(tileElement.Type);
                     auto entryIndex = _terrainSurfaceEntries.GetOrAddEntry(surfaceIndentifier);
-                    surface->SetSurfaceStyle(entryIndex);
+                    surface->SetSurfaceObjectIndex(entryIndex);
                 }
             }
         }
 
-        void ImportTileElements()
+        void ImportTileElements(GameState_t& gameState)
         {
             //            LOG_ERROR("Current position: %d", _stream->GetPosition());
             //            _stream->SetPosition(0xDE07);
             auto numElements = _stream->ReadValue<uint32_t>();
 
-            gCheatsSandboxMode = true;
-            gParkFlags |= PARK_FLAGS_NO_MONEY;
+            gameState.Cheats.sandboxMode = true;
+            gameState.Park.Flags |= PARK_FLAGS_NO_MONEY;
 
             for (uint32_t i = 0; i < numElements; i++)
             {
@@ -555,7 +557,7 @@ namespace ZT1
                 for (auto id : ZooEntrances)
                 {
                     if (id == combinedId)
-                        ImportZooEntrance();
+                        ImportZooEntrance(gameState);
                 }
                 if (ids[0] == "paths")
                 {
@@ -577,7 +579,7 @@ namespace ZT1
             [[maybe_unused]] auto height = _stream->ReadValue<int32_t>();
             auto rotation = _stream->ReadValue<int32_t>();
 
-            auto coords = TileCoordsXY((y / ZOO_COORDS_XY_STEP) + 1, (x / ZOO_COORDS_XY_STEP) + 1);
+            auto coords = TileCoordsXY((y / kZooCoordsXYStep) + 1, (x / kZooCoordsXYStep) + 1);
             auto* surface = MapGetSurfaceElementAt(coords);
             auto fences = surface->GetParkFences();
 
@@ -600,7 +602,7 @@ namespace ZT1
             surface->SetParkFences(fences);
         }
 
-        void ImportZooEntrance()
+        void ImportZooEntrance(GameState_t& gameState)
         {
             // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
@@ -609,36 +611,35 @@ namespace ZT1
             _stream->Seek(4, STREAM_SEEK_CURRENT);
 
             auto parkName = ReadZTString(*_stream);
-            auto& park = OpenRCT2::GetContext()->GetGameState()->GetPark();
-            park.Name = parkName;
+            gameState.Park.Name = parkName;
 
             TileCoordsXYZD tileCoords[3] = { ztCoords.ToTileCoordsXYZD(), ztCoords.ToTileCoordsXYZD(),
                                              ztCoords.ToTileCoordsXYZD() };
             tileCoords[0] = tileCoords[1] = tileCoords[0];
             tileCoords[2] = tileCoords[0];
             auto peepSpawnCoords = ztCoords.ToCoordsXYZD().ToTileCentre();
-            peepSpawnCoords.direction = (peepSpawnCoords.direction + 2) % NumOrthogonalDirections;
+            peepSpawnCoords.direction = (peepSpawnCoords.direction + 2) % kNumOrthogonalDirections;
             switch (tileCoords[0].direction)
             {
                 case 0:
                     tileCoords[1].y -= 1;
                     tileCoords[2].y += 1;
-                    peepSpawnCoords.x -= COORDS_XY_STEP;
+                    peepSpawnCoords.x -= kCoordsXYStep;
                     break;
                 case 1:
                     tileCoords[1].x -= 1;
                     tileCoords[2].x += 1;
-                    peepSpawnCoords.y -= COORDS_XY_STEP;
+                    peepSpawnCoords.y -= kCoordsXYStep;
                     break;
                 case 2:
                     tileCoords[1].y += 1;
                     tileCoords[2].y -= 1;
-                    peepSpawnCoords.x += COORDS_XY_STEP;
+                    peepSpawnCoords.x += kCoordsXYStep;
                     break;
                 case 3:
                     tileCoords[1].x += 1;
                     tileCoords[2].x -= 1;
-                    peepSpawnCoords.y += COORDS_XY_STEP;
+                    peepSpawnCoords.y += kCoordsXYStep;
                     break;
             }
 
@@ -673,11 +674,11 @@ namespace ZT1
                 if (sequenceIndex == 0)
                 {
                     MapAnimationCreate(MAP_ANIMATION_TYPE_PARK_ENTRANCE, current.ToCoordsXYZ());
-                    gPeepSpawns.push_back(peepSpawnCoords);
+                    gameState.PeepSpawns.push_back(peepSpawnCoords);
                 }
             }
 
-            gParkEntrances.push_back(tileCoords[0].ToCoordsXYZD());
+            gameState.Park.Entrances.push_back(tileCoords[0].ToCoordsXYZD());
         }
 
         void ImportPath(std::string_view combinedId)
@@ -736,7 +737,7 @@ namespace ZT1
                                 RCT12::EntryList* entries = GetEntryList(objectType);
 
                                 // Check if there are spare entries available
-                                size_t maxEntries = static_cast<size_t>(object_entry_group_counts[EnumValue(objectType)]);
+                                size_t maxEntries = static_cast<size_t>(getObjectEntryGroupCount(objectType));
                                 if (entries != nullptr && entries->GetCount() < maxEntries)
                                 {
                                     entries->GetOrAddEntry(objectName);

@@ -251,7 +251,7 @@ FileExtension GetFileExtensionType(u8string_view path)
         return FileExtension::TD6;
     if (String::IEquals(extension, ".park"))
         return FileExtension::PARK;
-    if (String::Equals(extension, ".zoo", true))
+    if (String::IEquals(extension, ".zoo"))
         return FileExtension::ZOO;
     return FileExtension::Unknown;
 }
