@@ -103,21 +103,3 @@ public:
         return "Invalid ride type";
     }
 };
-
-class UnsupportedVersionException : public std::exception
-{
-public:
-    uint32_t const MinVersion;
-    uint32_t const TargetVersion;
-
-    explicit UnsupportedVersionException(uint32_t minVersion, uint32_t targetVersion)
-        : MinVersion(minVersion)
-        , TargetVersion(targetVersion)
-    {
-    }
-
-    const char* what() const noexcept override
-    {
-        return "Unexpected version";
-    }
-};

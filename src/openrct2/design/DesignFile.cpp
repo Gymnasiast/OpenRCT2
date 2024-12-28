@@ -253,7 +253,7 @@ namespace OpenRCT2
     }
 } // namespace OpenRCT2
 
-std::unique_ptr<ITrackImporter> TrackImporter::CreateNTDF()
+std::unique_ptr<ITrackImporter> OpenRCT2::TrackImporter::CreateNTDF()
 {
     return std::make_unique<OpenRCT2::DesignFile>();
 }

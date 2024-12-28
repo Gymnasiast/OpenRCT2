@@ -23,4 +23,9 @@ public:
         , TargetVersion(targetVersion)
     {
     }
+
+    const char* what() const noexcept override
+    {
+        return "Unexpected version";
+    }
 };
