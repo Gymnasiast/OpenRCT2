@@ -502,7 +502,6 @@ namespace OpenRCT2
                 widgets[i].top += heightDifference;
                 widgets[i].bottom += heightDifference;
             }
-            height += heightDifference;
         }
 
         return heightDifference;
