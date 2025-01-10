@@ -103,7 +103,7 @@ namespace OpenRCT2::Scripting
                 }
                 else
                 {
-                    WindowSetResize(*w, value, w->min_height, value, w->max_height);
+                    WindowSetResize(*w, value, w->minBodyheight, value, w->maxBodyHeight);
                 }
             }
         }
@@ -112,7 +112,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                return w->height;
+                return w->bodyHeight;
             }
             return 0;
         }
@@ -123,7 +123,7 @@ namespace OpenRCT2::Scripting
             {
                 if (WindowCanResize(*w))
                 {
-                    WindowResize(*w, 0, value - w->height);
+                    WindowResize(*w, 0, value - w->bodyHeight);
                 }
                 else
                 {
@@ -145,7 +145,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                WindowSetResize(*w, value, w->min_height, w->max_width, w->max_height);
+                WindowSetResize(*w, value, w->minBodyheight, w->max_width, w->maxBodyHeight);
             }
         }
         int32_t maxWidth_get() const
@@ -162,7 +162,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                WindowSetResize(*w, w->min_width, w->min_height, value, w->max_height);
+                WindowSetResize(*w, w->min_width, w->minBodyheight, value, w->maxBodyHeight);
             }
         }
         int32_t minHeight_get() const
@@ -170,7 +170,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                return w->min_height;
+                return w->minBodyheight;
             }
             return 0;
         }
@@ -179,7 +179,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                WindowSetResize(*w, w->min_width, value, w->max_width, w->max_height);
+                WindowSetResize(*w, w->min_width, value, w->max_width, w->maxBodyHeight);
             }
         }
         int32_t maxHeight_get() const
@@ -187,7 +187,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                return w->max_height;
+                return w->maxBodyHeight;
             }
             return 0;
         }
@@ -196,7 +196,7 @@ namespace OpenRCT2::Scripting
             auto w = GetWindow();
             if (w != nullptr)
             {
-                WindowSetResize(*w, w->min_width, w->min_height, w->max_width, value);
+                WindowSetResize(*w, w->min_width, w->minBodyheight, w->max_width, value);
             }
         }
         bool isSticky_get() const
