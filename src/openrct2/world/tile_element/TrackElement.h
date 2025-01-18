@@ -48,6 +48,17 @@ enum
     LANDSCAPE_DOOR_OPEN = 3,
 };
 
+enum class TrackDecoration : uint8_t
+{
+    plain,
+    liftHill,
+    brake,
+    blockBrake,
+    booster,
+    cableLift,
+};
+constexpr uint8_t kNumTrackDecorations = 6;
+
 #pragma pack(push, 1)
 
 struct TrackElement : TileElementBase
@@ -148,6 +159,8 @@ public:
 
     bool IsStation() const;
     bool IsBlockStart() const;
+
+    TrackDecoration getDecoration() const;
 };
 static_assert(sizeof(TrackElement) == kTileElementSize);
 

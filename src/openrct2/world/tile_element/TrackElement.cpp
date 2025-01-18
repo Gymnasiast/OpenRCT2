@@ -302,3 +302,19 @@ void TrackElement::SetHighlight(bool on)
     if (on)
         Flags2 |= TRACK_ELEMENT_FLAGS2_HIGHLIGHT;
 }
+
+TrackDecoration TrackElement::getDecoration() const
+{
+    if (HasCableLift())
+        return TrackDecoration::cableLift;
+    if (HasChain())
+        return TrackDecoration::liftHill;
+    if (TrackTypeIsBrakes(GetTrackType()))
+        return TrackDecoration::brake;
+    if (TrackTypeIsBlockBrakes(GetTrackType()))
+        return TrackDecoration::blockBrake;
+    if (TrackTypeIsBooster(GetTrackType()))
+        return TrackDecoration::booster;
+
+    return TrackDecoration::plain;
+}
