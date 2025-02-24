@@ -91,7 +91,7 @@ namespace OpenRCT2::Ui::Windows
             ft.Add<StringId>(STR_STRING);
             ft.Add<char*>(_name.c_str());
 
-            ScreenCoordsXY stringCoords(windowPos.x + width / 2, windowPos.y + (height / 2) - 3);
+            ScreenCoordsXY stringCoords(windowPos.x + width / 2, windowPos.y + (height() / 2) - 3);
             DrawTextWrapped(dpi, stringCoords, width - 4, STR_FILEBROWSER_OVERWRITE_PROMPT, ft, { TextAlignment::CENTRE });
         }
     };
