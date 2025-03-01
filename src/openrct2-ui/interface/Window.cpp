@@ -1178,7 +1178,7 @@ namespace OpenRCT2::Ui::Windows
 
     int16_t GetTitleBarHeight()
     {
-        return Config::Get().interface.EnlargedUi ? 24 : 12;
+        return Config::Get().interface.EnlargedUi ? kTitleHeightDouble : kTitleHeightNormal;
     }
 
 } // namespace OpenRCT2::Ui::Windows
