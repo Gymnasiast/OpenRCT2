@@ -521,6 +521,10 @@ namespace OpenRCT2
             widgets[i].bottom += heightDifference;
         }
 
+        // Offset viewport
+        if (viewport != nullptr)
+            viewport->pos.y += heightDifference;
+
         return heightDifference;
     }
 
