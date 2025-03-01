@@ -502,16 +502,16 @@ namespace OpenRCT2
         auto currentHeight = titleWidget.height();
         auto heightDifference = preferredHeight - currentHeight;
 
-        if (heightDifference != 0)
-        {
-            // Offset title and close button
-            titleWidget.bottom += heightDifference;
-            closeButton.bottom += heightDifference;
+        if (heightDifference == 0)
+            return 0;
 
-            height += heightDifference;
-            min_height += heightDifference;
-            max_height += heightDifference;
-        }
+        // Offset title and close button
+        titleWidget.bottom += heightDifference;
+        closeButton.bottom += heightDifference;
+
+        height += heightDifference;
+        min_height += heightDifference;
+        max_height += heightDifference;
 
         // Offset body widgets
         // NB: we're offsetting page widget as well!
