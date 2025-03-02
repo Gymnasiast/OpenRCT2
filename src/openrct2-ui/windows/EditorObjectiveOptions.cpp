@@ -677,7 +677,7 @@ namespace OpenRCT2::Ui::Windows
          */
         void OnResizeMain()
         {
-            WindowSetResize(*this, 450, 229, 450, 229);
+            WindowSetResize(*this, { 450, 229 }, { 450, 229 });
         }
 
         /**
@@ -1006,7 +1006,7 @@ namespace OpenRCT2::Ui::Windows
          */
         void OnResizeRides()
         {
-            WindowSetResize(*this, 380, 224, 380, 224);
+            WindowSetResize(*this, { 380, 224 }, { 380, 224 });
         }
 
         /**

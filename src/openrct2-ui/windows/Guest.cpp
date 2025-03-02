@@ -435,7 +435,7 @@ namespace OpenRCT2::Ui::Windows
             }
             maxWidth = std::max(minWidth, maxWidth);
 
-            WindowSetResize(*this, minWidth, minHeight, maxWidth, maxHeight);
+            WindowSetResize(*this, { minWidth, minHeight }, { maxWidth, maxHeight });
         }
 
         void OnPrepareDrawCommon()
