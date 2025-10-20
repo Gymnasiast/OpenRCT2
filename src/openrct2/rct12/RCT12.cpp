@@ -543,9 +543,22 @@ static bool RCT12IsFormatChar(char c)
 
 bool IsLikelyUTF8(std::string_view s)
 {
-    // RCT2 uses CP-1252 so some characters may be >= 128. However we don't expect any
-    // characters that are reserved for formatting strings, so if those are found, assume
-    // that the string is UTF-8.
+    // Some characters are valid when interpreted as RCT2’s CP-1252 dialect, but extremely unlikely to occur naturally.
+    // What follows is a list with the internal value, followed by a comment with the value in Unicode
+    // and the result when misinterpreted as CP-1252.
+    static constexpr auto unlikelyValues = std::to_array(
+        {
+            "\xE9" // é - Ã©
+        });
+
+    for (const auto needle : unlikelyValues)
+    {
+        if (s.find(needle) != std::string_view::npos)
+            return true;
+    }
+
+    // We don't expect any characters that are reserved for formatting strings,
+    // so if those are found, assume that the string is UTF-8.
     for (auto c : s)
     {
         if (RCT12IsFormatChar(c))

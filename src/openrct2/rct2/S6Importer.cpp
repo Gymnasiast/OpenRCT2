@@ -145,7 +145,8 @@ namespace OpenRCT2::RCT2
 
                 // If the name or the details contain a colour code, they might be in UTF-8 already.
                 // This is caused by a bug that was in OpenRCT2 for 3 years.
-                if (!IsLikelyUTF8(_s6.Info.Name) && !IsLikelyUTF8(_s6.Info.Details))
+                const auto isLikelyUTF8 = IsLikelyUTF8(_s6.Info.Name) || IsLikelyUTF8(_s6.Info.Details);
+                if (!isLikelyUTF8)
                 {
                     RCT2StringToUTF8Self(_s6.Info.Name, sizeof(_s6.Info.Name));
                     RCT2StringToUTF8Self(_s6.Info.Details, sizeof(_s6.Info.Details));
