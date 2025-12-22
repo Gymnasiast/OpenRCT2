@@ -163,6 +163,7 @@ const OpenRCT2::G1Element* GfxGetG1Element(ImageIndex image_id);
 const OpenRCT2::G1Palette* GfxGetG1Palette(ImageIndex imageId);
 void GfxSetG1Element(ImageIndex imageId, const OpenRCT2::G1Element* g1);
 std::optional<OpenRCT2::Gx> GfxLoadGx(const std::vector<uint8_t>& buffer);
+bool isG1Loaded();
 bool IsCsgLoaded();
 
 // sprite blitting

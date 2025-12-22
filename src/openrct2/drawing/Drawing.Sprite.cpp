@@ -449,6 +449,8 @@ static Gx _palettes = {};
 static Gx _tracks = {};
 static Gx _csg = {};
 static G1Element _scrollingText[ScrollingText::kMaxEntries]{};
+
+static bool _g1Loaded = false;
 static bool _csgLoaded = false;
 
 static G1Element _g1Temp[kTempSpriteCount] = {};
@@ -495,20 +497,22 @@ bool GfxLoadG1(const IPlatformEnvironment& env)
             }
             OverrideElementOffsets(i, _g1.elements[i]);
         }
-        return true;
+
+        _g1Loaded = true;
+        return _g1Loaded;
     }
     catch (const std::exception&)
     {
-        _g1.elements.clear();
-        _g1.elements.shrink_to_fit();
+        GfxUnloadG1();
 
         LOG_FATAL("Unable to load g1 graphics");
-        if (!gOpenRCT2Headless)
-        {
-            auto& uiContext = GetContext()->GetUiContext();
-            uiContext.ShowMessageBox("Unable to load g1.dat. Your RollerCoaster Tycoon 2 path may be incorrectly set.");
-        }
-        return false;
+        // if (!gOpenRCT2Headless)
+        // {
+        //     auto& uiContext = GetContext()->GetUiContext();
+        //     uiContext.ShowMessageBox("Unable to load g1.dat. Your RollerCoaster Tycoon 2 path may be incorrectly set.");
+        // }
+
+        return _g1Loaded;
     }
 }
 
@@ -517,6 +521,7 @@ void GfxUnloadG1()
     _g1.data.reset();
     _g1.elements.clear();
     _g1.elements.shrink_to_fit();
+    _g1Loaded = false;
 }
 
 void GfxUnloadG2PalettesFontsTracks()
@@ -1190,6 +1195,11 @@ void GfxSetG1Element(ImageIndex imageId, const G1Element* g1)
             }
         }
     }
+}
+
+bool isG1Loaded()
+{
+    return _g1Loaded;
 }
 
 bool IsCsgLoaded()

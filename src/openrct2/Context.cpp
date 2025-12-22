@@ -69,6 +69,7 @@
 #include "scenes/SceneManager.h"
 #include "scenes/game/GameScene.h"
 #include "scenes/intro/IntroScene.h"
+#include "scenes/onboarding/OnboardingScene.h"
 #include "scenes/preloader/PreloaderScene.h"
 #include "scenes/title/TitleScene.h"
 #include "scenes/title/TitleSequenceManager.h"
@@ -474,15 +475,23 @@ namespace OpenRCT2
 
             if (!gOpenRCT2NoGraphics)
             {
-                if (!LoadBaseGraphics())
-                {
-                    return false;
-                }
+                LoadBaseGraphics();
                 Drawing::LightFx::Init();
             }
 
             ContextInit();
             ResetSubsystems();
+
+            if (!gOpenRCT2NoGraphics)
+            {
+                if (!isG1Loaded())
+                {
+                    // Advance to onboarding scene instead of preloader
+                    auto* onboardingScene = static_cast<OnboardingScene*>(_sceneManager->getOnboardingScene());
+                    _sceneManager->setActiveScene(onboardingScene);
+                    return true;
+                }
+            }
 
             if (!gOpenRCT2Headless)
             {
@@ -993,10 +1002,7 @@ namespace OpenRCT2
         // TODO: move function elsewhere?
         bool LoadBaseGraphics()
         {
-            if (!GfxLoadG1(*_env))
-            {
-                return false;
-            }
+            GfxLoadG1(*_env);
             GfxLoadG2PalettesFontsTracks();
             GfxLoadCsg();
             FontSpriteInitialiseCharacters();

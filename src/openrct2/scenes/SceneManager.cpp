@@ -12,6 +12,7 @@
 #include "../Context.h"
 #include "game/GameScene.h"
 #include "intro/IntroScene.h"
+#include "onboarding/OnboardingScene.h"
 #include "preloader/PreloaderScene.h"
 #include "title/TitleScene.h"
 
@@ -24,6 +25,7 @@ namespace OpenRCT2
         IContext* _sceneContext = nullptr;
         std::unique_ptr<GameScene> _gameScene;
         std::unique_ptr<IntroScene> _introScene;
+        std::unique_ptr<OnboardingScene> _onboardingScene;
         std::unique_ptr<PreloaderScene> _preloaderScene;
         std::unique_ptr<TitleScene> _titleScene;
 
@@ -60,6 +62,15 @@ namespace OpenRCT2
 
             _introScene = std::make_unique<IntroScene>(*_sceneContext);
             return _introScene.get();
+        }
+
+        IScene* getOnboardingScene() override
+        {
+            if (auto* scene = _onboardingScene.get())
+                return scene;
+
+            _onboardingScene = std::make_unique<OnboardingScene>(*_sceneContext);
+            return _onboardingScene.get();
         }
 
         IScene* getPreloaderScene() override
