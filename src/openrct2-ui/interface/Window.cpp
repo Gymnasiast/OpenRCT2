@@ -1024,9 +1024,16 @@ namespace OpenRCT2::Ui::Windows
      */
     void WindowDrawWidgets(WindowBase& w, RenderTarget& rt)
     {
-        if (w.flags.has(WindowFlag::transparent) && !w.flags.has(WindowFlag::noBackground))
-            Rectangle::filter(
-                rt, { w.windowPos, w.windowPos + ScreenCoordsXY{ w.width - 1, w.height - 1 } }, FilterPaletteID::palette51);
+        const ScreenRect windowRect = { w.windowPos, w.windowPos + ScreenCoordsXY{ w.width - 1, w.height - 1 } };
+        if (w.flags.has(WindowFlag::redBlack))
+        {
+            Rectangle::fill(rt, windowRect, PaletteIndex::pi10);
+            Rectangle::fill(rt, windowRect, PaletteIndex::pi169 | 0x1000000);
+        }
+        else if (w.flags.has(WindowFlag::transparent) && !w.flags.has(WindowFlag::noBackground))
+        {
+            Rectangle::filter(rt, windowRect, FilterPaletteID::palette51);
+        }
 
         // todo: some code missing here? Between 006EB18C and 006EB260
         for (WidgetIndex widgetIndex = 0; widgetIndex < w.widgets.size(); widgetIndex++)

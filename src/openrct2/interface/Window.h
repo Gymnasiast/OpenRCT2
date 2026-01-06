@@ -78,6 +78,7 @@ namespace OpenRCT2
          * Instead of half transparency, completely remove the window background
          */
         noBackground,
+        redBlack,
         /**
          * Window is closed and will be deleted in the next update.
          */

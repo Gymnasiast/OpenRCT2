@@ -244,33 +244,33 @@ namespace OpenRCT2::Ui::Windows
 #pragma endregion
 
     static constexpr auto _topToolbarWidgets = makeWidgets(
-        makeRemapWidget({  0, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TOOLBAR_PAUSE,          STR_PAUSE_GAME_TIP                ), // Pause
-        makeRemapWidget({ 60, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TOOLBAR_FILE,           STR_DISC_AND_GAME_OPTIONS_TIP     ), // File menu
-        makeRemapWidget({250, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_G2_TOOLBAR_MUTE,        STR_TOOLBAR_MUTE_TIP              ), // Mute
-        makeRemapWidget({100, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TOOLBAR_ZOOM_OUT,       STR_ZOOM_OUT_TIP                  ), // Zoom out
-        makeRemapWidget({130, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TOOLBAR_ZOOM_IN,        STR_ZOOM_IN_TIP                   ), // Zoom in
-        makeRemapWidget({190, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TAB_TOOLBAR,            STR_ROTATE_ANTI_CLOCKWISE         ), // Rotate camera anti-clockwise
-        makeRemapWidget({160, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TOOLBAR_ROTATE,         STR_ROTATE_CLOCKWISE              ), // Rotate camera clockwise
-        makeRemapWidget({220, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TOOLBAR_VIEW,           STR_VIEW_OPTIONS_TIP              ), // Transparency menu
-        makeRemapWidget({267, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::secondary , SPR_TOOLBAR_MAP,            STR_SHOW_MAP_TIP                  ), // Map
-        makeRemapWidget({297, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_LAND,           STR_ADJUST_LAND_TIP               ), // Land
-        makeRemapWidget({327, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_WATER,          STR_ADJUST_WATER_TIP              ), // Water
-        makeRemapWidget({357, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_SCENERY,        STR_PLACE_SCENERY_TIP             ), // Scenery
-        makeRemapWidget({387, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_FOOTPATH,       STR_BUILD_FOOTPATH_TIP            ), // Path
-        makeRemapWidget({490, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_CONSTRUCT_RIDE, STR_BUILD_RIDE_TIP                ), // Construct ride
-        makeRemapWidget({520, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TOOLBAR_RIDES,          STR_RIDES_IN_PARK_TIP             ), // Rides
-        makeRemapWidget({550, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TOOLBAR_PARK,           STR_PARK_INFORMATION_TIP          ), // Park
-        makeRemapWidget({560, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TAB_TOOLBAR,            STR_STAFF_TIP                     ), // Staff
-        makeRemapWidget({560, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TOOLBAR_GUESTS,         STR_GUESTS_TIP                    ), // Guests
-        makeRemapWidget({560, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::tertiary  , SPR_TOOLBAR_CLEAR_SCENERY,  STR_CLEAR_SCENERY_TIP             ), // Clear scenery
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TAB_TOOLBAR,            STR_GAME_SPEED_TIP                ), // Fast forward
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TAB_TOOLBAR,            STR_CHEATS_TIP                    ), // Cheats
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TAB_TOOLBAR,            STR_DEBUG_TIP                     ), // Debug
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TAB_TOOLBAR,            STR_SCENARIO_OPTIONS_FINANCIAL_TIP), // Finances
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TAB_TOOLBAR,            STR_FINANCES_RESEARCH_TIP         ), // Research
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::quaternary, SPR_TAB_TOOLBAR,            STR_SHOW_RECENT_MESSAGES_TIP      ), // News
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_G2_TOOLBAR_MULTIPLAYER, STR_SHOW_MULTIPLAYER_STATUS_TIP   ), // Network
-        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight + 1}, WidgetType::trnBtn, WindowColour::primary   , SPR_TAB_TOOLBAR,            STR_TOOLBAR_CHAT_TIP              ), // Chat
+        makeRemapWidget({  0, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_TOOLBAR_PAUSE,          STR_PAUSE_GAME_TIP                ), // Pause
+        makeRemapWidget({ 60, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_TOOLBAR_FILE,           STR_DISC_AND_GAME_OPTIONS_TIP     ), // File menu
+        makeRemapWidget({250, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_TOOLBAR_MUTE,        STR_TOOLBAR_MUTE_TIP              ), // Mute
+        makeRemapWidget({100, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_TOOLBAR_ZOOM_OUT,       STR_ZOOM_OUT_TIP                  ), // Zoom out
+        makeRemapWidget({130, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_TOOLBAR_ZOOM_IN,        STR_ZOOM_IN_TIP                   ), // Zoom in
+        makeRemapWidget({190, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_G2_EMPTY,               STR_ROTATE_ANTI_CLOCKWISE         ), // Rotate camera anti-clockwise
+        makeRemapWidget({160, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_TOOLBAR_ROTATE,         STR_ROTATE_CLOCKWISE              ), // Rotate camera clockwise
+        makeRemapWidget({220, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_TOOLBAR_VIEW,           STR_VIEW_OPTIONS_TIP              ), // Transparency menu
+        makeRemapWidget({267, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::secondary , SPR_TOOLBAR_MAP,            STR_SHOW_MAP_TIP                  ), // Map
+        makeRemapWidget({297, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_LAND,           STR_ADJUST_LAND_TIP               ), // Land
+        makeRemapWidget({327, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_WATER,          STR_ADJUST_WATER_TIP              ), // Water
+        makeRemapWidget({357, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_SCENERY,        STR_PLACE_SCENERY_TIP             ), // Scenery
+        makeRemapWidget({387, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_FOOTPATH,       STR_BUILD_FOOTPATH_TIP            ), // Path
+        makeRemapWidget({490, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_CONSTRUCT_RIDE, STR_BUILD_RIDE_TIP                ), // Construct ride
+        makeRemapWidget({520, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_TOOLBAR_RIDES,          STR_RIDES_IN_PARK_TIP             ), // Rides
+        makeRemapWidget({550, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_TOOLBAR_PARK,           STR_PARK_INFORMATION_TIP          ), // Park
+        makeRemapWidget({560, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_G2_EMPTY,               STR_STAFF_TIP                     ), // Staff
+        makeRemapWidget({560, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_TOOLBAR_GUESTS,         STR_GUESTS_TIP                    ), // Guests
+        makeRemapWidget({560, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::tertiary  , SPR_TOOLBAR_CLEAR_SCENERY,  STR_CLEAR_SCENERY_TIP             ), // Clear scenery
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_EMPTY,               STR_GAME_SPEED_TIP                ), // Fast forward
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_EMPTY,               STR_CHEATS_TIP                    ), // Cheats
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_EMPTY,               STR_DEBUG_TIP                     ), // Debug
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_G2_EMPTY,               STR_SCENARIO_OPTIONS_FINANCIAL_TIP), // Finances
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_G2_EMPTY,               STR_FINANCES_RESEARCH_TIP         ), // Research
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::quaternary, SPR_G2_EMPTY,               STR_SHOW_RECENT_MESSAGES_TIP      ), // News
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_TOOLBAR_MULTIPLAYER, STR_SHOW_MULTIPLAYER_STATUS_TIP   ), // Network
+        makeRemapWidget({ 30, 0}, {30, kTopToolbarHeight}, WidgetType::imgBtn, WindowColour::primary   , SPR_G2_EMPTY,               STR_TOOLBAR_CHAT_TIP              ), // Chat
         makeWidget     ({  0, 0}, {10,                     1}, WidgetType::empty,  WindowColour::primary                                                                   )  // Artificial widget separator
     );
     // clang-format on
@@ -1085,33 +1085,33 @@ namespace OpenRCT2::Ui::Windows
         void ResetWidgetToDefaultState()
         {
             // Enable / disable buttons
-            widgets[WIDX_PAUSE].type = WidgetType::trnBtn;
-            widgets[WIDX_FILE_MENU].type = WidgetType::trnBtn;
-            widgets[WIDX_ZOOM_OUT].type = WidgetType::trnBtn;
-            widgets[WIDX_ZOOM_IN].type = WidgetType::trnBtn;
-            widgets[WIDX_ROTATE_CLOCKWISE].type = WidgetType::trnBtn;
-            widgets[WIDX_ROTATE_ANTI_CLOCKWISE].type = WidgetType::trnBtn;
-            widgets[WIDX_VIEW_MENU].type = WidgetType::trnBtn;
-            widgets[WIDX_MAP].type = WidgetType::trnBtn;
-            widgets[WIDX_MUTE].type = WidgetType::trnBtn;
-            widgets[WIDX_CHAT].type = WidgetType::trnBtn;
-            widgets[WIDX_LAND].type = WidgetType::trnBtn;
-            widgets[WIDX_WATER].type = WidgetType::trnBtn;
-            widgets[WIDX_SCENERY].type = WidgetType::trnBtn;
-            widgets[WIDX_PATH].type = WidgetType::trnBtn;
-            widgets[WIDX_CONSTRUCT_RIDE].type = WidgetType::trnBtn;
-            widgets[WIDX_RIDES].type = WidgetType::trnBtn;
-            widgets[WIDX_PARK].type = WidgetType::trnBtn;
-            widgets[WIDX_STAFF].type = WidgetType::trnBtn;
-            widgets[WIDX_GUESTS].type = WidgetType::trnBtn;
-            widgets[WIDX_CLEAR_SCENERY].type = WidgetType::trnBtn;
-            widgets[WIDX_FINANCES].type = WidgetType::trnBtn;
-            widgets[WIDX_RESEARCH].type = WidgetType::trnBtn;
-            widgets[WIDX_FASTFORWARD].type = WidgetType::trnBtn;
-            widgets[WIDX_CHEATS].type = WidgetType::trnBtn;
-            widgets[WIDX_DEBUG].type = Config::Get().general.debuggingTools ? WidgetType::trnBtn : WidgetType::empty;
-            widgets[WIDX_NEWS].type = WidgetType::trnBtn;
-            widgets[WIDX_NETWORK].type = WidgetType::trnBtn;
+            widgets[WIDX_PAUSE].type = WidgetType::imgBtn;
+            widgets[WIDX_FILE_MENU].type = WidgetType::imgBtn;
+            widgets[WIDX_ZOOM_OUT].type = WidgetType::imgBtn;
+            widgets[WIDX_ZOOM_IN].type = WidgetType::imgBtn;
+            widgets[WIDX_ROTATE_CLOCKWISE].type = WidgetType::imgBtn;
+            widgets[WIDX_ROTATE_ANTI_CLOCKWISE].type = WidgetType::imgBtn;
+            widgets[WIDX_VIEW_MENU].type = WidgetType::imgBtn;
+            widgets[WIDX_MAP].type = WidgetType::imgBtn;
+            widgets[WIDX_MUTE].type = WidgetType::imgBtn;
+            widgets[WIDX_CHAT].type = WidgetType::imgBtn;
+            widgets[WIDX_LAND].type = WidgetType::imgBtn;
+            widgets[WIDX_WATER].type = WidgetType::imgBtn;
+            widgets[WIDX_SCENERY].type = WidgetType::imgBtn;
+            widgets[WIDX_PATH].type = WidgetType::imgBtn;
+            widgets[WIDX_CONSTRUCT_RIDE].type = WidgetType::imgBtn;
+            widgets[WIDX_RIDES].type = WidgetType::imgBtn;
+            widgets[WIDX_PARK].type = WidgetType::imgBtn;
+            widgets[WIDX_STAFF].type = WidgetType::imgBtn;
+            widgets[WIDX_GUESTS].type = WidgetType::imgBtn;
+            widgets[WIDX_CLEAR_SCENERY].type = WidgetType::imgBtn;
+            widgets[WIDX_FINANCES].type = WidgetType::imgBtn;
+            widgets[WIDX_RESEARCH].type = WidgetType::imgBtn;
+            widgets[WIDX_FASTFORWARD].type = WidgetType::imgBtn;
+            widgets[WIDX_CHEATS].type = WidgetType::imgBtn;
+            widgets[WIDX_DEBUG].type = Config::Get().general.debuggingTools ? WidgetType::imgBtn : WidgetType::empty;
+            widgets[WIDX_NEWS].type = WidgetType::imgBtn;
+            widgets[WIDX_NETWORK].type = WidgetType::imgBtn;
         }
 
         void HideDisabledButtons()
@@ -1365,7 +1365,9 @@ namespace OpenRCT2::Ui::Windows
             ApplyMapRotation();
             ApplyFootpathPressed();
 
-            if (!Config::Get().interface.toolbarButtonsCentred)
+            if (flags.has(WindowFlag::redBlack))
+                AlignButtons(kWidgetOrderCombined, 0);
+            else if (!Config::Get().interface.toolbarButtonsCentred)
                 AlignButtonsLeftRight();
             else
                 AlignButtonsCentre();
@@ -1510,8 +1512,8 @@ namespace OpenRCT2::Ui::Windows
     {
         auto* windowMgr = GetWindowManager();
         auto* window = windowMgr->Create<TopToolbar>(
-            WindowClass::topToolbar, ScreenCoordsXY(0, 0), { ContextGetWidth(), kTopToolbarHeight + 1 },
-            { WindowFlag::stickToFront, WindowFlag::transparent, WindowFlag::noBackground, WindowFlag::noTitleBar });
+            WindowClass::topToolbar, ScreenCoordsXY(0, 0), { ContextGetWidth(), kTopToolbarHeight },
+            { WindowFlag::stickToFront, WindowFlag::redBlack, WindowFlag::noTitleBar });
 
         window->setWidgets(_topToolbarWidgets);
 
