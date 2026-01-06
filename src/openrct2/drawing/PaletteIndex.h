@@ -82,6 +82,7 @@ namespace OpenRCT2::Drawing
         pi161 = 161, // Bright Purple (light)
         pi162 = 162, //
         pi164 = 164, //
+        pi169 = 169, // Red background colour used for the RCT1 top toolbar.
         pi171 = 171, // Saturated Red (lightest) Bright Red (middark)
         pi172 = 172, // Saturated Red (10-11), Bright Red (midlight)
         pi173 = 173, // Used to draw intense lines in the Ride Graphs window

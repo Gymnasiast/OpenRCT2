@@ -885,7 +885,10 @@ namespace OpenRCT2::Ui
             if (image.IsBlended())
                 image = image.WithBlended(false);
             else
-                image = image.WithPrimary(colour);
+            {
+                auto background = w.flags.has(WindowFlag::redBlack) ? Colour::invisible : colour;
+                image = image.WithPrimary(background);
+            }
 
             GfxDrawSprite(rt, image, screenCoords);
         }

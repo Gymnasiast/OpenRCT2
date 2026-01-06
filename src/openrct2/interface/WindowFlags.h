@@ -28,6 +28,10 @@ namespace OpenRCT2
          */
         noBackground,
         /**
+         * Fill the background with a red/black pattern, as used in the RCT1 top toolbar.
+         */
+        redBlack,
+        /**
          * Window is closed and will be deleted in the next update.
          */
         dead,
