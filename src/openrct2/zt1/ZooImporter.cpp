@@ -14,6 +14,7 @@
 #include "../GameState.h"
 #include "../ParkImporter.h"
 #include "../actions/RideCreateAction.h"
+#include "../actions/TrackPlaceAction.h"
 #include "../core/FileStream.h"
 #include "../interface/Viewport.h"
 #include "../object/DefaultObjects.h"
@@ -65,6 +66,10 @@ static const std::unordered_map<std::string, std::string> kFacilities = {
     { "objects/other/parkmap", "rct2.ride.infok" },      // Zoo Map
     { "building/building/hdogstnd", "rct2.ride.hotds" }, // Hot Dog Stall
     { "building/building/giftcart", "rct2.ride.souvs" }, // Gift Stand
+
+    { "building/building/carousal", "rct2.ride.mgr1" },   // Carousel
+    { "building/building/eleride", "rct2.ride.circus1" }, // Elephant Ride
+    { "building/building/giftshp", "rct2.ride.souvs" },   // Souvenir shop
 };
 static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/weepwill", "rct2.scenery_small.tww" }, // Weeping willow
@@ -76,10 +81,27 @@ static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/wtrreed", "rct2.scenery_small.tbr" }, // Water Reed
     { "objects/foliage/willow", "rct2.scenery_small.tww" },  // Globe Willow Tree
     { "objects/foliage/woak", "rct2.scenery_small.tco" },    // White Oak Tree
+
+    { "building/building/fgate1", "rct2.scenery_small.tgs" }, // Admission booth 1
+    { "building/building/fgate2", "rct2.scenery_small.tgs" }, // Admission booth 1
 };
 static const std::unordered_map<std::string, std::string> kWall = {
     { "fences/postrope/f", "rct2.scenery_wall.wpf" },       // Post and Rope Fence
     { "fences/woodslat/f", "couger.scenery_wall.acwwf32" }, // Wooden Slat Fence
+    { "fences/castiron/f", "rct2.scenery_wall.wsw1" },      // Cast-Iron Fence
+};
+static const std::unordered_map<std::string, std::string> kPathSurface = {
+    { "paths/paths/path", "rct1.footpath_surface.tiles_brown" },      // Concrete Path
+    { "paths/paths/dirtpath", "rct2.footpath_surface.tarmac_brown" }, // Dirt Path
+    { "paths/paths/brkpath", "rct1ll.footpath_surface.tiles_red" },   // Red brick
+    { "paths/paths/stnepath", "rct2.footpath_surface.crazy_paving" }, // Red brick
+};
+
+static constexpr std::array<colour_t, 24> kColourMap = {
+    COLOUR_DARK_PURPLE, COLOUR_BLACK, COLOUR_BLACK,      COLOUR_LIGHT_BROWN, COLOUR_BLACK,      COLOUR_BLACK,
+    COLOUR_BLACK,       COLOUR_BLACK, COLOUR_BLACK,      COLOUR_BLACK,       COLOUR_BLACK,      COLOUR_BLACK,
+    COLOUR_YELLOW,      COLOUR_BLACK, COLOUR_DARK_BROWN, COLOUR_BLACK,       COLOUR_BLACK,      COLOUR_BLACK,
+    COLOUR_BLACK,       COLOUR_BLACK, COLOUR_DARK_BLUE,  COLOUR_DARK_PINK,   COLOUR_LIGHT_BLUE, COLOUR_BLACK,
 };
 
 static constexpr FootpathSlope kDefaultPathSlope[] = {
@@ -277,7 +299,7 @@ static std::string_view GetTerrainSurfaceObject(ZooTerrainType terrainSurface)
         "rct2.terrain_surface.sand_red",     // DecideousFloor,
         "rct2.terrain_surface.grass",        // Waterfall,
         "rct2.terrain_surface.grass_clumps", // ConiferousFloor,
-        "rct2.terrain_surface.rock",         // Concrete,
+        "rct2.terrain_surface.sand_brown",   // Concrete,
         "rct2.terrain_surface.rock",         // Asphalt,
         "rct2.terrain_surface.grass_clumps", // TrampledTerrain,
         "rct2.terrain_surface.grid_purple",  // Gunite,
@@ -446,10 +468,10 @@ namespace ZT1
             //            AppendRequiredObjects(result, ObjectType::footpathSurface, _footpathSurfaceEntries);
             AppendRequiredObjects(
                 result, ObjectType::footpathSurface,
-                std::vector<std::string>({ "rct1.footpath_surface.tarmac", "rct1.footpath_surface.dirt",
-                                           "rct1.footpath_surface.crazy_paving", "rct1.footpath_surface.tiles_brown",
+                std::vector<std::string>({ "rct2.footpath_surface.tarmac", "rct1.footpath_surface.dirt",
+                                           "rct2.footpath_surface.crazy_paving", "rct1.footpath_surface.tiles_brown",
                                            "rct1aa.footpath_surface.ash", "rct1aa.footpath_surface.tarmac_green",
-                                           "rct1aa.footpath_surface.tarmac_brown", "rct1aa.footpath_surface.tiles_grey",
+                                           "rct2.footpath_surface.tarmac_brown", "rct1aa.footpath_surface.tiles_grey",
                                            "rct1aa.footpath_surface.tarmac_red", "rct1ll.footpath_surface.tiles_green",
                                            "rct1ll.footpath_surface.tiles_red", "rct1.footpath_surface.queue_blue",
                                            "rct1aa.footpath_surface.queue_red", "rct1aa.footpath_surface.queue_yellow",
@@ -484,12 +506,11 @@ namespace ZT1
 
         void AddDefaultEntries()
         {
-            _rideEntries.AddRange({
-                "rct2.ride.twist1", "rct2.ride.ptct1", "rct2.ride.zldb",  "rct2.ride.lfb1",  "rct2.ride.vcr",
-                "rct2.ride.mgr1",   "rct2.ride.tlt1",  "rct2.ride.atm1",  "rct2.ride.faid1", "rct2.ride.infok",
-                "rct2.ride.drnks",  "rct2.ride.cndyf", "rct2.ride.burgb", "rct2.ride.balln", "rct2.ride.arrt1",
-                "rct2.ride.rboat",  "rct2.ride.pizzs", "rct2.ride.hotds", "rct2.ride.souvs",
-            });
+            _rideEntries.AddRange({ "rct2.ride.twist1", "rct2.ride.ptct1", "rct2.ride.zldb",  "rct2.ride.lfb1",
+                                    "rct2.ride.vcr",    "rct2.ride.mgr1",  "rct2.ride.tlt1",  "rct2.ride.atm1",
+                                    "rct2.ride.faid1",  "rct2.ride.infok", "rct2.ride.drnks", "rct2.ride.cndyf",
+                                    "rct2.ride.burgb",  "rct2.ride.balln", "rct2.ride.arrt1", "rct2.ride.rboat",
+                                    "rct2.ride.pizzs",  "rct2.ride.hotds", "rct2.ride.souvs", "rct2.ride.circus1" });
 
             //            _wallEntries.AddRange({
             //                "couger.scenery_wall.acwwf32",
@@ -508,9 +529,9 @@ namespace ZT1
 
             // Add default footpaths
             _footpathSurfaceEntries.AddRange(
-                { "rct1.footpath_surface.tarmac", "rct1.footpath_surface.dirt", "rct1.footpath_surface.crazy_paving",
+                { "rct2.footpath_surface.tarmac", "rct1.footpath_surface.dirt", "rct2.footpath_surface.crazy_paving",
                   "rct1.footpath_surface.tiles_brown", "rct1aa.footpath_surface.ash", "rct1aa.footpath_surface.tarmac_green",
-                  "rct1aa.footpath_surface.tarmac_brown", "rct1aa.footpath_surface.tiles_grey",
+                  "rct2.footpath_surface.tarmac_brown", "rct1aa.footpath_surface.tiles_grey",
                   "rct1aa.footpath_surface.tarmac_red", "rct1ll.footpath_surface.tiles_green",
                   "rct1ll.footpath_surface.tiles_red", "rct1.footpath_surface.queue_blue", "rct1aa.footpath_surface.queue_red",
                   "rct1aa.footpath_surface.queue_yellow", "rct1aa.footpath_surface.queue_green" });
@@ -642,7 +663,7 @@ namespace ZT1
                 for (auto mapping : kFacilities)
                 {
                     if (mapping.first == combinedId)
-                        ImportFacility(mapping.second);
+                        ImportFacility(gameState, mapping.second);
                 }
                 for (auto mapping : kSmallScenery)
                 {
@@ -656,7 +677,17 @@ namespace ZT1
                 }
                 if (ids[0] == "paths")
                 {
-                    ImportPath(combinedId);
+                    bool found = false;
+                    for (auto mapping : kPathSurface)
+                    {
+                        if (mapping.first == combinedId)
+                        {
+                            found = true;
+                            ImportPath(mapping.second);
+                        }
+                    }
+                    if (!found)
+                        ImportPath("rct2.footpath_surface.tarmac");
                 }
                 //                if (ids[0] == "guests")
                 //                {
@@ -829,7 +860,7 @@ namespace ZT1
             surface->SetOwnership(OWNERSHIP_OWNED);
         }
 
-        void ImportFacility(const std::string& objectIdentifier)
+        void ImportFacility(GameState_t& gameState, const std::string& objectIdentifier)
         {
             // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
@@ -843,93 +874,122 @@ namespace ZT1
             auto name = ReadZTString(*_stream);
             LOG_ERROR("Name: %s", name.c_str());
 
+            _stream->Seek(43, STREAM_SEEK_CURRENT);
+            auto colour1 = _stream->ReadValue<uint8_t>();
+            auto colour2 = _stream->ReadValue<uint8_t>();
+            if (colour1 < kColourMap.size())
+                colour1 = kColourMap[colour1];
+            else
+                colour1 = COLOUR_BLACK;
+            if (colour2 < kColourMap.size())
+                colour2 = kColourMap[colour2];
+            else
+                colour2 = COLOUR_BLACK;
+
             auto subtypeId = _rideEntries.GetOrAddEntry(objectIdentifier);
             // auto& objManager = GetContext()->GetObjectManager();
             // const auto* object = objManager.GetLoadedObject<RideObject>(subtypeId);
 
-            auto rideIndex = GetNextFreeRideId();
-            auto* ride = RideAllocateAtIndex(rideIndex);
+            const auto* rideEntry = GetRideEntryByIndex(subtypeId);
+            if (rideEntry == nullptr)
+            {
+                LOG_ERROR("Ride entry not allocated!");
+                return;
+            }
+            auto rideTypeId = rideEntry->GetFirstNonNullRideType();
+            const auto& rtd = GetRideTypeDescriptor(rideTypeId);
+
+            auto rideCreateAction = GameActions::RideCreateAction(
+                rideTypeId, subtypeId, 0, 0, gameState.lastEntranceStyle, RideInspection::every30Minutes);
+            rideCreateAction.SetFlags(
+                { GameActions::CommandFlag::apply, GameActions::CommandFlag::allowDuringPaused,
+                  GameActions::CommandFlag::noSpend });
+            auto res = GameActions::Execute(&rideCreateAction, gameState);
+            const auto rideIndex = res.getData<RideId>();
+            auto ride = GetRide(rideIndex);
             if (ride == nullptr)
             {
                 LOG_ERROR("Ride not allocated!");
                 return;
             }
-            const auto* rideEntry = GetRideEntryByIndex(subtypeId);
-            if (rideEntry == nullptr)
-            {
-                LOG_ERROR("Ride entry not allocated!");
-                // return;
-            }
-            auto rideTypeId = rideEntry->GetFirstNonNullRideType();
-            ride->type = rideTypeId;
-            ride->subtype = subtypeId;
-            ride->setColourPreset(0, 0);
-            ride->overallView = coords;
+
+            ride->trackColours[0].main = colour1;
+            ride->trackColours[0].additional = colour2;
+            ride->vehicleColours[0].Body = colour1;
+            ride->vehicleColours[0].Trim = colour2;
+
+            // auto rideIndex = GetNextFreeRideId();
+            // auto* ride = RideAllocateAtIndex(rideIndex);
+
+            // ride->type = rideTypeId;
+            // ride->subtype = subtypeId;
+            // ride->setColourPreset(0, 0);
+            // ride->overallView = coords;
             ride->customName = name;
-
-            for (auto& station : ride->getStations())
-            {
-                station.Start.SetNull();
-                station.Entrance.SetNull();
-                station.Exit.SetNull();
-                station.TrainAtStation = RideStation::kNoTrain;
-                station.QueueTime = 0;
-                station.SegmentLength = 0;
-                station.QueueLength = 0;
-                station.Length = 0;
-                station.Height = 0;
-            }
-
-            ride->status = RideStatus::closed;
-            ride->numTrains = 1;
-            ride->proposedNumTrains = 1;
-            ride->maxTrains = OpenRCT2::Limits::kMaxTrainsPerRide;
-            ride->numCarsPerTrain = 1;
-            ride->proposedNumCarsPerTrain = 1; // rideEntry->max_cars_in_train;
-            ride->minWaitingTime = 10;
-            ride->maxWaitingTime = 60;
-            ride->departFlags = RIDE_DEPART_WAIT_FOR_MINIMUM_LENGTH | 3;
-            const auto& rtd = ride->getRideTypeDescriptor();
-            const auto& operatingSettings = rtd.OperatingSettings;
-            ride->operationOption = (operatingSettings.MinValue * 3 + operatingSettings.MaxValue) / 4;
-
-            ride->liftHillSpeed = rtd.LiftData.minimum_speed;
-
-            ride->ratings.setNull();
-            for (auto i = 0; i < RCT2::ObjectLimits::kMaxShopItemsPerRideEntry; i++)
-            {
-                ride->price[i] = rtd.DefaultPrices[i];
-            }
+            //
+            // for (auto& station : ride->getStations())
+            // {
+            //     station.Start.SetNull();
+            //     station.Entrance.SetNull();
+            //     station.Exit.SetNull();
+            //     station.TrainAtStation = RideStation::kNoTrain;
+            //     station.QueueTime = 0;
+            //     station.SegmentLength = 0;
+            //     station.QueueLength = 0;
+            //     station.Length = 0;
+            //     station.Height = 0;
+            // }
+            //
+            // ride->status = RideStatus::closed;
+            // ride->numTrains = 1;
+            // ride->proposedNumTrains = 1;
+            // ride->maxTrains = OpenRCT2::Limits::kMaxTrainsPerRide;
+            // ride->numCarsPerTrain = 1;
+            // ride->proposedNumCarsPerTrain = 1; // rideEntry->max_cars_in_train;
+            // ride->minWaitingTime = 10;
+            // ride->maxWaitingTime = 60;
+            // ride->departFlags = RIDE_DEPART_WAIT_FOR_MINIMUM_LENGTH | 3;
+            // const auto& rtd = ride->getRideTypeDescriptor();
+            // const auto& operatingSettings = rtd.OperatingSettings;
+            // ride->operationOption = (operatingSettings.MinValue * 3 + operatingSettings.MaxValue) / 4;
+            //
+            // ride->liftHillSpeed = rtd.LiftData.minimum_speed;
+            //
+            // ride->ratings.setNull();
+            // for (auto i = 0; i < RCT2::ObjectLimits::kMaxShopItemsPerRideEntry; i++)
+            // {
+            //     ride->price[i] = rtd.DefaultPrices[i];
+            // }
             //            ride->price[0] = GetShopItemDescriptor(rideEntry->shop_item[0]).DefaultPrice;
             //            if (rideEntry->shop_item[1] != ShopItem::None)
             //            {
             //                ride->price[1] = GetShopItemDescriptor(rideEntry->shop_item[1]).DefaultPrice;
             //            }
-            ride->value = kRideValueUndefined;
-            ride->satisfaction = 255;
-            ride->popularity = 255;
-            ride->buildDate = GetDate().GetMonthsElapsed();
-            ride->musicTuneId = kTuneIDNull;
+            // ride->value = kRideValueUndefined;
+            // ride->satisfaction = 255;
+            // ride->popularity = 255;
+            // ride->buildDate = GetDate().GetMonthsElapsed();
+            // ride->musicTuneId = kTuneIDNull;
 
-            ride->breakdownReason = 255;
-            ride->upkeepCost = kMoney64Undefined;
-            ride->reliability = kRideInitialReliability;
-            ride->unreliabilityFactor = 1;
-            ride->inspectionInterval = RideInspection::every30Minutes;
-            ride->lastCrashType = RIDE_CRASH_TYPE_NONE;
-            ride->incomePerHour = kMoney64Undefined;
-            ride->profit = kMoney64Undefined;
+            // ride->breakdownReason = 255;
+            // ride->upkeepCost = kMoney64Undefined;
+            // ride->reliability = kRideInitialReliability;
+            // ride->unreliabilityFactor = 1;
+            // ride->inspectionInterval = RideInspection::every30Minutes;
+            // ride->lastCrashType = RIDE_CRASH_TYPE_NONE;
+            // ride->incomePerHour = kMoney64Undefined;
+            // ride->profit = kMoney64Undefined;
 
-            ride->entranceStyle = kObjectEntryIndexNull;
-            if (rtd.HasFlag(RtdFlag::hasEntranceAndExit))
-            {
-                ride->entranceStyle = 0;
-            }
+            // ride->entranceStyle = kObjectEntryIndexNull;
+            // if (rtd.HasFlag(RtdFlag::hasEntranceAndExit))
+            // {
+            //     ride->entranceStyle = 0;
+            // }
 
-            ride->numCircuits = 1;
-            ride->mode = ride->getDefaultMode();
-            ride->minCarsPerTrain = 1; // rideEntry->min_cars_in_train;
-            ride->maxCarsPerTrain = 1; // rideEntry->max_cars_in_train;
+            // ride->numCircuits = 1;
+            // ride->mode = ride->getDefaultMode();
+            // ride->minCarsPerTrain = 1; // rideEntry->min_cars_in_train;
+            // ride->maxCarsPerTrain = 1; // rideEntry->max_cars_in_train;
 
             //            SelectedLiftAndInverted liftState{};
             //            auto trackPlaceAction = TrackPlaceAction(
@@ -940,18 +1000,34 @@ namespace ZT1
             auto& station0 = ride->getStation(StationIndex::FromUnderlying(0));
             station0.Start = coords;
             station0.SetBaseZ(coords.z);
-            ride->status = RideStatus::open;
-
-            auto* trackElement = TileElementInsert<TrackElement>(coords, 0b1111);
-            if (trackElement != nullptr)
+            const bool isShop = rtd.HasFlag(RtdFlag::isShopOrFacility);
+            if (isShop)
             {
-                trackElement->SetDirection(coords.direction);
-                trackElement->SetClearanceZ(trackElement->GetBaseZ() + (4 * kCoordsZStep));
-                trackElement->SetRideIndex(rideIndex);
-                trackElement->SetTrackType(rtd.StartTrackPiece);
-                trackElement->SetRideType(rideTypeId);
-                trackElement->SetColourScheme(RideColourScheme::main);
+                ride->status = RideStatus::open;
             }
+            else
+            {
+                ride->status = RideStatus::closed;
+                ride->numStations = 1;
+            }
+
+            GameActions::CommandFlags flags = { GameActions::CommandFlag::apply, GameActions::CommandFlag::allowDuringPaused,
+                                                GameActions::CommandFlag::noSpend };
+            auto trackPlaceAction = GameActions::TrackPlaceAction(
+                ride->id, rtd.StartTrackPiece, ride->type, coords, 0, 0, kDefaultSeatRotation, {}, true);
+            trackPlaceAction.SetFlags(flags);
+            GameActions::Execute(&trackPlaceAction, gameState);
+
+            // auto* trackElement = TileElementInsert<TrackElement>(coords, 0b1111);
+            // if (trackElement != nullptr)
+            // {
+            //     trackElement->SetDirection(coords.direction);
+            //     trackElement->SetClearanceZ(trackElement->GetBaseZ() + (4 * kCoordsZStep));
+            //     trackElement->SetRideIndex(rideIndex);
+            //     trackElement->SetTrackType(rtd.StartTrackPiece);
+            //     trackElement->SetRideType(rideTypeId);
+            //     trackElement->SetColourScheme(RideColourScheme::main);
+            // }
         }
 
         void ImportSmallScenery(const std::string& objectIdentifier)
@@ -1004,7 +1080,7 @@ namespace ZT1
             }
         }
 
-        void ImportPath(std::string_view combinedId)
+        void ImportPath(std::string_view objectIdentifier)
         {
             // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
@@ -1018,21 +1094,13 @@ namespace ZT1
             auto name = ReadZTString(*_stream);
             LOG_ERROR("Name: %s", name.c_str());
 
-            ObjectEntryIndex entryIndex = 0;
-            if (combinedId == "paths/paths/brkpath")
-            {
-                entryIndex = 10;
-            }
-            else if (combinedId == "paths/path/dirtpath")
-            {
-                entryIndex = 7;
-            }
-
             if (MapGetParkEntranceElementAt(coords, false))
                 return;
 
             auto pathElement = TileElementInsert<PathElement>(coords, 0b1111);
+            auto entryIndex = _footpathSurfaceEntries.GetOrAddEntry(objectIdentifier);
             pathElement->SetSurfaceEntryIndex(entryIndex);
+
             pathElement->SetRailingsEntryIndex(0);
             pathElement->SetClearanceZ(coords.z + kPathHeightStep);
 
