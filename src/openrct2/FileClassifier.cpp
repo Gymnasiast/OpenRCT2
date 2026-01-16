@@ -205,24 +205,23 @@ static bool TryClassifyAsTD4_TD6(IStream* stream, ClassifiedFileInfo* result)
 static bool TryClassifyAsZT1Zoo(OpenRCT2::IStream* stream, ClassifiedFileInfo* result)
 {
     bool success = false;
-
     uint64_t originalPosition = stream->GetPosition();
     try
     {
-        char buffer[4];
-        // size_t dataLength = static_cast<size_t>(stream->GetLength());
-        stream->Read4(buffer);
-        stream->SetPosition(originalPosition);
-
-        success = (std::string(buffer) == "TZFB");
-        result->Type = FILE_TYPE::ZOO;
-        result->Version = 0;
+        auto magic = stream->ReadValue<uint32_t>();
+        if (magic == 0x42465A54)
+        {
+            result->Type = FileType::zoo;
+            result->Version = 0;
+            success = true;
+        }
     }
     catch (const std::exception& e)
     {
-        Console::Error::WriteLine(e.what());
+        success = false;
+        LOG_VERBOSE(e.what());
     }
-
+    stream->SetPosition(originalPosition);
     return success;
 }
 

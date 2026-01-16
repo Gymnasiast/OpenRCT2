@@ -137,12 +137,6 @@ namespace OpenRCT2
 
     enum
     {
-        SLOPE_IS_IRREGULAR_FLAG = (1 << 3), // Flag set in `DefaultPathSlope[]` and checked in `footpath_place_real`
-        RAISE_FOOTPATH_FLAG = (1 << 4)
-    };
-
-    enum
-    {
         FOOTPATH_CORNER_0 = (1 << 0),
         FOOTPATH_CORNER_1 = (1 << 1),
         FOOTPATH_CORNER_2 = (1 << 2),

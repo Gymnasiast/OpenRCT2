@@ -9,25 +9,28 @@
 
 #include "../Cheats.h"
 #include "../Context.h"
+#include "../Diagnostic.h"
 #include "../Editor.h"
 #include "../GameState.h"
 #include "../ParkImporter.h"
-#include "../actions/ParkEntrancePlaceAction.h"
 #include "../actions/RideCreateAction.h"
-#include "../actions/TrackPlaceAction.h"
 #include "../core/FileStream.h"
 #include "../interface/Viewport.h"
 #include "../object/DefaultObjects.h"
 #include "../object/ObjectManager.h"
 #include "../object/ObjectRepository.h"
+#include "../object/ObjectTypes.h"
+#include "../park/Legacy.h"
+#include "../park/ParkPreview.h"
 #include "../rct1/RCT1.h"
 #include "../rct1/Tables.h"
 #include "../rct12/EntryList.h"
 #include "../rct12/RCT12.h"
+#include "../rct2/RCT2.h"
 #include "../ride/RideData.h"
 #include "../scenario/ScenarioRepository.h"
 #include "../world/Entrance.h"
-#include "../world/Park.h"
+#include "../world/Map.h"
 #include "../world/Scenery.h"
 #include "../world/tile_element/EntranceElement.h"
 #include "../world/tile_element/PathElement.h"
@@ -42,12 +45,12 @@ using namespace OpenRCT2;
 static constexpr const uint8_t kZooCoordsXYStep = 64;
 // static constexpr const uint8_t ZOO_kCoordsZStep = 8;
 
-const std::string_view ZooWalls[] = {
+constexpr std::string_view kZooWalls[] = {
     "fences/zoowall/f",
     "fences/dwall/f",
     "fences/aqwall/f",
 };
-const std::string_view ZooEntrances[] = {
+constexpr std::string_view kZooEntrances[] = {
     "building/building/fgate",
     "building/building/dgate",
     "building/building/aqgate",
@@ -71,31 +74,24 @@ static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/birch", "rct2.scenery_small.tsb" },   // Birch Tree
     { "objects/foliage/fir", "rct2.scenery_small.tns" },     // Fir Tree
     { "objects/foliage/wtrreed", "rct2.scenery_small.tbr" }, // Water Reed
+    { "objects/foliage/willow", "rct2.scenery_small.tww" },  // Globe Willow Tree
+    { "objects/foliage/woak", "rct2.scenery_small.tco" },    // White Oak Tree
 };
 static const std::unordered_map<std::string, std::string> kWall = {
     { "fences/postrope/f", "rct2.scenery_wall.wpf" },       // Post and Rope Fence
     { "fences/woodslat/f", "couger.scenery_wall.acwwf32" }, // Wooden Slat Fence
 };
-static constexpr uint8_t DefaultPathSlope[] = {
-    0,
-    SLOPE_IS_IRREGULAR_FLAG,
-    SLOPE_IS_IRREGULAR_FLAG,
-    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 2,
-    SLOPE_IS_IRREGULAR_FLAG,
-    SLOPE_IS_IRREGULAR_FLAG,
-    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 3,
-    RAISE_FOOTPATH_FLAG,
-    SLOPE_IS_IRREGULAR_FLAG,
-    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 1,
-    SLOPE_IS_IRREGULAR_FLAG,
-    RAISE_FOOTPATH_FLAG,
-    FOOTPATH_PROPERTIES_FLAG_IS_SLOPED | 0,
-    RAISE_FOOTPATH_FLAG,
-    RAISE_FOOTPATH_FLAG,
-    SLOPE_IS_IRREGULAR_FLAG,
+
+static constexpr FootpathSlope kDefaultPathSlope[] = {
+    { FootpathSlopeType::flat },      { FootpathSlopeType::irregular }, { FootpathSlopeType::irregular },
+    { FootpathSlopeType::sloped, 2 }, { FootpathSlopeType::irregular }, { FootpathSlopeType::irregular },
+    { FootpathSlopeType::sloped, 3 }, { FootpathSlopeType::raise },     { FootpathSlopeType::irregular },
+    { FootpathSlopeType::sloped, 1 }, { FootpathSlopeType::irregular }, { FootpathSlopeType::raise },
+    { FootpathSlopeType::sloped, 0 }, { FootpathSlopeType::raise },     { FootpathSlopeType::raise },
+    { FootpathSlopeType::irregular },
 };
 
-enum ZooTerrainType : uint8_t
+enum class ZooTerrainType : uint8_t
 {
     Grass,
     SavannahGrass,
@@ -264,7 +260,7 @@ static std::string ReadZTString(OpenRCT2::IStream& stream)
     return std::string(buffer);
 }
 
-static std::string_view GetTerrainSurfaceObject(uint8_t terrainSurface)
+static std::string_view GetTerrainSurfaceObject(ZooTerrainType terrainSurface)
 {
     static constexpr std::string_view map[] = {
         "rct2.terrain_surface.grass",        // Grass,
@@ -286,7 +282,7 @@ static std::string_view GetTerrainSurfaceObject(uint8_t terrainSurface)
         "rct2.terrain_surface.grass_clumps", // TrampledTerrain,
         "rct2.terrain_surface.grid_purple",  // Gunite,
     };
-    return terrainSurface < std::size(map) ? map[terrainSurface] : map[0];
+    return EnumValue(terrainSurface) < std::size(map) ? map[EnumValue(terrainSurface)] : map[0];
 }
 
 namespace ZT1
@@ -325,14 +321,14 @@ namespace ZT1
         ObjectEntryIndex _footpathRailingsTypeToEntryMap[4]{};
 
     public:
-        ParkLoadResult Load(const u8string& path) override
+        ParkLoadResult Load(const u8string& path, bool skipObjectCheck) override
         {
-            return LoadSavedGame(path);
+            return LoadSavedGame(path, skipObjectCheck);
         }
 
         ParkLoadResult LoadSavedGame(const u8string& path, bool skipObjectCheck = false) override
         {
-            auto fs = FileStream(path, FILE_MODE_OPEN);
+            auto fs = FileStream(path, FileMode::open);
             auto result = LoadFromStream(&fs, true, skipObjectCheck, path);
             return result;
         }
@@ -364,6 +360,7 @@ namespace ZT1
             _stream->Seek(sizeof(int32_t) * 4, STREAM_SEEK_CURRENT);
             ImportTerrain();
             ImportTileElements(gameState);
+            ResearchFix();
             ResearchItemsMakeAllResearched();
             SetEveryRideTypeInvented();
             SetEveryRideEntryInvented();
@@ -394,7 +391,7 @@ namespace ZT1
             }
         }
 
-        bool GetDetails(ScenarioIndexEntry* dst) override
+        bool PopulateIndexEntry(ScenarioIndexEntry* dst) override
         {
             *dst = {};
             return false;
@@ -411,19 +408,24 @@ namespace ZT1
             //            return true;
         }
 
+        ParkPreview GetParkPreview() override
+        {
+            return {};
+        }
+
         ObjectList GetRequiredObjects()
         {
             ObjectList result;
 
-            AppendRequiredObjects(result, ObjectType::Ride, _rideEntries);
-            AppendRequiredObjects(result, ObjectType::SmallScenery, _smallSceneryEntries);
-            AppendRequiredObjects(result, ObjectType::LargeScenery, _largeSceneryEntries);
-            AppendRequiredObjects(result, ObjectType::Walls, _wallEntries);
-            AppendRequiredObjects(result, ObjectType::Paths, _pathEntries);
-            AppendRequiredObjects(result, ObjectType::PathAdditions, _pathAdditionEntries);
-            AppendRequiredObjects(result, ObjectType::SceneryGroup, _sceneryGroupEntries);
+            AppendRequiredObjects(result, ObjectType::ride, _rideEntries);
+            AppendRequiredObjects(result, ObjectType::smallScenery, _smallSceneryEntries);
+            AppendRequiredObjects(result, ObjectType::largeScenery, _largeSceneryEntries);
+            AppendRequiredObjects(result, ObjectType::walls, _wallEntries);
+            AppendRequiredObjects(result, ObjectType::paths, _pathEntries);
+            AppendRequiredObjects(result, ObjectType::pathAdditions, _pathAdditionEntries);
+            AppendRequiredObjects(result, ObjectType::sceneryGroup, _sceneryGroupEntries);
             AppendRequiredObjects(
-                result, ObjectType::Banners,
+                result, ObjectType::banners,
                 std::vector<std::string>({
                     "rct2.footpath_banner.bn1",
                     "rct2.footpath_banner.bn2",
@@ -435,15 +437,15 @@ namespace ZT1
                     "rct2.footpath_banner.bn8",
                     "rct2.footpath_banner.bn9",
                 }));
-            AppendRequiredObjects(result, ObjectType::ParkEntrance, std::vector<std::string>({ "rct2.park_entrance.pkent1" }));
-            AppendRequiredObjects(result, ObjectType::Water, std::vector<std::string>({ "rct2.water.wtrcyan" }));
-            AppendRequiredObjects(result, ObjectType::PeepNames, std::vector<std::string>({ "rct2.peep_names.original" }));
-            AppendRequiredObjects(result, ObjectType::TerrainSurface, _terrainSurfaceEntries);
-            AppendRequiredObjects(result, ObjectType::TerrainEdge, std::vector<std::string>({ "rct2.terrain_edge.rock" }));
-            //            AppendRequiredObjects(result, ObjectType::TerrainEdge, _terrainEdgeEntries);
-            //            AppendRequiredObjects(result, ObjectType::FootpathSurface, _footpathSurfaceEntries);
+            AppendRequiredObjects(result, ObjectType::parkEntrance, std::vector<std::string>({ "rct2.park_entrance.pkent1" }));
+            AppendRequiredObjects(result, ObjectType::water, std::vector<std::string>({ "rct2.water.wtrcyan" }));
+            AppendRequiredObjects(result, ObjectType::peepNames, std::vector<std::string>({ "rct2.peep_names.original" }));
+            AppendRequiredObjects(result, ObjectType::terrainSurface, _terrainSurfaceEntries);
+            AppendRequiredObjects(result, ObjectType::terrainEdge, std::vector<std::string>({ "rct2.terrain_edge.rock" }));
+            //            AppendRequiredObjects(result, ObjectType::terrainEdge, _terrainEdgeEntries);
+            //            AppendRequiredObjects(result, ObjectType::footpathSurface, _footpathSurfaceEntries);
             AppendRequiredObjects(
-                result, ObjectType::FootpathSurface,
+                result, ObjectType::footpathSurface,
                 std::vector<std::string>({ "rct1.footpath_surface.tarmac", "rct1.footpath_surface.dirt",
                                            "rct1.footpath_surface.crazy_paving", "rct1.footpath_surface.tiles_brown",
                                            "rct1aa.footpath_surface.ash", "rct1aa.footpath_surface.tarmac_green",
@@ -452,10 +454,25 @@ namespace ZT1
                                            "rct1ll.footpath_surface.tiles_red", "rct1.footpath_surface.queue_blue",
                                            "rct1aa.footpath_surface.queue_red", "rct1aa.footpath_surface.queue_yellow",
                                            "rct1aa.footpath_surface.queue_green" }));
-            //            AppendRequiredObjects(result, ObjectType::FootpathRailings, _footpathRailingsEntries);
+            //            AppendRequiredObjects(result, ObjectType::footpathRailings, _footpathRailingsEntries);
             AppendRequiredObjects(
-                result, ObjectType::FootpathRailings, std::vector<std::string>({ "rct2.footpath_railings.wood" }));
-            RCT12AddDefaultObjects(result);
+                result, ObjectType::footpathRailings, std::vector<std::string>({ "rct2.footpath_railings.wood" }));
+            // RCT12AddDefaultObjects(result);
+            //  Add default surfaces
+            _terrainSurfaceEntries.AddRange(RCT2::DefaultTerrainSurfaces);
+
+            // Add default edges
+            _terrainEdgeEntries.AddRange(RCT2::DefaultTerrainEdges);
+
+            AppendRequiredObjects(result, ObjectType::station, kDefaultStationStyles);
+
+            // Add all legacy peep animation objects
+            auto animObjects = GetLegacyPeepAnimationObjects();
+            AppendRequiredObjects(result, ObjectType::peepAnimations, animObjects);
+
+            constexpr std::string_view climateObjId = "rct2.climate.warm";
+            AppendRequiredObjects(result, ObjectType::climate, std::vector({ climateObjId }));
+
             return result;
         }
 
@@ -522,30 +539,29 @@ namespace ZT1
 
         void InitialiseEntryMaps()
         {
-            std::fill(std::begin(_smallSceneryTypeToEntryMap), std::end(_smallSceneryTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_largeSceneryTypeToEntryMap), std::end(_largeSceneryTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_wallTypeToEntryMap), std::end(_wallTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_pathTypeToEntryMap), std::end(_pathTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_pathAdditionTypeToEntryMap), std::end(_pathAdditionTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_sceneryThemeTypeToEntryMap), std::end(_sceneryThemeTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
+            std::fill(std::begin(_smallSceneryTypeToEntryMap), std::end(_smallSceneryTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_largeSceneryTypeToEntryMap), std::end(_largeSceneryTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_wallTypeToEntryMap), std::end(_wallTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_pathTypeToEntryMap), std::end(_pathTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_pathAdditionTypeToEntryMap), std::end(_pathAdditionTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_sceneryThemeTypeToEntryMap), std::end(_sceneryThemeTypeToEntryMap), kObjectEntryIndexNull);
             std::fill(
-                std::begin(_terrainSurfaceTypeToEntryMap), std::end(_terrainSurfaceTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
-            std::fill(std::begin(_terrainEdgeTypeToEntryMap), std::end(_terrainEdgeTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
+                std::begin(_terrainSurfaceTypeToEntryMap), std::end(_terrainSurfaceTypeToEntryMap), kObjectEntryIndexNull);
+            std::fill(std::begin(_terrainEdgeTypeToEntryMap), std::end(_terrainEdgeTypeToEntryMap), kObjectEntryIndexNull);
             std::fill(
-                std::begin(_footpathSurfaceTypeToEntryMap), std::end(_footpathSurfaceTypeToEntryMap), OBJECT_ENTRY_INDEX_NULL);
+                std::begin(_footpathSurfaceTypeToEntryMap), std::end(_footpathSurfaceTypeToEntryMap), kObjectEntryIndexNull);
             std::fill(
-                std::begin(_footpathRailingsTypeToEntryMap), std::end(_footpathRailingsTypeToEntryMap),
-                OBJECT_ENTRY_INDEX_NULL);
+                std::begin(_footpathRailingsTypeToEntryMap), std::end(_footpathRailingsTypeToEntryMap), kObjectEntryIndexNull);
         }
 
         void Initialise(GameState_t& gameState)
         {
-            gameState.ScenarioFileName = "";
+            gameState.scenarioFileName = "";
 
             // Do map initialisation, same kind of stuff done when loading scenario editor
             gameStateInitAll(gameState, { _header.MapSizeX + 2, _header.MapSizeY + 2 });
-            gameState.EditorStep = EditorStep::ObjectSelection;
-            gameState.ScenarioCategory = SCENARIO_CATEGORY_OTHER;
+            gameState.editorStep = EditorStep::ObjectSelection;
+            // gameState.scenarioCategory = Scenario::Category::other;
         }
 
         void ImportTerrain()
@@ -596,8 +612,8 @@ namespace ZT1
             //            _stream->SetPosition(0xDE07);
             auto numElements = _stream->ReadValue<uint32_t>();
 
-            gameState.Cheats.sandboxMode = true;
-            gameState.Park.Flags |= PARK_FLAGS_NO_MONEY;
+            gameState.cheats.sandboxMode = true;
+            gameState.park.flags |= PARK_FLAGS_NO_MONEY;
 
             for (uint32_t i = 0; i < numElements; i++)
             {
@@ -611,12 +627,12 @@ namespace ZT1
                 auto restLength = _stream->ReadValue<int32_t>();
                 auto savedPos = _stream->GetPosition();
 
-                for (auto id : ZooWalls)
+                for (auto id : kZooWalls)
                 {
                     if (id == combinedId)
                         ImportZooWall();
                 }
-                for (auto id : ZooEntrances)
+                for (auto id : kZooEntrances)
                 {
                     if (id == combinedId)
                     {
@@ -728,7 +744,7 @@ namespace ZT1
             auto name = ReadZTString(*_stream);
             LOG_ERROR("Name: %s", name.c_str());
 
-            gameState.Park.Name = name;
+            gameState.park.name = name;
 
             coords.direction = DirectionReverse(coords.direction);
             auto asTileCoords = TileCoordsXYZD(coords);
@@ -798,17 +814,17 @@ namespace ZT1
 
                 if (sequenceIndex == 0)
                 {
-                    MapAnimationCreate(MAP_ANIMATION_TYPE_PARK_ENTRANCE, current.ToCoordsXYZ());
+                    // MapAnimationCreate( MAP_ANIMATION_TYPE_PARK_ENTRANCE, current.ToCoordsXYZ());
                 }
             }
 
-            gameState.PeepSpawns.push_back(peepSpawnCoords);
+            gameState.peepSpawns.push_back(peepSpawnCoords);
             auto* peepSpawnSurface = MapGetSurfaceElementAt(peepSpawnCoords);
             peepSpawnSurface->SetOwnership(OWNERSHIP_UNOWNED);
 
-            gameState.Park.Entrances.push_back(segmentTileCoords[0].ToCoordsXYZD());
-            gameState.SavedView = Translate3DTo2DWithZ(segmentTileCoords[0].direction, segmentTileCoords[0].ToCoordsXYZ());
-            gameState.SavedViewRotation = segmentTileCoords[0].direction;
+            gameState.park.entrances.push_back(segmentTileCoords[0].ToCoordsXYZD());
+            gameState.savedView = Translate3DTo2DWithZ(segmentTileCoords[0].direction, segmentTileCoords[0].ToCoordsXYZ());
+            gameState.savedViewRotation = segmentTileCoords[0].direction;
             auto* surface = MapGetSurfaceElementAt(firstOwnedSquareCoords);
             surface->SetOwnership(OWNERSHIP_OWNED);
         }
@@ -847,11 +863,11 @@ namespace ZT1
             auto rideTypeId = rideEntry->GetFirstNonNullRideType();
             ride->type = rideTypeId;
             ride->subtype = subtypeId;
-            ride->SetColourPreset(0);
-            ride->overall_view = coords;
-            ride->custom_name = name;
+            ride->setColourPreset(0, 0);
+            ride->overallView = coords;
+            ride->customName = name;
 
-            for (auto& station : ride->GetStations())
+            for (auto& station : ride->getStations())
             {
                 station.Start.SetNull();
                 station.Entrance.SetNull();
@@ -864,23 +880,23 @@ namespace ZT1
                 station.Height = 0;
             }
 
-            ride->status = RideStatus::Closed;
-            ride->NumTrains = 1;
-            ride->ProposedNumTrains = 1;
-            ride->max_trains = OpenRCT2::Limits::kMaxTrainsPerRide;
-            ride->num_cars_per_train = 1;
-            ride->proposed_num_cars_per_train = 1; // rideEntry->max_cars_in_train;
-            ride->min_waiting_time = 10;
-            ride->max_waiting_time = 60;
-            ride->depart_flags = RIDE_DEPART_WAIT_FOR_MINIMUM_LENGTH | 3;
-            const auto& rtd = ride->GetRideTypeDescriptor();
+            ride->status = RideStatus::closed;
+            ride->numTrains = 1;
+            ride->proposedNumTrains = 1;
+            ride->maxTrains = OpenRCT2::Limits::kMaxTrainsPerRide;
+            ride->numCarsPerTrain = 1;
+            ride->proposedNumCarsPerTrain = 1; // rideEntry->max_cars_in_train;
+            ride->minWaitingTime = 10;
+            ride->maxWaitingTime = 60;
+            ride->departFlags = RIDE_DEPART_WAIT_FOR_MINIMUM_LENGTH | 3;
+            const auto& rtd = ride->getRideTypeDescriptor();
             const auto& operatingSettings = rtd.OperatingSettings;
-            ride->operation_option = (operatingSettings.MinValue * 3 + operatingSettings.MaxValue) / 4;
+            ride->operationOption = (operatingSettings.MinValue * 3 + operatingSettings.MaxValue) / 4;
 
-            ride->lift_hill_speed = rtd.LiftData.minimum_speed;
+            ride->liftHillSpeed = rtd.LiftData.minimum_speed;
 
             ride->ratings.setNull();
-            for (auto i = 0; i < RCT2::ObjectLimits::MaxShopItemsPerRideEntry; i++)
+            for (auto i = 0; i < RCT2::ObjectLimits::kMaxShopItemsPerRideEntry; i++)
             {
                 ride->price[i] = rtd.DefaultPrices[i];
             }
@@ -889,31 +905,31 @@ namespace ZT1
             //            {
             //                ride->price[1] = GetShopItemDescriptor(rideEntry->shop_item[1]).DefaultPrice;
             //            }
-            ride->value = RIDE_VALUE_UNDEFINED;
+            ride->value = kRideValueUndefined;
             ride->satisfaction = 255;
             ride->popularity = 255;
-            ride->build_date = GetDate().GetMonthsElapsed();
-            ride->music_tune_id = TUNE_ID_NULL;
+            ride->buildDate = GetDate().GetMonthsElapsed();
+            ride->musicTuneId = kTuneIDNull;
 
-            ride->breakdown_reason = 255;
-            ride->upkeep_cost = kMoney64Undefined;
+            ride->breakdownReason = 255;
+            ride->upkeepCost = kMoney64Undefined;
             ride->reliability = kRideInitialReliability;
-            ride->unreliability_factor = 1;
-            ride->inspection_interval = RIDE_INSPECTION_EVERY_30_MINUTES;
-            ride->last_crash_type = RIDE_CRASH_TYPE_NONE;
-            ride->income_per_hour = kMoney64Undefined;
+            ride->unreliabilityFactor = 1;
+            ride->inspectionInterval = RideInspection::every30Minutes;
+            ride->lastCrashType = RIDE_CRASH_TYPE_NONE;
+            ride->incomePerHour = kMoney64Undefined;
             ride->profit = kMoney64Undefined;
 
-            ride->entrance_style = OBJECT_ENTRY_INDEX_NULL;
+            ride->entranceStyle = kObjectEntryIndexNull;
             if (rtd.HasFlag(RtdFlag::hasEntranceAndExit))
             {
-                ride->entrance_style = 0;
+                ride->entranceStyle = 0;
             }
 
-            ride->num_circuits = 1;
-            ride->mode = ride->GetDefaultMode();
-            ride->MinCarsPerTrain = 1; // rideEntry->min_cars_in_train;
-            ride->MaxCarsPerTrain = 1; // rideEntry->max_cars_in_train;
+            ride->numCircuits = 1;
+            ride->mode = ride->getDefaultMode();
+            ride->minCarsPerTrain = 1; // rideEntry->min_cars_in_train;
+            ride->maxCarsPerTrain = 1; // rideEntry->max_cars_in_train;
 
             //            SelectedLiftAndInverted liftState{};
             //            auto trackPlaceAction = TrackPlaceAction(
@@ -921,10 +937,10 @@ namespace ZT1
             //                DEFAULT_SEAT_ROTATION, liftState, false);
             //            GameActions::Execute(&trackPlaceAction);
 
-            auto& station0 = ride->GetStation(StationIndex::FromUnderlying(0));
+            auto& station0 = ride->getStation(StationIndex::FromUnderlying(0));
             station0.Start = coords;
             station0.SetBaseZ(coords.z);
-            ride->status = RideStatus::Open;
+            ride->status = RideStatus::open;
 
             auto* trackElement = TileElementInsert<TrackElement>(coords, 0b1111);
             if (trackElement != nullptr)
@@ -1021,12 +1037,12 @@ namespace ZT1
             pathElement->SetClearanceZ(coords.z + kPathHeightStep);
 
             auto* surfaceElement = MapGetSurfaceElementAt(coords);
-            auto pathSlope = DefaultPathSlope[surfaceElement->GetSlope() & kTileSlopeRaisedCornersMask];
-            auto isSloped = pathSlope & FOOTPATH_PROPERTIES_FLAG_IS_SLOPED;
+            auto pathSlope = kDefaultPathSlope[surfaceElement->GetSlope() & kTileSlopeRaisedCornersMask];
+            auto isSloped = pathSlope.type == FootpathSlopeType::sloped;
             pathElement->SetSloped(isSloped);
             if (isSloped)
             {
-                pathElement->SetSlopeDirection(pathSlope & ~FOOTPATH_PROPERTIES_FLAG_IS_SLOPED);
+                pathElement->SetSlopeDirection(pathSlope.direction);
                 pathElement->SetBaseZ(pathElement->GetBaseZ() - kCoordsZStep);
                 pathElement->SetClearanceZ(pathElement->GetClearanceZ() - kCoordsZStep);
             }
@@ -1037,7 +1053,8 @@ namespace ZT1
 
             // ZT does not save footpath edges. Autoconnect them. This will need rework once fences are imported.
             FootpathConnectEdges(
-                coords, pathElement->as<TileElement>(), GAME_COMMAND_FLAG_APPLY | GAME_COMMAND_FLAG_ALLOW_DURING_PAUSED);
+                coords, pathElement->as<TileElement>(),
+                { GameActions::CommandFlag::apply, GameActions::CommandFlag::allowDuringPaused });
         }
 
         //        void ImportGuest()
@@ -1059,7 +1076,7 @@ namespace ZT1
         {
             for (int32_t sceneryTheme = 0; sceneryTheme <= RCT1::RCT1_SCENERY_THEME_PAGODA; sceneryTheme++)
             {
-                //                if (sceneryTheme != 0 && _sceneryThemeTypeToEntryMap[sceneryTheme] == OBJECT_ENTRY_INDEX_NULL)
+                //                if (sceneryTheme != 0 && _sceneryThemeTypeToEntryMap[sceneryTheme] == kObjectEntryIndexNull)
                 //                    continue;
 
                 auto objects = RCT1::GetSceneryObjects(sceneryTheme);
@@ -1072,11 +1089,11 @@ namespace ZT1
                         auto objectType = foundObject->Type;
                         switch (objectType)
                         {
-                            case ObjectType::SmallScenery:
-                            case ObjectType::LargeScenery:
-                            case ObjectType::Walls:
-                            case ObjectType::Paths:
-                            case ObjectType::PathAdditions:
+                            case ObjectType::smallScenery:
+                            case ObjectType::largeScenery:
+                            case ObjectType::walls:
+                            case ObjectType::paths:
+                            case ObjectType::pathAdditions:
                             {
                                 RCT12::EntryList* entries = GetEntryList(objectType);
 
@@ -1105,21 +1122,21 @@ namespace ZT1
         {
             switch (objectType)
             {
-                case ObjectType::Ride:
+                case ObjectType::ride:
                     return &_rideEntries;
-                case ObjectType::SmallScenery:
+                case ObjectType::smallScenery:
                     return &_smallSceneryEntries;
-                case ObjectType::LargeScenery:
+                case ObjectType::largeScenery:
                     return &_largeSceneryEntries;
-                case ObjectType::Walls:
+                case ObjectType::walls:
                     return &_wallEntries;
-                case ObjectType::Paths:
+                case ObjectType::paths:
                     return &_pathEntries;
-                case ObjectType::PathAdditions:
+                case ObjectType::pathAdditions:
                     return &_pathAdditionEntries;
-                case ObjectType::SceneryGroup:
+                case ObjectType::sceneryGroup:
                     return &_sceneryGroupEntries;
-                case ObjectType::Water:
+                case ObjectType::water:
                     return &_waterEntry;
                 default:
                     // This switch processes only ObjectType for for Entries
