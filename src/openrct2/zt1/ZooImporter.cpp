@@ -81,6 +81,7 @@ static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/wtrreed", "rct2.scenery_small.tbr" }, // Water Reed
     { "objects/foliage/willow", "rct2.scenery_small.tww" },  // Globe Willow Tree
     { "objects/foliage/woak", "rct2.scenery_small.tco" },    // White Oak Tree
+    { "objects/foliage/palm", "rct2.scenery_small.th2" },    // Palm Tree
 
     { "building/building/fgate1", "rct2.scenery_small.tgs" }, // Admission booth 1
     { "building/building/fgate2", "rct2.scenery_small.tgs" }, // Admission booth 1
@@ -89,12 +90,15 @@ static const std::unordered_map<std::string, std::string> kWall = {
     { "fences/postrope/f", "rct2.scenery_wall.wpf" },       // Post and Rope Fence
     { "fences/woodslat/f", "couger.scenery_wall.acwwf32" }, // Wooden Slat Fence
     { "fences/castiron/f", "rct2.scenery_wall.wsw1" },      // Cast-Iron Fence
+    { "fences/zoobars/f", "rct2.scenery_wall.walltn32" },   // Iron Bar Fence
+    { "fences/rockwall/f", "rct2.scenery_wall.wallrk32" },  // Rock Wall
 };
 static const std::unordered_map<std::string, std::string> kPathSurface = {
-    { "paths/paths/path", "rct1.footpath_surface.tiles_brown" },      // Concrete Path
-    { "paths/paths/dirtpath", "rct2.footpath_surface.tarmac_brown" }, // Dirt Path
-    { "paths/paths/brkpath", "rct1ll.footpath_surface.tiles_red" },   // Red brick
-    { "paths/paths/stnepath", "rct2.footpath_surface.crazy_paving" }, // Red brick
+    { "paths/paths/path", "rct1.footpath_surface.tiles_brown" },       // Concrete Path
+    { "paths/paths/dirtpath", "rct2.footpath_surface.tarmac_brown" },  // Dirt Path
+    { "paths/paths/brkpath", "rct1ll.footpath_surface.tiles_red" },    // Red brick
+    { "paths/paths/stnepath", "rct2.footpath_surface.crazy_paving" },  // Cobblestone Path
+    { "paths/paths/yellpath", "rct1ll.footpath_surface.tiles_green" }, // Yellow brick path
 };
 
 static constexpr std::array<colour_t, 24> kColourMap = {
@@ -188,16 +192,19 @@ static ShapeMap GetConvertedShape(uint8_t ztShape)
 }
 
 #pragma pack(push, 1)
-struct ZooHeader
+struct ZooHeader1
 {
     char Magic[4];
     int32_t Version;
     int32_t Language;
-    int32_t Campaign;
+};
+
+struct ZooHeader2
+{
     int32_t MapSizeX;
     int32_t MapSizeY;
-    int32_t Unk18;
-    int32_t Unk1C;
+    int32_t zooEntranceX;
+    int32_t zooEntranceY;
 };
 
 struct ZooTerrainElement
@@ -273,6 +280,10 @@ static void AppendRequiredObjects(ObjectList& objectList, ObjectType objectType,
 static std::string ReadZTString(OpenRCT2::IStream& stream)
 {
     auto stringLength = stream.ReadValue<int32_t>();
+    if (stringLength > 128)
+    {
+        LOG_ERROR("Very long string, error?!");
+    }
     char buffer[stringLength + 1];
     if (stringLength > 0)
     {
@@ -314,7 +325,9 @@ namespace ZT1
     private:
         OpenRCT2::IStream* _stream;
         std::string _zooPath;
-        ZooHeader _header;
+        ZooHeader1 _header1;
+        // int32_t _campaign;
+        ZooHeader2 _header2;
 
         // Lists of dynamic object entries
         RCT12::EntryList _rideEntries;
@@ -373,13 +386,30 @@ namespace ZT1
 
         void Import(GameState_t& gameState) override
         {
-            _header = _stream->ReadValue<ZooHeader>();
+            _header1 = _stream->ReadValue<ZooHeader1>();
+            if (_header1.Version > 71)
+            {
+                auto campaign = _stream->ReadValue<uint32_t>();
+                LOG_INFO("Campaign: %d", campaign);
+            }
+            _header2 = _stream->ReadValue<ZooHeader2>();
             Initialise(gameState);
 
             CreateAvailableObjectMappings();
 
             ImportExhibits();
-            _stream->Seek(sizeof(int32_t) * 4, STREAM_SEEK_CURRENT);
+            _stream->Seek(sizeof(int32_t) * 1, STREAM_SEEK_CURRENT);
+            if (_header1.Version <= 83)
+            {
+                _stream->Seek(sizeof(int32_t) * 1, STREAM_SEEK_CURRENT);
+            }
+            else
+            {
+                auto numSomething = _stream->ReadValue<uint32_t>();
+                _stream->Seek(numSomething * 14, STREAM_SEEK_CURRENT);
+                _stream->Seek(sizeof(int32_t) * 2, STREAM_SEEK_CURRENT);
+            }
+            
             ImportTerrain();
             ImportTileElements(gameState);
             ResearchFix();
@@ -580,20 +610,21 @@ namespace ZT1
             gameState.scenarioFileName = "";
 
             // Do map initialisation, same kind of stuff done when loading scenario editor
-            gameStateInitAll(gameState, { _header.MapSizeX + 2, _header.MapSizeY + 2 });
+            gameStateInitAll(gameState, { _header2.MapSizeX + 2, _header2.MapSizeY + 2 });
             gameState.editorStep = EditorStep::ObjectSelection;
             // gameState.scenarioCategory = Scenario::Category::other;
         }
 
         void ImportTerrain()
         {
+            LOG_INFO("Reading terrain at offset %d", _stream->GetPosition());
             // gMapBaseZ = 7;
 
             //            assert(_stream->GetPosition() == 0x24D);
             //            _stream->SetPosition(0x24D);
-            for (auto y = 0; y < _header.MapSizeY; y++)
+            for (auto y = 0; y < _header2.MapSizeY; y++)
             {
-                for (auto x = 0; x < _header.MapSizeX; x++)
+                for (auto x = 0; x < _header2.MapSizeX; x++)
                 {
                     auto tileElement = _stream->ReadValue<ZooTerrainElement>();
                     // Zoo Tycoon lays out its X/Y in another direction
@@ -629,7 +660,7 @@ namespace ZT1
 
         void ImportTileElements(GameState_t& gameState)
         {
-            //            LOG_ERROR("Current position: %d", _stream->GetPosition());
+            LOG_ERROR("Current position: %d", _stream->GetPosition());
             //            _stream->SetPosition(0xDE07);
             auto numElements = _stream->ReadValue<uint32_t>();
 
@@ -1044,6 +1075,7 @@ namespace ZT1
             auto name = ReadZTString(*_stream);
             LOG_ERROR("Name: %s", name.c_str());
 
+            // TODO: just call SmallSceneryPlaceAction, if necessary with clearance checks off
             auto* smallSceneryElement = TileElementInsert<SmallSceneryElement>(coords, 0b1111);
             if (smallSceneryElement != nullptr)
             {
@@ -1052,6 +1084,12 @@ namespace ZT1
                 smallSceneryElement->SetDirection(coords.direction);
                 smallSceneryElement->SetClearanceZ(smallSceneryElement->GetBaseZ() + (4 * kCoordsZStep));
                 smallSceneryElement->SetEntryIndex(entryIndex);
+
+                const auto* entry = smallSceneryElement->GetEntry();
+                if (entry != nullptr)
+                {
+                    smallSceneryElement->SetClearanceZ(smallSceneryElement->GetBaseZ() + entry->height);
+                }
             }
         }
 
