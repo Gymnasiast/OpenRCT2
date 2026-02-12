@@ -24,7 +24,6 @@ namespace OpenRCT2::Audio
 
     private:
         AudioSource_* _source = nullptr;
-        ResamplerState* _resampler = nullptr;
 
         MixerGroup _group = MixerGroup::Sound;
         double _rate = 0;
@@ -51,32 +50,9 @@ namespace OpenRCT2::Audio
             AudioChannelImpl::SetPan(0.5f);
         }
 
-        ~AudioChannelImpl() override
-        {
-            if (_resampler != nullptr)
-            {
-                ma_resampler_uninit(_resampler, nullptr);
-                free(_resampler);
-                _resampler = nullptr;
-            }
-        }
-
         [[nodiscard]] IAudioSource* GetSource() const override
         {
             return _source;
-        }
-
-        [[nodiscard]] ResamplerState* GetResampler() const override
-        {
-            return _resampler;
-        }
-
-        void SetResampler(ResamplerState* value) override
-        {
-            if (_resampler != nullptr)
-                free(_resampler);
-
-            _resampler = value;
         }
 
         [[nodiscard]] MixerGroup GetGroup() const override
