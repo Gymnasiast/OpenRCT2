@@ -13,8 +13,9 @@
 #include "../Editor.h"
 #include "../GameState.h"
 #include "../ParkImporter.h"
-#include "../actions/RideCreateAction.h"
-#include "../actions/TrackPlaceAction.h"
+#include "../actions/GameActionRunner.h"
+#include "../actions/ride/RideCreateAction.h"
+#include "../actions/track/TrackPlaceAction.h"
 #include "../core/FileStream.h"
 #include "../interface/Viewport.h"
 #include "../object/DefaultObjects.h"
@@ -101,11 +102,12 @@ static const std::unordered_map<std::string, std::string> kPathSurface = {
     { "paths/paths/yellpath", "rct1ll.footpath_surface.tiles_green" }, // Yellow brick path
 };
 
-static constexpr std::array<colour_t, 24> kColourMap = {
-    COLOUR_DARK_PURPLE, COLOUR_BLACK, COLOUR_BLACK,      COLOUR_LIGHT_BROWN, COLOUR_BLACK,      COLOUR_BLACK,
-    COLOUR_BLACK,       COLOUR_BLACK, COLOUR_BLACK,      COLOUR_BLACK,       COLOUR_BLACK,      COLOUR_BLACK,
-    COLOUR_YELLOW,      COLOUR_BLACK, COLOUR_DARK_BROWN, COLOUR_BLACK,       COLOUR_BLACK,      COLOUR_BLACK,
-    COLOUR_BLACK,       COLOUR_BLACK, COLOUR_DARK_BLUE,  COLOUR_DARK_PINK,   COLOUR_LIGHT_BLUE, COLOUR_BLACK,
+using OpenRCT2::Drawing::Colour;
+static constexpr std::array<Colour, 24> kColourMap = {
+    Colour::darkPurple, Colour::black, Colour::black,     Colour::lightBrown, Colour::black,     Colour::black,
+    Colour::black,      Colour::black, Colour::black,     Colour::black,      Colour::black,     Colour::black,
+    Colour::yellow,     Colour::black, Colour::darkBrown, Colour::black,      Colour::black,     Colour::black,
+    Colour::black,      Colour::black, Colour::darkBlue,  Colour::darkPink,   Colour::lightBlue, Colour::black,
 };
 
 static constexpr FootpathSlope kDefaultPathSlope[] = {
@@ -906,16 +908,14 @@ namespace ZT1
             LOG_ERROR("Name: %s", name.c_str());
 
             _stream->Seek(43, STREAM_SEEK_CURRENT);
-            auto colour1 = _stream->ReadValue<uint8_t>();
-            auto colour2 = _stream->ReadValue<uint8_t>();
-            if (colour1 < kColourMap.size())
-                colour1 = kColourMap[colour1];
-            else
-                colour1 = COLOUR_BLACK;
-            if (colour2 < kColourMap.size())
-                colour2 = kColourMap[colour2];
-            else
-                colour2 = COLOUR_BLACK;
+            auto colour1Raw = _stream->ReadValue<uint8_t>();
+            auto colour1 = Colour::black;
+            auto colour2Raw = _stream->ReadValue<uint8_t>();
+            auto colour2 = Colour::black;
+            if (colour1Raw < kColourMap.size())
+                colour1 = kColourMap[colour1Raw];
+            if (colour2Raw < kColourMap.size())
+                colour2 = kColourMap[colour2Raw];
 
             auto subtypeId = _rideEntries.GetOrAddEntry(objectIdentifier);
             // auto& objManager = GetContext()->GetObjectManager();
@@ -1031,7 +1031,7 @@ namespace ZT1
             auto& station0 = ride->getStation(StationIndex::FromUnderlying(0));
             station0.Start = coords;
             station0.SetBaseZ(coords.z);
-            const bool isShop = rtd.HasFlag(RtdFlag::isShopOrFacility);
+            const bool isShop = rtd.flags.has(RtdFlag::isShopOrFacility);
             if (isShop)
             {
                 ride->status = RideStatus::open;
