@@ -47,6 +47,12 @@ using namespace OpenRCT2;
 static constexpr const uint8_t kZooCoordsXYStep = 64;
 // static constexpr const uint8_t ZOO_kCoordsZStep = 8;
 
+struct MappingWithOffset
+{
+    std::string identifier;
+    TileCoordsXY offset{};
+};
+
 constexpr std::string_view kZooWalls[] = {
     "fences/zoowall/f",
     "fences/dwall/f",
@@ -57,20 +63,20 @@ constexpr std::string_view kZooEntrances[] = {
     "building/building/dgate",
     "building/building/aqgate",
 };
-static const std::unordered_map<std::string, std::string> kFacilities = {
-    { "building/building/bathroom", "rct2.ride.tlt1" },  // Small restroom
-    { "building/building/fbatroom", "rct2.ride.tlt1" },  // Family restroom
-    { "building/building/acbath", "rct2.ride.tlt1" },    // Aquatic restroom
-    { "building/building/bgrstnd", "rct2.ride.burgb" },  // Burger Stand
-    { "building/building/pizzstnd", "rct2.ride.pizzs" }, // Pizza Stand
-    { "building/building/drkstnd", "rct2.ride.drnks" },  // Drinks Stand
-    { "objects/other/parkmap", "rct2.ride.infok" },      // Zoo Map
-    { "building/building/hdogstnd", "rct2.ride.hotds" }, // Hot Dog Stall
-    { "building/building/giftcart", "rct2.ride.souvs" }, // Gift Stand
+static const std::unordered_map<std::string, MappingWithOffset> kFacilities = {
+    { "building/building/bathroom", { "rct2.ride.tlt1" } },           // Small restroom
+    { "building/building/fbatroom", { "rct2.ride.tlt1", { 0, 1 } } }, // Family restroom
+    { "building/building/acbath", { "rct2.ride.tlt1" } },             // Aquatic restroom
+    { "building/building/bgrstnd", { "rct2.ride.burgb", { 0, 1 } } },           // Burger Stand
+    { "building/building/pizzstnd", { "rct2.ride.pizzs" } },          // Pizza Stand
+    { "building/building/drkstnd", { "rct2.ride.drnks" } },           // Drinks Stand
+    { "objects/other/parkmap", { "rct2.ride.infok" } },               // Zoo Map
+    { "building/building/hdogstnd", { "rct2.ride.hotds" } },          // Hot Dog Stall
+    { "building/building/giftcart", { "rct2.ride.souvs" } },          // Gift Stand
 
-    { "building/building/carousal", "rct2.ride.mgr1" },   // Carousel
-    { "building/building/eleride", "rct2.ride.circus1" }, // Elephant Ride
-    { "building/building/giftshp", "rct2.ride.souvs" },   // Souvenir shop
+    { "building/building/carousal", { "rct2.ride.mgr1" } },   // Carousel
+    { "building/building/eleride", { "rct2.ride.circus1" } }, // Elephant Ride
+    { "building/building/giftshp", { "rct2.ride.souvs", { -1, 0 } } },   // Souvenir shop
 };
 static const std::unordered_map<std::string, std::string> kSmallScenery = {
     { "objects/foliage/weepwill", "rct2.scenery_small.tww" }, // Weeping willow
@@ -893,13 +899,14 @@ namespace ZT1
             surface->SetOwnership(OWNERSHIP_OWNED);
         }
 
-        void ImportFacility(GameState_t& gameState, const std::string& objectIdentifier)
+        void ImportFacility(GameState_t& gameState, const MappingWithOffset& mapping)
         {
             // Skip unk
             _stream->Seek(4, STREAM_SEEK_CURRENT);
 
             auto ztCoords = _stream->ReadValue<ZT1CoordsXYZD>();
             auto coords = ztCoords.ToCoordsXYZD();
+            coords += mapping.offset.Rotate(coords.direction).ToCoordsXY();
 
             // Skip age(?)
             _stream->Seek(4, STREAM_SEEK_CURRENT);
@@ -917,7 +924,7 @@ namespace ZT1
             if (colour2Raw < kColourMap.size())
                 colour2 = kColourMap[colour2Raw];
 
-            auto subtypeId = _rideEntries.GetOrAddEntry(objectIdentifier);
+            auto subtypeId = _rideEntries.GetOrAddEntry(mapping.identifier);
             // auto& objManager = GetContext()->GetObjectManager();
             // const auto* object = objManager.GetLoadedObject<RideObject>(subtypeId);
 
