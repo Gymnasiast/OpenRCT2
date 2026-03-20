@@ -210,6 +210,12 @@ struct TextPaint
     }
 };
 
+enum class Overflow : uint8_t
+{
+    ellipsise,
+    wrapped,
+};
+
 void DrawTextBasic(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, StringId format);
 void DrawTextEllipsised(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format);
 int32_t DrawTextWrapped(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format);
@@ -223,6 +229,9 @@ void DrawTextBasic(
 void DrawTextEllipsised(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
     const OpenRCT2::Formatter& ft, TextPaint textPaint = {});
+void DrawTextEllipsised(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string,
+    TextPaint textPaint = {});
 int32_t DrawTextWrapped(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
     const OpenRCT2::Formatter& ft, TextPaint textPaint = {});

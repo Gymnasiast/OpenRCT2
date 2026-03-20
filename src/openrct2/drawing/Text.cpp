@@ -13,6 +13,7 @@
 #include "../drawing/Rectangle.h"
 #include "../localisation/Formatter.h"
 #include "../localisation/Formatting.h"
+#include "../localisation/Language.h"
 #include "Drawing.h"
 
 using namespace OpenRCT2;
@@ -128,9 +129,7 @@ void DrawTextBasic(RenderTarget& rt, const ScreenCoordsXY& coords, StringId form
 
 void DrawTextEllipsised(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format)
 {
-    Formatter ft{};
-    TextPaint textPaint{};
-    DrawTextEllipsised(rt, coords, width, format, ft, textPaint);
+    DrawTextEllipsised(rt, coords, width, LanguageGetString(format));
 }
 
 void DrawTextEllipsised(
@@ -138,9 +137,15 @@ void DrawTextEllipsised(
 {
     utf8 buffer[512];
     FormatStringLegacy(buffer, sizeof(buffer), format, ft.Data());
-    GfxClipString(buffer, width, textPaint.FontStyle);
+    DrawTextEllipsised(rt, coords, width, buffer, textPaint);
+}
 
-    DrawText(rt, coords, textPaint, buffer);
+void DrawTextEllipsised(
+    RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string, TextPaint textPaint)
+{
+    auto buffer = u8string(string);
+    GfxClipString(const_cast<utf8*>(buffer.c_str()), width, textPaint.FontStyle);
+    DrawText(rt, coords, textPaint, buffer.c_str());
 }
 
 int32_t DrawTextWrapped(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format)
