@@ -158,9 +158,14 @@ int32_t DrawTextWrapped(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t 
 int32_t DrawTextWrapped(
     RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format, const Formatter& ft, TextPaint textPaint)
 {
-    const void* args = ft.Data();
+    auto formatted = FormatStringIDLegacy(format, ft.Data());
+    return DrawTextWrapped(rt, coords, width, formatted, textPaint);
+}
 
-    StaticLayout layout(FormatStringIDLegacy(format, args), textPaint, width);
+int32_t DrawTextWrapped(
+    RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string, TextPaint textPaint)
+{
+    StaticLayout layout(string, textPaint, width);
 
     if (textPaint.Alignment == TextAlignment::centre)
     {
