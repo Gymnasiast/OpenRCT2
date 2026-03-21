@@ -24,6 +24,7 @@
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/object/ObjectManager.h>
 #include <openrct2/ride/RideConstruction.h>
 #include <openrct2/ride/RideData.h>
@@ -179,7 +180,7 @@ namespace OpenRCT2::Ui::Windows
                 {
                     // Scenery not available
                     DrawTextEllipsised(
-                        rt, screenPos, 308, STR_DESIGN_INCLUDES_SCENERY_WHICH_IS_UNAVAILABLE, {}, { TextAlignment::centre });
+                        rt, screenPos, 308, STR_DESIGN_INCLUDES_SCENERY_WHICH_IS_UNAVAILABLE, { TextAlignment::centre });
                     screenPos.y -= kListRowHeight;
                 }
             }
@@ -273,10 +274,9 @@ namespace OpenRCT2::Ui::Windows
                 }
 
                 // Ride length
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_RIDE_LENGTH_ENTRY);
-                ft.Add<uint16_t>(td.statistics.rideLength);
-                DrawTextEllipsised(rt, screenPos, 214, STR_TRACK_LIST_RIDE_LENGTH, ft);
+                auto rideLength = FormatStringID(
+                    STR_TRACK_LIST_RIDE_LENGTH, static_cast<StringId>(STR_RIDE_LENGTH_ENTRY), td.statistics.rideLength);
+                DrawTextEllipsised(rt, screenPos, 214, rideLength);
                 screenPos.y += kListRowHeight;
             }
 

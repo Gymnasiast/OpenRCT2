@@ -16,7 +16,7 @@
 #include <openrct2/SpriteIds.h>
 #include <openrct2/Version.h>
 #include <openrct2/drawing/Drawing.h>
-#include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/StringIds.h>
 #include <openrct2/ui/UiContext.h>
 #include <openrct2/ui/WindowManager.h>
@@ -161,18 +161,15 @@ namespace OpenRCT2::Ui::Windows
             // Draw tab names
             {
                 // TODO: this string shouldn't be reused for this tab
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_TITLE_SEQUENCE_OPENRCT2);
                 DrawTextWrapped(
-                    rt, aboutOpenRCT2Coords, 87, STR_WINDOW_COLOUR_2_STRINGID, ft,
+                    rt, aboutOpenRCT2Coords, 87,
+                    FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, EnumValue(STR_TITLE_SEQUENCE_OPENRCT2)),
                     { Drawing::Colour::lightWater, TextAlignment::centre });
             }
             {
                 // TODO: this string shouldn't be reused for this tab
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_TITLE_SEQUENCE_RCT2);
                 DrawTextWrapped(
-                    rt, aboutRCT2Coords, 87, STR_WINDOW_COLOUR_2_STRINGID, ft,
+                    rt, aboutRCT2Coords, 87, FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, EnumValue(STR_TITLE_SEQUENCE_RCT2)),
                     { Drawing::Colour::lightWater, TextAlignment::centre });
             }
 
@@ -227,15 +224,11 @@ namespace OpenRCT2::Ui::Windows
             auto logoCoords = windowPos + ScreenCoordsXY(logoWidget.left, logoWidget.top);
             GfxDrawSprite(rt, ImageId(SPR_G2_LOGO), logoCoords);
 
-            u8string versionInfo = gVersionInfoFull;
-            auto ft = Formatter();
-            ft.Add<const char*>(versionInfo.c_str());
-
             const auto& versionWidget = widgets[WIDX_VERSION];
             auto centreX = versionWidget.midX();
             auto centreY = versionWidget.midY() - FontGetLineHeight(FontStyle::medium) / 2;
             auto centrePos = windowPos + ScreenCoordsXY(centreX, centreY);
-            DrawTextWrapped(rt, centrePos, versionWidget.width() - 1, STR_STRING, ft, { colours[1], TextAlignment::centre });
+            DrawTextWrapped(rt, centrePos, versionWidget.width() - 1, gVersionInfoFull, { colours[1], TextAlignment::centre });
 
             // Shows the update available button
             if (GetContext()->HasNewVersionInfo())
@@ -248,7 +241,7 @@ namespace OpenRCT2::Ui::Windows
             auto textCoords = windowPos + ScreenCoordsXY((width / 2) - 1, 240);
             auto textWidth = kWindowSize.width - (kPadding * 2);
             for (auto stringId : _OpenRCT2InfoStrings)
-                textCoords.y += DrawTextWrapped(rt, textCoords, textWidth, stringId, {}, tp) + 5;
+                textCoords.y += DrawTextWrapped(rt, textCoords, textWidth, stringId, tp) + 5;
 
             return textCoords.y - windowPos.y;
         }
@@ -269,7 +262,7 @@ namespace OpenRCT2::Ui::Windows
                     continue;
                 }
 
-                textCoords.y += DrawTextWrapped(rt, textCoords, textWidth, stringId, {}, tp);
+                textCoords.y += DrawTextWrapped(rt, textCoords, textWidth, stringId, tp);
                 if (stringId == STR_COPYRIGHT_CS)
                     textCoords.y += 74;
             }

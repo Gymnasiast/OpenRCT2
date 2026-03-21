@@ -217,9 +217,7 @@ namespace OpenRCT2::Ui::Windows
                 auto isHighlighted = i == _highlightedIndex;
                 if (i == numAssetPacks)
                 {
-                    auto ft = Formatter();
-                    ft.Add<StringId>(STR_BASE_GRAPHICS_MUSIC_SOUND);
-                    PaintItem(rt, y, ft, true, isSelected, isHighlighted);
+                    PaintItem(rt, y, LanguageGetString(STR_BASE_GRAPHICS_MUSIC_SOUND), true, isSelected, isHighlighted);
                 }
                 else
                 {
@@ -227,10 +225,7 @@ namespace OpenRCT2::Ui::Windows
                     if (assetPack != nullptr)
                     {
                         auto isChecked = assetPack->IsEnabled();
-                        auto ft = Formatter();
-                        ft.Add<StringId>(STR_STRING);
-                        ft.Add<const char*>(assetPack->Name.c_str());
-                        PaintItem(rt, y, ft, isChecked, isSelected, isHighlighted);
+                        PaintItem(rt, y, assetPack->Name, isChecked, isSelected, isHighlighted);
                     }
                 }
                 y += ItemHeight;
@@ -238,22 +233,26 @@ namespace OpenRCT2::Ui::Windows
         }
 
     private:
-        void PaintItem(RenderTarget& rt, int32_t y, Formatter& ft, bool isChecked, bool isSelected, bool isHighlighted)
+        void PaintItem(RenderTarget& rt, int32_t y, u8string_view text, bool isChecked, bool isSelected, bool isHighlighted)
         {
             auto listWidth = widgets[WIDX_LIST].right - widgets[WIDX_LIST].left;
-            auto stringId = STR_BLACK_STRING;
+            u8string formatting;
             auto fillRectangle = ScreenRect{ { 0, y }, { listWidth, y + ItemHeight - 1 } };
             if (isSelected)
             {
                 Rectangle::fill(rt, fillRectangle, getColourMap(colours[1].colour).midDark);
-                stringId = STR_WINDOW_COLOUR_2_STRINGID;
+                formatting = "{WINDOW_COLOUR_2}";
             }
-            else if (isHighlighted)
+            else
             {
-                Rectangle::fill(rt, fillRectangle, getColourMap(colours[1].colour).midDark);
+                formatting = "{BLACK}";
+                if (isHighlighted)
+                {
+                    Rectangle::fill(rt, fillRectangle, getColourMap(colours[1].colour).midDark);
+                }
             }
 
-            DrawTextEllipsised(rt, { 16, y + 1 }, listWidth, stringId, ft);
+            DrawTextEllipsised(rt, { 16, y + 1 }, listWidth, formatting.append(text));
 
             auto checkboxSize = ItemHeight - 3;
             PaintCheckbox(rt, { { 2, y + 1 }, { 2 + checkboxSize + 1, y + 1 + checkboxSize } }, isChecked);

@@ -973,9 +973,6 @@ namespace OpenRCT2
         STR_WATER_LEVEL = 5185,
         STR_WATER_LEVEL_LABEL = 2692,
 
-        // Window: MapTooltip
-        STR_MAP_TOOLTIP_STRINGID = 1162,
-
         // Window: MazeConstruction
         STR_RIDE_CONSTRUCTION_BUILD = 1732,
         STR_RIDE_CONSTRUCTION_BUILD_MAZE_IN_THIS_DIRECTION_TIP = 1761,
@@ -1808,7 +1805,6 @@ namespace OpenRCT2
         STR_SCENARIO_LOCKED = 5783,
         STR_SCENARIO_LOCKED_DESC = 5784,
         STR_SELECT_SCENARIO = 2291,
-        STR_SMALL_WINDOW_COLOUR_2_STRINGID = 5138,
 
         // Window: Scenery
         STR_ALL_SCENERY = 6547,

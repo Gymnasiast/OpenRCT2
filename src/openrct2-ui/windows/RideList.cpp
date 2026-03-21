@@ -24,6 +24,7 @@
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/network/Network.h>
 #include <openrct2/ride/RideData.h>
 #include <openrct2/ride/RideManager.hpp>
@@ -598,14 +599,11 @@ namespace OpenRCT2::Ui::Windows
                 if (listInformationType == sortType && !(strId == STR_STATUS && sortType == INFORMATION_TYPE_STATUS))
                     indicatorId = _windowListSortDescending ? STR_DOWN : STR_UP;
 
-                auto ft = Formatter();
-                ft.Add<StringId>(strId);
-                ft.Add<StringId>(indicatorId);
-
+                auto listHeader = FormatStringID(STR_RIDE_LIST_HEADER_FORMAT, strId, indicatorId);
                 auto cRT = const_cast<const RenderTarget&>(rt);
                 DrawTextEllipsised(
-                    cRT, windowPos + ScreenCoordsXY{ widget.left + 1, widget.top + 1 }, widget.width() - 1,
-                    STR_RIDE_LIST_HEADER_FORMAT, ft, { colours[1] });
+                    cRT, windowPos + ScreenCoordsXY{ widget.left + 1, widget.top + 1 }, widget.width() - 1, listHeader,
+                    { colours[1] });
             };
 
             drawButtonCaption(widgets[WIDX_HEADER_NAME], STR_RIDE_LIST_NAME, INFORMATION_TYPE_STATUS);
@@ -656,14 +654,12 @@ namespace OpenRCT2::Ui::Windows
                     continue;
 
                 // Ride name
-                auto ft = Formatter();
-                ridePtr->formatNameTo(ft);
-
+                auto formattedRideName = FormatStringID(format, EnumValue(STR_STRING), ridePtr->getName());
                 auto& nameHeader = widgets[WIDX_HEADER_NAME];
-                DrawTextEllipsised(rt, { 0, y - 1 }, nameHeader.width() - 3, format, ft);
+                DrawTextEllipsised(rt, { 0, y - 1 }, nameHeader.width() - 3, formattedRideName);
 
                 // Ride information
-                ft = Formatter();
+                auto ft = Formatter();
                 ft.Increment(2);
                 auto formatSecondaryEnabled = true;
                 StringId formatSecondary = 0;
@@ -865,8 +861,9 @@ namespace OpenRCT2::Ui::Windows
                     ft.Add<StringId>(formatSecondary);
                 }
 
+                auto formattedInfo = FormatStringIDLegacy(format, ft.Data());
                 auto infoHeader = widgets[WIDX_HEADER_OTHER];
-                DrawTextEllipsised(rt, { infoHeader.left - 4, y - 1 }, infoHeader.width() - 3, format, ft);
+                DrawTextEllipsised(rt, { infoHeader.left - 4, y - 1 }, infoHeader.width() - 3, formattedInfo);
                 y += kScrollableRowHeight;
             }
         }

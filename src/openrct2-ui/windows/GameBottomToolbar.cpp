@@ -373,19 +373,17 @@ namespace OpenRCT2::Ui::Windows
             int32_t panelWidth = middleOutsetWidget->width() - 63;
 
             // Check if there is a map tooltip to draw
-            StringId stringId;
-            auto ft = GetMapTooltip();
-            std::memcpy(&stringId, ft.Data(), sizeof(StringId));
-            if (stringId == kStringIdNone)
+            u8string tooltip = GetMapTooltip();
+            if (tooltip.empty())
             {
                 // TODO: this string probably shouldn't be reused for this
                 DrawTextWrapped(
-                    rt, middleWidgetCoords, panelWidth, STR_TITLE_SEQUENCE_OPENRCT2, ft, { colours[0], TextAlignment::centre });
+                    rt, middleWidgetCoords, panelWidth, STR_TITLE_SEQUENCE_OPENRCT2, { colours[0], TextAlignment::centre });
             }
             else
             {
                 // Show tooltip in bottom toolbar
-                DrawTextWrapped(rt, middleWidgetCoords, panelWidth, STR_STRINGID, ft, { colours[0], TextAlignment::centre });
+                DrawTextWrapped(rt, middleWidgetCoords, panelWidth, tooltip, { colours[0], TextAlignment::centre });
             }
         }
 

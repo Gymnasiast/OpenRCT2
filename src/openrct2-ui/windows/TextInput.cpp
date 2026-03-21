@@ -205,15 +205,13 @@ namespace OpenRCT2::Ui::Windows
 
             if (_descriptionStringId == kStringIdNone)
             {
-                auto ft = Formatter();
-                ft.Add<const char*>(_description.c_str());
-                DrawTextWrapped(rt, screenCoords, kWindowSize.width, STR_STRING, ft, { colours[1], TextAlignment::centre });
+                DrawTextWrapped(rt, screenCoords, kWindowSize.width, _description, { colours[1], TextAlignment::centre });
             }
             else
             {
+                auto formattedDescription = FormatStringIDLegacy(_descriptionStringId, _descriptionArgs.Data());
                 DrawTextWrapped(
-                    rt, screenCoords, kWindowSize.width, _descriptionStringId, _descriptionArgs,
-                    { colours[1], TextAlignment::centre });
+                    rt, screenCoords, kWindowSize.width, formattedDescription, { colours[1], TextAlignment::centre });
             }
 
             screenCoords.y += 25;

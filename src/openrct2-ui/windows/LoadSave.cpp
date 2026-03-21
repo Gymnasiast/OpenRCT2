@@ -37,6 +37,7 @@
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/interface/ColourWithFlags.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/Localisation.Date.h>
 #include <openrct2/network/Network.h>
 #include <openrct2/object/ObjectRepository.h>
@@ -428,12 +429,9 @@ namespace OpenRCT2::Ui::Windows
             {
                 auto namePos = windowPos
                     + ScreenCoordsXY(width - previewPaneSize.width / 2 - kPadding, widget.top - kButtonFaceHeight);
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(_preview.parkName.c_str());
+                auto parkName = "{WINDOW_COLOUR_2}" + _preview.parkName;
                 DrawTextEllipsised(
-                    rt, namePos, previewPaneSize.width - kPadding * 2, STR_WINDOW_COLOUR_2_STRINGID, ft,
-                    { TextAlignment::centre });
+                    rt, namePos, previewPaneSize.width - kPadding * 2, parkName.c_str(), { TextAlignment::centre });
             }
 
             const bool drawFrame = image != nullptr || targetType == PreviewImageType::screenshot;
@@ -752,13 +750,8 @@ namespace OpenRCT2::Ui::Windows
 
                 // Draw path text
                 const auto normalisedPath = Platform::StrDecompToPrecomp(buffer.data());
-                const auto* normalisedPathC = normalisedPath.c_str();
-
-                auto ft = Formatter();
-                ft.Add<const char*>(normalisedPathC);
-
                 auto pathPos = windowPos + ScreenCoordsXY{ 4, widget.top + 4 };
-                DrawTextEllipsised(rt, pathPos, pathWidth, STR_STRING, ft);
+                DrawTextEllipsised(rt, pathPos, pathWidth, normalisedPath);
             }
 
             const auto drawButtonCaption =
@@ -769,13 +762,12 @@ namespace OpenRCT2::Ui::Windows
                     else if (Config::Get().general.loadSaveSort == descSort)
                         indicatorId = STR_DOWN;
 
-                    auto ft = Formatter();
-                    ft.Add<StringId>(indicatorId);
+                    auto captionFormatted = FormatStringID(strId, indicatorId);
 
                     auto cRT = const_cast<const RenderTarget&>(rt);
                     DrawTextEllipsised(
-                        cRT, windowPos + ScreenCoordsXY{ widget.left + 5, widget.top + 1 }, widget.width() - 1, strId, ft,
-                        { Drawing::Colour::grey });
+                        cRT, windowPos + ScreenCoordsXY{ widget.left + 5, widget.top + 1 }, widget.width() - 1,
+                        captionFormatted, { Drawing::Colour::grey });
                 };
 
             auto& config = Config::Get().general;
@@ -1125,11 +1117,9 @@ namespace OpenRCT2::Ui::Windows
                 }
 
                 // Print filename
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<char*>(_listItems[i].name.c_str());
+                auto formattedFilename = FormatStringID(stringId, EnumValue(STR_STRING), _listItems[i].name.c_str());
                 int32_t max_file_width = widgets[WIDX_SORT_NAME].width() - 16;
-                DrawTextEllipsised(rt, { 15, y }, max_file_width, stringId, ft);
+                DrawTextEllipsised(rt, { 15, y }, max_file_width, formattedFilename);
 
                 // Print formatted modified date, if this is a file
                 if (_listItems[i].type != FileType::file)
@@ -1137,25 +1127,20 @@ namespace OpenRCT2::Ui::Windows
 
                 if (config.fileBrowserShowSizeColumn)
                 {
-                    ft = Formatter();
-                    ft.Add<StringId>(STR_FILEBROWSER_FILE_SIZE_VALUE);
-                    ft.Add<uint32_t>(_listItems[i].fileSizeFormatted);
-                    ft.Add<StringId>(_listItems[i].fileSizeUnit);
-                    DrawTextEllipsised(rt, { sizeColumnLeft + 2, y }, maxDateWidth + maxTimeWidth, stringId, ft);
+                    auto formattedSize = FormatStringID(
+                        stringId, EnumValue(STR_FILEBROWSER_FILE_SIZE_VALUE),
+                        static_cast<uint32_t>(_listItems[i].fileSizeFormatted), _listItems[i].fileSizeUnit);
+                    DrawTextEllipsised(rt, { sizeColumnLeft + 2, y }, maxDateWidth + maxTimeWidth, formattedSize);
                 }
 
                 if (config.fileBrowserShowDateColumn)
                 {
-                    ft = Formatter();
-                    ft.Add<StringId>(STR_STRING);
-                    ft.Add<char*>(_listItems[i].dateFormatted.c_str());
+                    auto formattedDate = FormatStringID(stringId, EnumValue(STR_STRING), _listItems[i].dateFormatted.c_str());
                     DrawTextEllipsised(
-                        rt, { dateAnchor - kDateTimeGap, y }, maxDateWidth, stringId, ft, { TextAlignment::right });
+                        rt, { dateAnchor - kDateTimeGap, y }, maxDateWidth, formattedDate, { TextAlignment::right });
 
-                    ft = Formatter();
-                    ft.Add<StringId>(STR_STRING);
-                    ft.Add<char*>(_listItems[i].timeFormatted.c_str());
-                    DrawTextEllipsised(rt, { dateAnchor + kDateTimeGap, y }, maxTimeWidth, stringId, ft);
+                    auto formattedTime = FormatStringID(stringId, EnumValue(STR_STRING), _listItems[i].timeFormatted.c_str());
+                    DrawTextEllipsised(rt, { dateAnchor + kDateTimeGap, y }, maxTimeWidth, formattedTime);
                 }
             }
         }

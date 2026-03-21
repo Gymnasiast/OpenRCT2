@@ -527,7 +527,7 @@ namespace OpenRCT2::Ui::Windows
                 && gLegacyScene != LegacyScene::trackDesignsManager)
             {
                 // Vehicle design not available
-                DrawTextEllipsised(rt, screenPos, 368, STR_VEHICLE_DESIGN_UNAVAILABLE, {}, { TextAlignment::centre });
+                DrawTextEllipsised(rt, screenPos, 368, STR_VEHICLE_DESIGN_UNAVAILABLE, { TextAlignment::centre });
                 screenPos.y -= kScrollableRowHeight;
             }
 
@@ -537,33 +537,29 @@ namespace OpenRCT2::Ui::Windows
                 {
                     // Scenery not available
                     DrawTextEllipsised(
-                        rt, screenPos, 368, STR_DESIGN_INCLUDES_SCENERY_WHICH_IS_UNAVAILABLE, {}, { TextAlignment::centre });
+                        rt, screenPos, 368, STR_DESIGN_INCLUDES_SCENERY_WHICH_IS_UNAVAILABLE, { TextAlignment::centre });
                     screenPos.y -= kScrollableRowHeight;
                 }
             }
 
             // Track design name
-            auto ft = Formatter();
-            ft.Add<const utf8*>(_trackDesigns[trackIndex].name.c_str());
-            DrawTextEllipsised(rt, screenPos, 368, STR_TRACK_PREVIEW_NAME_FORMAT, ft, { TextAlignment::centre });
+            auto trackDesignName = FormatStringID(STR_TRACK_PREVIEW_NAME_FORMAT, _trackDesigns[trackIndex].name.c_str());
+            DrawTextEllipsised(rt, screenPos, 368, trackDesignName, { TextAlignment::centre });
 
             // Information
             screenPos = windowPos + ScreenCoordsXY{ tdWidget.left + 1, tdWidget.bottom + 2 };
 
             // Stats
-            ft = Formatter();
-            ft.Add<fixed32_2dp>(_loadedTrackDesign->statistics.ratings.excitement);
-            DrawTextBasic(rt, screenPos, STR_TRACK_LIST_EXCITEMENT_RATING, ft);
+            fixed32_2dp excitement = _loadedTrackDesign->statistics.ratings.excitement;
+            DrawTextBasic(rt, screenPos, FormatStringID(STR_TRACK_LIST_EXCITEMENT_RATING, excitement));
             screenPos.y += kListRowHeight;
 
-            ft = Formatter();
-            ft.Add<fixed32_2dp>(_loadedTrackDesign->statistics.ratings.intensity);
-            DrawTextBasic(rt, screenPos, STR_TRACK_LIST_INTENSITY_RATING, ft);
+            fixed32_2dp intensity = _loadedTrackDesign->statistics.ratings.intensity;
+            DrawTextBasic(rt, screenPos, FormatStringID(STR_TRACK_LIST_INTENSITY_RATING, intensity));
             screenPos.y += kListRowHeight;
 
-            ft = Formatter();
-            ft.Add<fixed32_2dp>(_loadedTrackDesign->statistics.ratings.nausea);
-            DrawTextBasic(rt, screenPos, STR_TRACK_LIST_NAUSEA_RATING, ft);
+            fixed32_2dp nausea = _loadedTrackDesign->statistics.ratings.nausea;
+            DrawTextBasic(rt, screenPos, FormatStringID(STR_TRACK_LIST_NAUSEA_RATING, nausea));
             screenPos.y += kListRowHeight + 4;
 
             // Information for tracked rides.
@@ -575,60 +571,53 @@ namespace OpenRCT2::Ui::Windows
                     if (rtd.specialType == RtdSpecialType::miniGolf)
                     {
                         // Holes
-                        ft = Formatter();
-                        ft.Add<uint16_t>(_loadedTrackDesign->statistics.holes);
-                        DrawTextBasic(rt, screenPos, STR_HOLES, ft);
+                        uint16_t holes = _loadedTrackDesign->statistics.holes;
+                        DrawTextBasic(rt, screenPos, FormatStringID(STR_HOLES, holes));
                         screenPos.y += kListRowHeight;
                     }
                     else
                     {
                         // Maximum speed
-                        ft = Formatter();
-                        ft.Add<uint16_t>(ToHumanReadableSpeed(_loadedTrackDesign->statistics.maxSpeed << 16));
-                        DrawTextBasic(rt, screenPos, STR_MAX_SPEED, ft);
+                        uint16_t maxSpeed = ToHumanReadableSpeed(_loadedTrackDesign->statistics.maxSpeed << 16);
+                        DrawTextBasic(rt, screenPos, FormatStringID(STR_MAX_SPEED, maxSpeed));
                         screenPos.y += kListRowHeight;
 
                         // Average speed
-                        ft = Formatter();
-                        ft.Add<uint16_t>(ToHumanReadableSpeed(_loadedTrackDesign->statistics.averageSpeed << 16));
-                        DrawTextBasic(rt, screenPos, STR_AVERAGE_SPEED, ft);
+                        uint16_t averageSpeed = ToHumanReadableSpeed(_loadedTrackDesign->statistics.averageSpeed << 16);
+                        DrawTextBasic(rt, screenPos, FormatStringID(STR_AVERAGE_SPEED, averageSpeed));
                         screenPos.y += kListRowHeight;
                     }
 
                     // Ride length
-                    ft = Formatter();
-                    ft.Add<StringId>(STR_RIDE_LENGTH_ENTRY);
-                    ft.Add<uint16_t>(_loadedTrackDesign->statistics.rideLength);
-                    DrawTextEllipsised(rt, screenPos, 214, STR_TRACK_LIST_RIDE_LENGTH, ft);
+                    uint16_t rideLength = _loadedTrackDesign->statistics.rideLength;
+                    auto rideLenthFormatted = FormatStringID(
+                        STR_TRACK_LIST_RIDE_LENGTH, EnumValue(STR_RIDE_LENGTH_ENTRY), rideLength);
+                    DrawTextEllipsised(rt, screenPos, 214, rideLenthFormatted);
                     screenPos.y += kListRowHeight;
                 }
 
                 if (GetRideTypeDescriptor(_loadedTrackDesign->trackAndVehicle.rtdIndex).flags.has(RtdFlag::hasGForces))
                 {
                     // Maximum positive vertical Gs
-                    ft = Formatter();
-                    ft.Add<int32_t>(_loadedTrackDesign->statistics.maxPositiveVerticalG);
-                    DrawTextBasic(rt, screenPos, STR_MAX_POSITIVE_VERTICAL_G, ft);
+                    int32_t maxPosVertG = _loadedTrackDesign->statistics.maxPositiveVerticalG;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_MAX_POSITIVE_VERTICAL_G, maxPosVertG));
                     screenPos.y += kListRowHeight;
 
                     // Maximum negative vertical Gs
-                    ft = Formatter();
-                    ft.Add<int32_t>(_loadedTrackDesign->statistics.maxNegativeVerticalG);
-                    DrawTextBasic(rt, screenPos, STR_MAX_NEGATIVE_VERTICAL_G, ft);
+                    int32_t maxNegVertG = _loadedTrackDesign->statistics.maxNegativeVerticalG;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_MAX_NEGATIVE_VERTICAL_G, maxNegVertG));
                     screenPos.y += kListRowHeight;
 
                     // Maximum lateral Gs
-                    ft = Formatter();
-                    ft.Add<int32_t>(_loadedTrackDesign->statistics.maxLateralG);
-                    DrawTextBasic(rt, screenPos, STR_MAX_LATERAL_G, ft);
+                    int32_t maxLatG = _loadedTrackDesign->statistics.maxLateralG;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_MAX_LATERAL_G, maxLatG));
                     screenPos.y += kListRowHeight;
 
                     if (_loadedTrackDesign->statistics.totalAirTime != 0)
                     {
                         // Total air time
-                        ft = Formatter();
-                        ft.Add<int32_t>(ToHumanReadableAirTime(_loadedTrackDesign->statistics.totalAirTime));
-                        DrawTextBasic(rt, screenPos, STR_TOTAL_AIR_TIME, ft);
+                        int32_t airTime = ToHumanReadableAirTime(_loadedTrackDesign->statistics.totalAirTime);
+                        DrawTextBasic(rt, screenPos, FormatStringID(STR_TOTAL_AIR_TIME, airTime));
                         screenPos.y += kListRowHeight;
                     }
                 }
@@ -636,23 +625,20 @@ namespace OpenRCT2::Ui::Windows
                 if (GetRideTypeDescriptor(_loadedTrackDesign->trackAndVehicle.rtdIndex).flags.has(RtdFlag::hasDrops))
                 {
                     // Drops
-                    ft = Formatter();
-                    ft.Add<uint16_t>(_loadedTrackDesign->statistics.drops);
-                    DrawTextBasic(rt, screenPos, STR_DROPS, ft);
+                    uint16_t drops = _loadedTrackDesign->statistics.drops;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_DROPS, drops));
                     screenPos.y += kListRowHeight;
 
                     // Drop height is multiplied by 0.75
-                    ft = Formatter();
-                    ft.Add<uint16_t>((_loadedTrackDesign->statistics.highestDropHeight * 3) / 4);
-                    DrawTextBasic(rt, screenPos, STR_HIGHEST_DROP_HEIGHT, ft);
+                    uint16_t dropHeight = (_loadedTrackDesign->statistics.highestDropHeight * 3) / 4;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_HIGHEST_DROP_HEIGHT, dropHeight));
                     screenPos.y += kListRowHeight;
                 }
 
                 if (_loadedTrackDesign->statistics.inversions != 0)
                 {
-                    ft = Formatter();
-                    ft.Add<uint16_t>(_loadedTrackDesign->statistics.inversions);
-                    DrawTextBasic(rt, screenPos, STR_INVERSIONS, ft);
+                    uint16_t inversions = _loadedTrackDesign->statistics.inversions;
+                    DrawTextBasic(rt, screenPos, FormatStringID(STR_INVERSIONS, inversions));
                     screenPos.y += kListRowHeight;
                 }
 
@@ -662,18 +648,16 @@ namespace OpenRCT2::Ui::Windows
             if (!_loadedTrackDesign->statistics.spaceRequired.IsNull())
             {
                 // Space required
-                ft = Formatter();
-                ft.Add<uint16_t>(_loadedTrackDesign->statistics.spaceRequired.x);
-                ft.Add<uint16_t>(_loadedTrackDesign->statistics.spaceRequired.y);
-                DrawTextBasic(rt, screenPos, STR_TRACK_LIST_SPACE_REQUIRED, ft);
+                uint16_t spaceRequiredX = _loadedTrackDesign->statistics.spaceRequired.x;
+                uint16_t spaceRequiredY = _loadedTrackDesign->statistics.spaceRequired.y;
+                DrawTextBasic(rt, screenPos, FormatStringID(STR_TRACK_LIST_SPACE_REQUIRED, spaceRequiredX, spaceRequiredY));
                 screenPos.y += kListRowHeight;
             }
 
             if (_loadedTrackDesign->gameStateData.cost != 0)
             {
-                ft = Formatter();
-                ft.Add<uint32_t>(_loadedTrackDesign->gameStateData.cost);
-                DrawTextBasic(rt, screenPos, STR_TRACK_LIST_COST_AROUND, ft);
+                money64 cost = _loadedTrackDesign->gameStateData.cost;
+                DrawTextBasic(rt, screenPos, FormatStringID(STR_TRACK_LIST_COST_AROUND, cost));
             }
         }
 

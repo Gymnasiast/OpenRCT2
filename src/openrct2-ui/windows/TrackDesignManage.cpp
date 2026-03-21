@@ -12,6 +12,7 @@
 #include <openrct2/Context.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/StringIds.h>
 #include <openrct2/platform/Platform.h>
 #include <openrct2/ride/TrackDesignRepository.h>
@@ -194,11 +195,10 @@ namespace OpenRCT2::Ui::Windows
             const auto maxMessageHeight = buttonTop - titleBarBottom;
             const auto messageTop = titleBarBottom + (maxMessageHeight - fontHeight) / 2;
 
-            auto ft = Formatter();
-            ft.Add<const utf8*>(_trackDesignFileReference->name.c_str());
+            auto prompt = FormatStringID(
+                STR_ARE_YOU_SURE_YOU_WANT_TO_PERMANENTLY_DELETE_TRACK, _trackDesignFileReference->name.c_str());
             DrawTextWrapped(
-                rt, windowPos + ScreenCoordsXY{ width / 2, messageTop }, (width - 4),
-                STR_ARE_YOU_SURE_YOU_WANT_TO_PERMANENTLY_DELETE_TRACK, ft, { TextAlignment::centre });
+                rt, windowPos + ScreenCoordsXY{ width / 2, messageTop }, (width - 4), prompt, { TextAlignment::centre });
         }
     };
     /**

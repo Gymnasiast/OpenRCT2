@@ -21,6 +21,7 @@
 #include <openrct2/entity/Peep.h>
 #include <openrct2/entity/Staff.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/Localisation.Date.h>
 #include <openrct2/management/NewsItem.h>
 #include <openrct2/object/ObjectManager.h>
@@ -494,13 +495,9 @@ namespace OpenRCT2::Ui::Windows
                     DrawTextBasic(rt, { 2, y }, STR_NEWS_DATE_FORMAT, ft, { Drawing::Colour::white, FontStyle::small });
                 }
                 // Item text
-                {
-                    auto ft = Formatter();
-                    ft.Add<const char*>(newsItem.text.c_str());
-                    DrawTextWrapped(
-                        rt, { 2, y + lineHeight }, 325, STR_BOTTOM_TOOLBAR_NEWS_TEXT, ft,
-                        { Drawing::Colour::brightGreen, FontStyle::small });
-                }
+                DrawTextWrapped(
+                    rt, { 2, y + lineHeight }, 325, FormatStringID(STR_BOTTOM_TOOLBAR_NEWS_TEXT, newsItem.text.c_str()),
+                    { Drawing::Colour::brightGreen, FontStyle::small });
                 // Subject button
                 if (newsItem.typeHasSubject() && !newsItem.hasButton())
                 {

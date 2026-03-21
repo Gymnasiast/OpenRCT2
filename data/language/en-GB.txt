@@ -531,7 +531,6 @@ STR_1158    :Can’t remove this…
 STR_1159    :Place scenery, gardens, and other accessories
 STR_1160    :Create/adjust lakes & water
 STR_1161    :Can’t position this here…
-STR_1162    :{OUTLINE}{TOPAZ}{STRINGID}
 STR_1163    :{STRINGID}{NEWLINE}(Right-Click to Modify)
 STR_1164    :{STRINGID}{NEWLINE}(Right-Click to Remove)
 STR_1165    :{STRINGID} - {STRINGID} {COMMA16}
@@ -1694,16 +1693,16 @@ STR_2383    :Water
 STR_2384    :{WINDOW_COLOUR_2}Your objective:
 STR_2385    :{BLACK}None
 STR_2386    :{BLACK}To have at least {COMMA32} guests in your park at the end of {MONTHYEAR_SENTENCE}, with a park rating of at least 600
-STR_2387    :{BLACK}To achieve a park value of at least {POP16}{POP16}{CURRENCY} at the end of {PUSH16}{PUSH16}{PUSH16}{PUSH16}{PUSH16}{MONTHYEAR_SENTENCE}
+STR_2387    :{BLACK}To achieve a park value of at least {CURRENCY} at the end of {MONTHYEAR_SENTENCE}
 STR_2388    :{BLACK}Have Fun!
 STR_2389    :{BLACK}Build the best {STRINGID} you can!
 STR_2390    :{BLACK}To have 10 different types of roller coasters operating in your park, each with an excitement value of at least 6.00
 STR_2391    :{BLACK}To have at least {COMMA32} guests in your park. You must not let the park rating drop below 700 at any time!
-STR_2392    :{BLACK}To achieve a monthly income from ride tickets of at least {POP16}{POP16}{CURRENCY}
+STR_2392    :{BLACK}To achieve a monthly income from ride tickets of at least {CURRENCY}
 STR_2393    :{BLACK}To have 10 different types of roller coasters operating in your park, each with a minimum length of {LENGTH}, and an excitement rating of at least 7.00
-STR_2394    :{BLACK}To finish building all 5 of the partially built roller coasters in this park, designing them to achieve excitement ratings of at least {POP16}{POP16}{COMMA2DP32} each
-STR_2395    :{BLACK}To repay your loan and achieve a park value of at least {POP16}{POP16}{CURRENCY}
-STR_2396    :{BLACK}To achieve a monthly profit from food, drink and merchandise sales of at least {POP16}{POP16}{CURRENCY}
+STR_2394    :{BLACK}To finish building all 5 of the partially built roller coasters in this park, designing them to achieve excitement ratings of at least {COMMA2DP32} each
+STR_2395    :{BLACK}To repay your loan and achieve a park value of at least {CURRENCY}
+STR_2396    :{BLACK}To achieve a monthly profit from food, drink and merchandise sales of at least {CURRENCY}
 STR_2397    :None
 STR_2398    :Number of guests at a given date
 STR_2399    :Park value at a given date
@@ -2082,7 +2081,7 @@ STR_3077    :{RED}CLOSURE NOTICE: Your park has been closed down!
 STR_3090    :Select style of entrance, exit, and station
 STR_3091    :You are not allowed to remove this section!
 STR_3092    :You are not allowed to move or modify the station for this ride!
-STR_3093    :{WINDOW_COLOUR_2}Favourite: {BLACK}{STRINGID}
+STR_3093    :{WINDOW_COLOUR_2}Favourite: {BLACK}{STRING}
 STR_3094    :N/A
 STR_3095    :{WINDOW_COLOUR_2}Lift hill chain speed:
 STR_3097    :Select lift hill chain speed
@@ -2355,7 +2354,6 @@ STR_5134    :Adjust larger area of land rights
 STR_5135    :Buy land rights and construction rights
 STR_5136    :Land rights
 STR_5137    :Unlock operating limits
-STR_5138    :{WINDOW_COLOUR_2}{STRINGID}
 STR_5139    :{WHITE}{STRINGID}
 STR_5140    :Disable brakes failure
 STR_5141    :Disable all breakdowns

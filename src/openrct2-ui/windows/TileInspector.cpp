@@ -1600,9 +1600,8 @@ static uint64_t PageDisabledWidgets[] = {
                 auto& listWidget = widgets[WIDX_LIST];
                 auto centrePos = ScreenCoordsXY{ listWidget.width() / 2,
                                                  (listWidget.height() - 1 - FontGetLineHeight(FontStyle::medium)) / 2 };
-                auto ft = Formatter{};
                 auto textPaint = TextPaint{ colours[1], TextAlignment::centre };
-                DrawTextWrapped(rt, centrePos, listWidth, STR_TILE_INSPECTOR_SELECT_TILE_HINT, ft, textPaint);
+                DrawTextWrapped(rt, centrePos, listWidth, STR_TILE_INSPECTOR_SELECT_TILE_HINT, textPaint);
                 return;
             }
 
@@ -1633,13 +1632,9 @@ static uint64_t PageDisabledWidgets[] = {
                 else if (((windowTileInspectorElementCount - i) & 1) == 0)
                     Rectangle::fill(rt, fillRectangle, getColourMap(colours[1].colour).light, true);
 
-                StringId stringFormat = STR_WINDOW_COLOUR_2_STRINGID;
+                u8string stringFormat = "{WINDOW_COLOUR_2}";
                 if (selectedRow || hoveredRow)
-                    stringFormat = STR_WHITE_STRING;
-
-                auto checkboxFormatter = Formatter();
-                checkboxFormatter.Add<StringId>(STR_STRING);
-                checkboxFormatter.Add<char*>(kCheckMarkString);
+                    stringFormat = "{WHITE}";
 
                 // Draw checkbox and check if visible
                 Rectangle::fillInset(
@@ -1647,10 +1642,7 @@ static uint64_t PageDisabledWidgets[] = {
                     Rectangle::FillBrightness::dark, Rectangle::FillMode::dontLightenWhenInset);
                 if (!tileElement->IsInvisible())
                 {
-                    auto eyeFormatter = Formatter();
-                    eyeFormatter.Add<StringId>(STR_STRING);
-                    eyeFormatter.Add<char*>(kEyeString);
-                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ 2, 1 }, stringFormat, eyeFormatter);
+                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ 2, 1 }, stringFormat + kEyeString);
                 }
 
                 const auto type = tileElement->GetType();
@@ -1715,36 +1707,27 @@ static uint64_t PageDisabledWidgets[] = {
                 const bool last = tileElement->IsLastForTile();
 
                 // Element name
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<char*>(typeName);
                 DrawTextEllipsised(
-                    rt, screenCoords + ScreenCoordsXY{ kTypeColumnXY.x, 0 }, kTypeColumnSize.width, stringFormat, ft);
+                    rt, screenCoords + ScreenCoordsXY{ kTypeColumnXY.x, 0 }, kTypeColumnSize.width, stringFormat + typeName);
 
                 // Base height
-                ft = Formatter();
-                ft.Add<StringId>(STR_FORMAT_INTEGER);
-                ft.Add<int32_t>(tileElement->BaseHeight);
-                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kBaseHeightColumnXY.x, 0 }, stringFormat, ft);
+                auto baseFormatted = std::to_string(tileElement->BaseHeight);
+                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kBaseHeightColumnXY.x, 0 }, stringFormat + baseFormatted);
 
                 // Clearance height
-                ft = Formatter();
-                ft.Add<StringId>(STR_FORMAT_INTEGER);
-                ft.Add<int32_t>(clearanceHeight);
-                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kClearanceHeightColumnXY.x, 0 }, stringFormat, ft);
+                auto clearanceFormatted = std::to_string(clearanceHeight);
+                DrawTextBasic(
+                    rt, screenCoords + ScreenCoordsXY{ kClearanceHeightColumnXY.x, 0 }, stringFormat + clearanceFormatted);
 
                 // Direction
-                ft = Formatter();
-                ft.Add<StringId>(STR_FORMAT_INTEGER);
-                ft.Add<int32_t>(tileElement->GetDirection());
-                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kDirectionColumnXY.x, 0 }, stringFormat, ft);
+                auto directionFormatted = std::to_string(tileElement->GetDirection());
+                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kDirectionColumnXY.x, 0 }, stringFormat + directionFormatted);
 
-                // Checkmarks for ghost and last for tile
                 if (ghost)
                     DrawTextBasic(
-                        rt, screenCoords + ScreenCoordsXY{ kGhostFlagColumnXY.x, 0 }, stringFormat, checkboxFormatter);
+                        rt, screenCoords + ScreenCoordsXY{ kGhostFlagColumnXY.x, 0 }, stringFormat + kCheckMarkString);
                 if (last)
-                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kLastFlagColumnXY.x, 0 }, stringFormat, checkboxFormatter);
+                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kLastFlagColumnXY.x, 0 }, stringFormat + kCheckMarkString);
 
                 screenCoords.y -= kScrollableRowHeight;
                 i++;

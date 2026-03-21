@@ -168,10 +168,10 @@ namespace OpenRCT2::Ui::Windows
                 colour = { background, { ColourFlag::inset } };
 
             auto yOffset = ItemPadding;
-            Formatter ft;
-            ft.Add<const utf8*>(item.text);
+            const utf8* textString = item.text;
+            auto formatted = FormatStringID(format, textString);
 
-            DrawTextEllipsised(rt, { screenCoords.x + 2, screenCoords.y + yOffset }, ddWidth - 7, format, ft, { colour });
+            DrawTextEllipsised(rt, { screenCoords.x + 2, screenCoords.y + yOffset }, ddWidth - 7, formatted, { colour });
         }
 
         void onDraw(RenderTarget& rt) override

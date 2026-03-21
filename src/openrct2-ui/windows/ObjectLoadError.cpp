@@ -500,15 +500,13 @@ namespace OpenRCT2::Ui::Windows
             auto screenPos = windowPos + ScreenCoordsXY{ 5, widgets[WIDX_TITLE].bottom };
 
             // Draw explanatory message
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_OBJECT_ERROR_WINDOW_EXPLANATION);
-            DrawTextWrapped(rt, screenPos + ScreenCoordsXY{ 0, 4 }, kWindowSize.width - 10, STR_BLACK_STRING, ft);
+            DrawTextWrapped(
+                rt, screenPos + ScreenCoordsXY{ 0, 4 }, kWindowSize.width - 10,
+                FormatStringID(STR_BLACK_STRING, EnumValue(STR_OBJECT_ERROR_WINDOW_EXPLANATION)));
 
             // Draw file name
-            ft = Formatter();
-            ft.Add<StringId>(STR_OBJECT_ERROR_WINDOW_FILE);
-            ft.Add<utf8*>(_filePath.c_str());
-            DrawTextEllipsised(rt, screenPos + ScreenCoordsXY{ 0, 29 }, kWindowSize.width - 5, STR_BLACK_STRING, ft);
+            auto filename = FormatStringID(STR_BLACK_STRING, EnumValue(STR_OBJECT_ERROR_WINDOW_FILE), _filePath.c_str());
+            DrawTextEllipsised(rt, screenPos + ScreenCoordsXY{ 0, 29 }, kWindowSize.width - 5, filename);
         }
 
         void onScrollDraw(const int32_t scrollIndex, RenderTarget& rt) override

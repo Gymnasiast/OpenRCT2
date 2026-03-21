@@ -307,14 +307,9 @@ namespace OpenRCT2::Ui::Windows
         {
             drawWidgets(rt);
 
-            StringId format = STR_WINDOW_COLOUR_2_STRINGID;
             FontStyle fontStyle = FontStyle::medium;
-
             if (ScenarioSelectUseSmallFont())
-            {
-                format = STR_SMALL_WINDOW_COLOUR_2_STRINGID;
                 fontStyle = FontStyle::small;
-            }
 
             // Text for each tab
             for (uint32_t i = 0; i < std::size(kScenarioOriginStringIds); i++)
@@ -323,12 +318,11 @@ namespace OpenRCT2::Ui::Windows
                 if (widget.type == WidgetType::empty)
                     continue;
 
-                auto ft = Formatter();
-                ft.Add<StringId>(kScenarioOriginStringIds[i]);
+                auto caption = FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, kScenarioOriginStringIds[i]);
 
                 auto stringCoords = windowPos + ScreenCoordsXY{ widget.midX(), widget.midY() - 3 };
                 DrawTextWrapped(
-                    rt, stringCoords, 87, format, ft, { Drawing::Colour::lightWater, fontStyle, TextAlignment::centre });
+                    rt, stringCoords, 87, caption, { Drawing::Colour::lightWater, fontStyle, TextAlignment::centre });
             }
 
             auto previewPaneWidth = GetPreviewPaneWidth();
@@ -343,7 +337,7 @@ namespace OpenRCT2::Ui::Windows
                     auto screenPos = windowPos
                         + ScreenCoordsXY{ widgets[WIDX_SCENARIOLIST].right + 4, widgets[WIDX_TABCONTENT].top + 5 };
                     DrawTextEllipsised(
-                        rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 0 }, previewPaneWidth, STR_SCENARIO_LOCKED, {},
+                        rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 0 }, previewPaneWidth, STR_SCENARIO_LOCKED,
                         { TextAlignment::centre });
 
                     DrawTextWrapped(rt, screenPos + ScreenCoordsXY{ 0, 15 }, previewPaneWidth, STR_SCENARIO_LOCKED_DESC);
@@ -372,21 +366,17 @@ namespace OpenRCT2::Ui::Windows
             // Scenario name
             auto screenPos = windowPos
                 + ScreenCoordsXY{ widgets[WIDX_SCENARIOLIST].right + 4, widgets[WIDX_TABCONTENT].top + 5 };
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const char*>(scenario->Name.c_str());
+            u8string scenarioNameFormatted = "{WINDOW_COLOUR_2}" + scenario->Name;
             DrawTextEllipsised(
-                rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 0 }, previewPaneWidth, STR_WINDOW_COLOUR_2_STRINGID, ft,
+                rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 0 }, previewPaneWidth, scenarioNameFormatted,
                 { TextAlignment::centre });
 
             // Still loading the preview?
             if (_previewLoadJob.isValid())
             {
-                ft = Formatter();
-                ft.Add<StringId>(STR_LOADING_GENERIC);
+                auto loadingFormatted = FormatStringID(STR_BLACK_STRING, EnumValue(STR_LOADING_GENERIC));
                 DrawTextBasic(
-                    rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 15 }, STR_BLACK_STRING, ft,
-                    { TextAlignment::centre });
+                    rt, screenPos + ScreenCoordsXY{ previewPaneWidth / 2, 15 }, loadingFormatted, { TextAlignment::centre });
                 return;
             }
 
@@ -395,10 +385,8 @@ namespace OpenRCT2::Ui::Windows
             screenPos.y = previewEnd.y + 15;
 
             // Scenario details
-            ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const char*>(scenario->Details.c_str());
-            screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, STR_BLACK_STRING, ft) + 5;
+            u8string formattedDetails = "{BLACK}" + scenario->Details;
+            screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, formattedDetails) + 5;
 
             // Scenario objective
             Scenario::Objective objective = { .Type = scenario->ObjectiveType,
@@ -406,10 +394,8 @@ namespace OpenRCT2::Ui::Windows
                                               .NumGuests = static_cast<uint16_t>(scenario->ObjectiveArg3),
                                               .Currency = scenario->ObjectiveArg2 };
 
-            ft = Formatter();
-            ft.Add<StringId>(kObjectiveNames[EnumValue(scenario->ObjectiveType)]);
-            formatObjective(ft, objective);
-            screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, STR_OBJECTIVE, ft) + 5;
+            auto formattedObjective = FormatStringID(STR_OBJECTIVE, EnumValue(STR_STRING), formatObjective(objective));
+            screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, formattedObjective) + 5;
 
             // Scenario score
             if (scenario->Highscore != nullptr)
@@ -420,11 +406,11 @@ namespace OpenRCT2::Ui::Windows
                 {
                     completedByName = scenario->Highscore->name;
                 }
-                ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(completedByName.c_str());
-                ft.Add<money64>(scenario->Highscore->company_value);
-                screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, STR_COMPLETED_BY_WITH_COMPANY_VALUE, ft);
+
+                auto completedBy = FormatStringID(
+                    STR_COMPLETED_BY_WITH_COMPANY_VALUE, EnumValue(STR_STRING), completedByName.c_str(),
+                    scenario->Highscore->company_value);
+                screenPos.y += DrawTextWrapped(rt, screenPos, previewPaneWidth, completedBy);
             }
         }
 

@@ -22,6 +22,7 @@
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/interface/ColourWithFlags.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/network/Network.h>
 #include <openrct2/ui/WindowManager.h>
 
@@ -195,27 +196,21 @@ namespace OpenRCT2::Ui::Windows
 
                 const auto& name = Network::GetServerName();
                 {
-                    auto ft = Formatter();
-                    ft.Add<const char*>(name.c_str());
-                    screenCoords.y += DrawTextWrapped(clippedRT, screenCoords, newWidth, STR_STRING, ft, { colours[1] });
+                    screenCoords.y += DrawTextWrapped(clippedRT, screenCoords, newWidth, name, { colours[1] });
                     screenCoords.y += kListRowHeight / 2;
                 }
 
                 const auto& description = Network::GetServerDescription();
                 if (!description.empty())
                 {
-                    auto ft = Formatter();
-                    ft.Add<const char*>(description.c_str());
-                    screenCoords.y += DrawTextWrapped(clippedRT, screenCoords, newWidth, STR_STRING, ft, { colours[1] });
+                    screenCoords.y += DrawTextWrapped(clippedRT, screenCoords, newWidth, description, { colours[1] });
                     screenCoords.y += kListRowHeight / 2;
                 }
 
                 const auto& providerName = Network::GetServerProviderName();
                 if (!providerName.empty())
                 {
-                    auto ft = Formatter();
-                    ft.Add<const char*>(providerName.c_str());
-                    DrawTextBasic(clippedRT, screenCoords, STR_PROVIDER_NAME, ft);
+                    DrawTextBasic(clippedRT, screenCoords, FormatStringID(STR_PROVIDER_NAME, providerName.c_str()));
                     screenCoords.y += kListRowHeight;
                 }
 
@@ -309,16 +304,13 @@ namespace OpenRCT2::Ui::Windows
 
                     // Draw last action
                     int32_t action = Network::GetPlayerLastAction(player, 2000);
-                    auto ft = Formatter();
+                    StringId actionStringId;
                     if (action != -999)
-                    {
-                        ft.Add<StringId>(Network::GetActionNameStringID(action));
-                    }
+                        actionStringId = Network::GetActionNameStringID(action);
                     else
-                    {
-                        ft.Add<StringId>(STR_ACTION_NA);
-                    }
-                    DrawTextEllipsised(rt, { 256, screenCoords.y }, 100, STR_BLACK_STRING, ft);
+                        actionStringId = STR_ACTION_NA;
+
+                    DrawTextEllipsised(rt, { 256, screenCoords.y }, 100, FormatStringID(STR_BLACK_STRING, actionStringId));
 
                     // Draw ping
                     _buffer.resize(0);
@@ -359,10 +351,8 @@ namespace OpenRCT2::Ui::Windows
                 _buffer.assign("{WINDOW_COLOUR_2}");
                 _buffer += Network::GetGroupName(group);
 
-                auto ft = Formatter();
-                ft.Add<const char*>(_buffer.c_str());
                 DrawTextEllipsised(
-                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, STR_STRING, ft,
+                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, _buffer,
                     { TextAlignment::centre });
             }
 
@@ -383,10 +373,8 @@ namespace OpenRCT2::Ui::Windows
             {
                 _buffer.assign("{WINDOW_COLOUR_2}");
                 _buffer += Network::GetGroupName(group);
-                auto ft = Formatter();
-                ft.Add<const char*>(_buffer.c_str());
                 DrawTextEllipsised(
-                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, STR_STRING, ft,
+                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, _buffer,
                     { TextAlignment::centre });
             }
         }

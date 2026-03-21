@@ -402,6 +402,7 @@ namespace OpenRCT2
         [[nodiscard]] GameActions::Result Place(const TileCoordsXYZ& location, bool apply);
         void RemoveFromRide();
         void FormatActionTo(Formatter&) const;
+        [[nodiscard]] std::string getAction() const;
         void FormatNameTo(Formatter&) const;
         [[nodiscard]] std::string GetName() const;
         bool SetName(std::string_view value);

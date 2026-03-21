@@ -9,8 +9,11 @@
 
 #include "Objective.h"
 
+#include "openrct2/localisation/Language.h"
+
 #include <cstdint>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/Localisation.Date.h>
 #include <openrct2/ride/Ride.h>
 #include <openrct2/ride/RideData.h>
@@ -18,7 +21,7 @@
 
 namespace OpenRCT2::Ui
 {
-    const StringId kObjectiveNames[] = {
+    static constexpr StringId kObjectiveNames[] = {
         STR_OBJECTIVE_NONE,
         STR_OBJECTIVE_GUESTS_BY,
         STR_OBJECTIVE_PARK_VALUE_BY,
@@ -33,39 +36,76 @@ namespace OpenRCT2::Ui
         STR_OBJECTIVE_MONTHLY_FOOD_INCOME,
     };
 
-    void formatObjective(Formatter& ft, const Scenario::Objective& objective)
+    u8string formatObjective(const Scenario::Objective& objective)
     {
-        if (objective.Type == Scenario::ObjectiveType::buildTheBest)
+        auto baseStringId = kObjectiveNames[EnumValue(objective.Type)];
+
+        switch (objective.Type)
         {
-            StringId rideTypeString = kStringIdNone;
-            auto rideTypeId = objective.RideId;
-            if (rideTypeId != kRideTypeNull && rideTypeId < RIDE_TYPE_COUNT)
+            case Scenario::ObjectiveType::none:
             {
-                rideTypeString = GetRideTypeDescriptor(rideTypeId).Naming.Name;
+                return LanguageGetString(baseStringId);
             }
-            ft.Add<StringId>(rideTypeString);
+            case Scenario::ObjectiveType::guestsBy:
+            {
+                return FormatStringID(
+                    baseStringId, static_cast<int32_t>(objective.NumGuests),
+                    static_cast<int16_t>(DateGetTotalMonths(MONTH_OCTOBER, objective.Year)));
+            }
+            case Scenario::ObjectiveType::parkValueBy:
+            {
+                return FormatStringID(
+                    baseStringId, objective.Currency, static_cast<int16_t>(DateGetTotalMonths(MONTH_OCTOBER, objective.Year)));
+            }
+            case Scenario::ObjectiveType::haveFun:
+            {
+                return LanguageGetString(baseStringId);
+            }
+            case Scenario::ObjectiveType::buildTheBest:
+            {
+                StringId rideTypeString = kStringIdNone;
+                auto rideTypeId = objective.RideId;
+                if (rideTypeId != kRideTypeNull && rideTypeId < RIDE_TYPE_COUNT)
+                {
+                    rideTypeString = GetRideTypeDescriptor(rideTypeId).Naming.Name;
+                }
+                return FormatStringID(baseStringId, rideTypeString);
+            }
+            case Scenario::ObjectiveType::tenRollercoasters:
+            {
+                return LanguageGetString(baseStringId);
+            }
+            case Scenario::ObjectiveType::guestsAndRating:
+            {
+                return FormatStringID(baseStringId, static_cast<int32_t>(objective.NumGuests));
+            }
+            case Scenario::ObjectiveType::monthlyRideIncome:
+            {
+                return FormatStringID(baseStringId, objective.Currency);
+            }
+            case Scenario::ObjectiveType::tenRollercoastersLength:
+            {
+                return FormatStringID(baseStringId, static_cast<int16_t>(objective.MinimumLength));
+            }
+            case Scenario::ObjectiveType::finishFiveRollercoasters:
+            {
+                return FormatStringID(baseStringId, static_cast<int32_t>(objective.MinimumExcitement));
+            }
+            case Scenario::ObjectiveType::repayLoanAndParkValue:
+            {
+                return FormatStringID(baseStringId, objective.Currency);
+            }
+            case Scenario::ObjectiveType::monthlyFoodIncome:
+            {
+                return FormatStringID(baseStringId, objective.Currency);
+            }
+            case Scenario::ObjectiveType::count:
+            {
+                return {};
+            }
         }
-        else if (objective.Type == Scenario::ObjectiveType::guestsBy)
-        {
-            ft.Add<int32_t>(objective.NumGuests);
-            ft.Add<int16_t>(DateGetTotalMonths(MONTH_OCTOBER, objective.Year));
-        }
-        else if (objective.Type == Scenario::ObjectiveType::guestsAndRating)
-        {
-            ft.Add<int32_t>(objective.NumGuests);
-        }
-        else if (objective.Type == Scenario::ObjectiveType::tenRollercoastersLength)
-        {
-            ft.Add<int16_t>(objective.MinimumLength);
-        }
-        else
-        {
-            ft.Add<int16_t>(objective.NumGuests);
-            ft.Add<int16_t>(DateGetTotalMonths(MONTH_OCTOBER, objective.Year));
-            if (objective.Type == Scenario::ObjectiveType::finishFiveRollercoasters)
-                ft.Add<RideRating_t>(objective.MinimumExcitement);
-            else
-                ft.Add<money64>(objective.Currency);
-        }
+        
+        assert(false);
+        return {};
     }
 } // namespace OpenRCT2::Ui

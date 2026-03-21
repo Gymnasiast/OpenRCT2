@@ -35,6 +35,7 @@
 #include <openrct2/entity/EntityRegistry.h>
 #include <openrct2/entity/Staff.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/object/BannerSceneryEntry.h>
 #include <openrct2/object/LargeSceneryEntry.h>
 #include <openrct2/object/ObjectEntryManager.h>
@@ -149,12 +150,7 @@ namespace OpenRCT2::Ui
             case ViewportInteractionItem::parkEntrance:
             {
                 auto& gameState = getGameState();
-                auto parkName = gameState.park.name.c_str();
-
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(parkName);
-                SetMapTooltip(ft);
+                SetMapTooltip(gameState.park.name);
                 break;
             }
             default:
@@ -303,10 +299,7 @@ namespace OpenRCT2::Ui
                 ride = GetRide(vehicle->ride);
                 if (ride != nullptr && ride->status == RideStatus::closed)
                 {
-                    auto ft = Formatter();
-                    ft.Add<StringId>(STR_MAP_TOOLTIP_STRINGID_CLICK_TO_MODIFY);
-                    ride->formatNameTo(ft);
-                    SetMapTooltip(ft);
+                    SetMapTooltip(FormatStringID(STR_MAP_TOOLTIP_STRINGID_CLICK_TO_MODIFY, ride->getName()));
                 }
                 return info;
             }

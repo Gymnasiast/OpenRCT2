@@ -770,12 +770,13 @@ void CustomListView::PaintSeparator(RenderTarget& rt, const ScreenCoordsXY& pos,
 void CustomListView::PaintCell(
     RenderTarget& rt, const ScreenCoordsXY& pos, const ScreenSize& size, const char* text, bool isHighlighted) const
 {
-    StringId stringId = isHighlighted ? STR_WINDOW_COLOUR_2_STRINGID : STR_BLACK_STRING;
+    u8string formatted;
+    if (isHighlighted)
+        formatted = u8string("{WINDOW_COLOUR_2}") + text;
+    else
+        formatted = u8string("{BLACK}") + text;
 
-    auto ft = Formatter();
-    ft.Add<StringId>(STR_STRING);
-    ft.Add<const char*>(text);
-    DrawTextEllipsised(rt, pos, size.width, stringId, ft, {});
+    DrawTextEllipsised(rt, pos, size.width, formatted, {});
 }
 
 std::optional<RowColumn> CustomListView::GetItemIndexAt(const ScreenCoordsXY& pos)

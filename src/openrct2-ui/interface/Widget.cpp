@@ -26,6 +26,7 @@
 #include <openrct2/interface/ColourWithFlags.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/localisation/Formatting.h>
+#include <openrct2/localisation/Language.h>
 #include <openrct2/localisation/StringIds.h>
 
 using namespace OpenRCT2;
@@ -55,6 +56,14 @@ namespace OpenRCT2::Ui
     static void WidgetVScrollbarDraw(
         RenderTarget& rt, const ScrollArea& scroll, int32_t l, int32_t t, int32_t r, int32_t b, ColourWithFlags colour);
     static void WidgetDrawImage(RenderTarget& rt, WindowBase& w, WidgetIndex widgetIndex);
+
+    static inline u8string getWidgetText(const Widget& widget)
+    {
+        if (widget.flags.has(WidgetFlag::textIsString))
+            return widget.string;
+
+        return LanguageGetString(widget.text);
+    }
 
     /**
      *
@@ -381,23 +390,11 @@ namespace OpenRCT2::Ui
             topLeft.y += widget.top;
         }
 
-        auto stringId = widget.text;
-        auto ft = Formatter();
-        if (widget.flags.has(WidgetFlag::textIsString))
-        {
-            stringId = STR_STRING;
-            ft.Add<utf8*>(widget.string);
-        }
+        u8string string = getWidgetText(widget);
 
         ScreenCoordsXY coords = { (topLeft.x + r + 1) / 2 - 1, topLeft.y };
-        if (widget.type == WidgetType::labelCentred)
-        {
-            DrawTextWrapped(rt, coords, widget.width() - 3, stringId, ft, { colour, TextAlignment::centre });
-        }
-        else
-        {
-            DrawTextEllipsised(rt, coords, widget.width() - 3, stringId, ft, { colour, TextAlignment::centre });
-        }
+        auto overflow = (widget.type == WidgetType::labelCentred) ? Overflow::wrapped : Overflow::ellipsise;
+        DrawTextWithWidth(rt, coords, widget.width() - 3, string, overflow, { colour, TextAlignment::centre });
     }
 
     /**
@@ -429,23 +426,18 @@ namespace OpenRCT2::Ui
         else
             t = w.windowPos.y + widget.top;
 
-        auto stringId = widget.text;
-        auto ft = Formatter();
-        if (widget.flags.has(WidgetFlag::textIsString))
-        {
-            stringId = STR_STRING;
-            ft.Add<utf8*>(widget.string);
-        }
+        auto string = getWidgetText(widget);
 
         ScreenCoordsXY coords = { l + 1, t };
+        auto overflow = Overflow::ellipsise;
+        auto alignment = TextAlignment::left;
         if (widget.type == WidgetType::labelCentred)
         {
-            DrawTextWrapped(rt, coords, r - l, stringId, ft, { colour, TextAlignment::centre });
+            alignment = TextAlignment::centre;
+            overflow = Overflow::wrapped;
         }
-        else
-        {
-            DrawTextEllipsised(rt, coords, r - l, stringId, ft, colour);
-        }
+
+        DrawTextWithWidth(rt, coords, r - l, string, overflow, { colour, alignment });
     }
 
     /**
@@ -484,34 +476,15 @@ namespace OpenRCT2::Ui
         auto textRight = l;
 
         // Text
-        auto stringId = widget.text;
-        auto rawFt = Formatter();
-        if (widget.flags.has(WidgetFlag::textIsString))
-        {
-            if (widget.string != nullptr && widget.string[0] != '\0')
-            {
-                stringId = STR_STRING;
-                rawFt.Add<utf8*>(widget.string);
-            }
-            else
-            {
-                stringId = kStringIdNone;
-            }
-        }
-
-        if (stringId != kStringIdNone)
+        auto string = getWidgetText(widget);
+        if (!string.empty())
         {
             auto colour = w.colours[widget.colour].withFlag(ColourFlag::translucent, false);
             if (widgetIsDisabled(w, widgetIndex))
                 colour.flags.set(ColourFlag::inset, true);
 
-            utf8 buffer[512] = { 0 };
-            FormatStringLegacy(buffer, sizeof(buffer), stringId, rawFt.Data());
-
-            auto ft = Formatter();
-            ft.Add<utf8*>(buffer);
-            DrawTextBasic(rt, { l, t }, STR_STRING, ft, { colour });
-            textRight = l + GfxGetStringWidth(buffer, FontStyle::medium) + 1;
+            DrawText(rt, { l, t }, { colour }, string.c_str());
+            textRight = l + GfxGetStringWidth(string.c_str(), FontStyle::medium) + 1;
         }
 
         // Border
@@ -598,17 +571,9 @@ namespace OpenRCT2::Ui
         if (Config::Get().interface.enlargedUi)
             topLeft.y += kTitleHeightLarge / 4;
 
-        Formatter ft{};
-        bool hasStringPtr = widget->flags.has(WidgetFlag::textIsString);
-        auto formatString = widget->text;
-        if (hasStringPtr)
-        {
-            formatString = STR_STRING;
-            ft.Add<const utf8*>(widget->string);
-        }
-
+        auto string = getWidgetText(*widget);
         DrawTextEllipsised(
-            rt, topLeft, width, formatString, ft,
+            rt, topLeft, width, string,
             { ColourWithFlags{ Drawing::Colour::white }.withFlag(ColourFlag::withOutline, true), TextAlignment::centre });
     }
 
@@ -688,16 +653,9 @@ namespace OpenRCT2::Ui
         if (widget.text == kStringIdNone)
             return;
 
-        auto stringId = widget.text;
-        auto ft = Formatter();
-        if (widget.flags.has(WidgetFlag::textIsString))
-        {
-            stringId = STR_STRING;
-            ft.Add<utf8*>(widget.string);
-        }
-
+        auto string = getWidgetText(widget);
         DrawTextEllipsised(
-            rt, w.windowPos + ScreenCoordsXY{ widget.left + 14, widget.textTop() }, widget.width() - 15, stringId, ft, colour);
+            rt, w.windowPos + ScreenCoordsXY{ widget.left + 14, widget.textTop() }, widget.width() - 15, string, colour);
     }
 
     /**

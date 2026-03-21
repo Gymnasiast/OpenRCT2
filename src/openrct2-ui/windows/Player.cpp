@@ -20,6 +20,7 @@
 #include <openrct2/actions/network/PlayerSetGroupAction.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/network/Network.h>
 #include <openrct2/network/NetworkAction.h>
 #include <openrct2/ui/WindowManager.h>
@@ -435,11 +436,9 @@ namespace OpenRCT2::Ui::Windows
                 thread_local std::string _buffer;
                 _buffer.assign("{WINDOW_COLOUR_2}");
                 _buffer += Network::GetGroupName(groupindex);
-                auto ft = Formatter();
-                ft.Add<const char*>(_buffer.c_str());
 
                 DrawTextEllipsised(
-                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, STR_STRING, ft,
+                    rt, windowPos + ScreenCoordsXY{ widget->midX() - 5, widget->top }, widget->width() - 9, _buffer,
                     { TextAlignment::centre });
             }
 
@@ -458,15 +457,15 @@ namespace OpenRCT2::Ui::Windows
             int32_t updatedWidth = this->width - 8;
             int32_t lastaction = Network::GetPlayerLastAction(player, 0);
             ft = Formatter();
+            StringId lastActionStringId;
             if (lastaction != -999)
-            {
-                ft.Add<StringId>(Network::GetActionNameStringID(lastaction));
-            }
+                lastActionStringId = Network::GetActionNameStringID(lastaction);
             else
-            {
-                ft.Add<StringId>(STR_ACTION_NA);
-            }
-            DrawTextEllipsised(rt, screenCoords, updatedWidth, STR_LAST_ACTION_RAN, ft, { TextAlignment::centre });
+                lastActionStringId = STR_ACTION_NA;
+
+            DrawTextEllipsised(
+                rt, screenCoords, updatedWidth, FormatStringID(STR_LAST_ACTION_RAN, lastActionStringId),
+                { TextAlignment::centre });
 
             if (viewport != nullptr && _drawViewport)
             {

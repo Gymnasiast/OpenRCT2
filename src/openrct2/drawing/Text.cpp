@@ -127,17 +127,9 @@ void DrawTextBasic(RenderTarget& rt, const ScreenCoordsXY& coords, StringId form
     DrawText(rt, coords, textPaint, buffer);
 }
 
-void DrawTextEllipsised(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format)
+void DrawTextEllipsised(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format, TextPaint textPaint)
 {
-    DrawTextEllipsised(rt, coords, width, LanguageGetString(format));
-}
-
-void DrawTextEllipsised(
-    RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format, const Formatter& ft, TextPaint textPaint)
-{
-    utf8 buffer[512];
-    FormatStringLegacy(buffer, sizeof(buffer), format, ft.Data());
-    DrawTextEllipsised(rt, coords, width, buffer, textPaint);
+    DrawTextEllipsised(rt, coords, width, LanguageGetString(format), textPaint);
 }
 
 void DrawTextEllipsised(
@@ -148,18 +140,9 @@ void DrawTextEllipsised(
     DrawText(rt, coords, textPaint, buffer.c_str());
 }
 
-int32_t DrawTextWrapped(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format)
+int32_t DrawTextWrapped(RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format, TextPaint textPaint)
 {
-    Formatter ft{};
-    TextPaint textPaint{};
-    return DrawTextWrapped(rt, coords, width, format, ft, textPaint);
-}
-
-int32_t DrawTextWrapped(
-    RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format, const Formatter& ft, TextPaint textPaint)
-{
-    auto formatted = FormatStringIDLegacy(format, ft.Data());
-    return DrawTextWrapped(rt, coords, width, formatted, textPaint);
+    return DrawTextWrapped(rt, coords, width, LanguageGetString(format), textPaint);
 }
 
 int32_t DrawTextWrapped(

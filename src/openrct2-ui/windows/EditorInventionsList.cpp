@@ -22,6 +22,7 @@
 #include <openrct2/interface/ColourWithFlags.h>
 #include <openrct2/interface/Cursors.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/management/Research.h>
 #include <openrct2/object/DefaultObjects.h>
 #include <openrct2/object/ObjectList.h>
@@ -120,22 +121,19 @@ namespace OpenRCT2::Ui::Windows
                                               .Name;
 
             // Draw group name
-            auto ft = Formatter();
-            ft.Add<StringId>(rideTypeName);
-            DrawTextEllipsised(rt, screenCoords, columnSplitOffset - 11, format, ft, textPaint);
+            auto groupName = FormatStringID(format, rideTypeName);
+            DrawTextEllipsised(rt, screenCoords, columnSplitOffset - 11, groupName, textPaint);
 
             // Draw vehicle name
-            ft = Formatter();
-            ft.Add<StringId>(itemNameId);
+            auto vehicleName = FormatStringID(format, itemNameId);
             DrawTextEllipsised(
-                rt, { screenCoords + ScreenCoordsXY{ columnSplitOffset, 0 } }, columnSplitOffset - 11, format, ft, textPaint);
+                rt, { screenCoords + ScreenCoordsXY{ columnSplitOffset, 0 } }, columnSplitOffset - 11, vehicleName, textPaint);
         }
         else
         {
             // Scenery group, flat ride or shopdis
-            auto ft = Formatter();
-            ft.Add<StringId>(itemNameId);
-            DrawTextEllipsised(rt, screenCoords, width, format, ft, textPaint);
+            auto itemName = FormatStringID(format, itemNameId);
+            DrawTextEllipsised(rt, screenCoords, width, itemName, textPaint);
         }
     }
 
@@ -416,32 +414,28 @@ namespace OpenRCT2::Ui::Windows
             screenPos = windowPos + ScreenCoordsXY{ bkWidget.midX() + 1, bkWidget.bottom + 3 };
             const auto itemWidth = width - widgets[WIDX_RESEARCH_ORDER_SCROLL].right - 6;
 
-            StringId drawString = STR_WINDOW_COLOUR_2_STRINGID;
             StringId stringId = researchItem->GetName();
-            auto ft = Formatter();
+            u8string formatted;
 
             if (researchItem->type == Research::EntryType::ride
                 && !GetRideTypeDescriptor(researchItem->baseRideType).flags.has(RtdFlag::listVehiclesSeparately))
             {
-                drawString = STR_WINDOW_COLOUR_2_STRINGID_STRINGID;
                 StringId rideTypeName = GetRideNaming(researchItem->baseRideType, GetRideEntryByIndex(researchItem->entryIndex))
                                             .Name;
-                ft.Add<StringId>(rideTypeName);
-                ft.Add<StringId>(stringId);
+                formatted = FormatStringID(STR_WINDOW_COLOUR_2_STRINGID_STRINGID, rideTypeName, stringId);
             }
             else
             {
-                ft.Add<StringId>(stringId);
+                formatted = FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, stringId);
             }
 
-            DrawTextEllipsised(rt, screenPos, itemWidth, drawString, ft, { TextAlignment::centre });
+            DrawTextEllipsised(rt, screenPos, itemWidth, formatted, { TextAlignment::centre });
             screenPos.y += 15;
 
             // Item category
             screenPos.x = windowPos.x + widgets[WIDX_RESEARCH_ORDER_SCROLL].right + 4;
-            ft = Formatter();
-            ft.Add<StringId>(researchItem->GetCategoryInventionString());
-            DrawTextBasic(rt, screenPos, STR_INVENTION_RESEARCH_GROUP, ft);
+            auto category = FormatStringID(STR_INVENTION_RESEARCH_GROUP, researchItem->GetCategoryInventionString());
+            DrawTextBasic(rt, screenPos, category);
         }
 
         void onPrepareDraw() override

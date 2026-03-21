@@ -14,7 +14,7 @@
 #include <openrct2/actions/GameActionRunner.h>
 #include <openrct2/actions/ride/RideDemolishAction.h>
 #include <openrct2/drawing/Drawing.h>
-#include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/ui/WindowManager.h>
 #include <openrct2/windows/Intent.h>
 #include <openrct2/world/Park.h>
@@ -83,12 +83,10 @@ namespace OpenRCT2::Ui::Windows
             {
                 auto stringId = (getGameState().park.flags & PARK_FLAGS_NO_MONEY) ? STR_DEMOLISH_RIDE_ID
                                                                                   : STR_DEMOLISH_RIDE_ID_MONEY;
-                auto ft = Formatter();
-                currentRide->formatNameTo(ft);
-                ft.Add<money64>(_demolishRideCost);
+                auto formattedString = FormatStringID(stringId, currentRide->getName(), _demolishRideCost);
 
                 ScreenCoordsXY stringCoords(windowPos.x + kWindowSize.width / 2, windowPos.y + (kWindowSize.height / 2) - 3);
-                DrawTextWrapped(rt, stringCoords, kWindowSize.width - 4, stringId, ft, { TextAlignment::centre });
+                DrawTextWrapped(rt, stringCoords, kWindowSize.width - 4, formattedString, { TextAlignment::centre });
             }
         }
     };

@@ -462,8 +462,8 @@ namespace OpenRCT2::Ui::Windows
             }
 
             {
-                Formatter ft(_filterArguments.args);
-                DrawTextEllipsised(rt, screenCoords, 310, format, ft);
+                auto formatted = FormatStringIDLegacy(format, _filterArguments.args);
+                DrawTextEllipsised(rt, screenCoords, 310, formatted);
             }
 
             // Number of guests (list items)
@@ -658,11 +658,11 @@ namespace OpenRCT2::Ui::Windows
                     && y < rt.y + rt.height)
                 {
                     // Highlight backcolour and text colour (format)
-                    StringId format = STR_BLACK_STRING;
+                    u8string formattedName = "{BLACK}";
                     if (index == _highlightedIndex)
                     {
                         Rectangle::filter(rt, { 0, y, 800, y + kScrollableRowHeight - 1 }, FilterPaletteID::paletteDarken1);
-                        format = STR_WINDOW_COLOUR_2_STRINGID;
+                        formattedName = "{WINDOW_COLOUR_2}";
                     }
 
                     // Guest name
@@ -671,13 +671,12 @@ namespace OpenRCT2::Ui::Windows
                     {
                         continue;
                     }
-                    auto ft = Formatter();
-                    peep->FormatNameTo(ft);
-                    DrawTextEllipsised(rt, { 0, y }, 113, format, ft);
+                    DrawTextEllipsised(rt, { 0, y }, 113, formattedName + peep->GetName());
 
                     switch (_selectedView)
                     {
                         case GuestViewType::Actions:
+                        {
                             // Guest face
                             GfxDrawSprite(rt, ImageId(GetPeepFaceSpriteSmall(peep)), { 118, y + 1 });
 
@@ -686,11 +685,12 @@ namespace OpenRCT2::Ui::Windows
                                 GfxDrawSprite(rt, ImageId(STR_ENTER_SELECTION_SIZE), { 112, y + 1 });
 
                             // Action
-                            ft = Formatter();
-                            peep->FormatActionTo(ft);
-                            DrawTextEllipsised(rt, { 133, y }, 314, format, ft);
+                            u8string actionFormatted = "{BLACK}" + peep->getAction();
+                            DrawTextEllipsised(rt, { 133, y }, 314, actionFormatted);
                             break;
+                        }
                         case GuestViewType::Thoughts:
+                        {
                             // For each thought
                             for (const auto& thought : peep->Thoughts)
                             {
@@ -701,12 +701,14 @@ namespace OpenRCT2::Ui::Windows
                                 if (thought.freshness > 5)
                                     break;
 
-                                ft = Formatter();
+                                auto ft = Formatter();
                                 PeepThoughtSetFormatArgs(&thought, ft);
-                                DrawTextEllipsised(rt, { 118, y }, 329, format, ft, { FontStyle::small });
+                                auto thoughtFormatted = FormatStringIDLegacy(STR_BLACK_STRING, ft.Data());
+                                DrawTextEllipsised(rt, { 118, y }, 329, thoughtFormatted, { FontStyle::small });
                                 break;
                             }
                             break;
+                        }
                     }
                 }
                 y += kScrollableRowHeight;
@@ -745,21 +747,15 @@ namespace OpenRCT2::Ui::Windows
 
                     // Draw action/thoughts
                     Formatter ft(group.Arguments.args);
+                    auto formattedThought = FormatStringIDLegacy(format, ft.Data());
                     // Draw small font if displaying guests
-                    if (_selectedView == GuestViewType::Thoughts)
-                    {
-                        DrawTextEllipsised(rt, { 0, y }, 414, format, ft, { FontStyle::small });
-                    }
-                    else
-                    {
-                        DrawTextEllipsised(rt, { 0, y }, 414, format, ft);
-                    }
+                    auto fontStyle = (_selectedView == GuestViewType::Thoughts) ? FontStyle::small : FontStyle::medium;
+                    DrawTextEllipsised(rt, { 0, y }, 414, formattedThought, { fontStyle });
 
                     // Draw guest count
-                    ft = Formatter();
-                    ft.Add<StringId>(STR_GUESTS_COUNT_COMMA_SEP);
-                    ft.Add<uint32_t>(group.NumGuests);
-                    DrawTextBasic(rt, { 326, y }, format, ft, { TextAlignment::right });
+                    auto formattedCount = FormatStringID(
+                        format, EnumValue(STR_GUESTS_COUNT_COMMA_SEP), static_cast<uint32_t>(group.NumGuests));
+                    DrawTextBasic(rt, { 326, y }, formattedCount, { TextAlignment::right });
                 }
                 y += kSummarisedGuestsRowHeight;
                 index++;

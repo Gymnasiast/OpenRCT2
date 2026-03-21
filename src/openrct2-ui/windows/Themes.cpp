@@ -403,15 +403,13 @@ namespace OpenRCT2::Ui::Windows
 
                 size_t activeAvailableThemeIndex = ThemeManagerGetAvailableThemeIndex();
                 const utf8* activeThemeName = ThemeManagerGetAvailableThemeName(activeAvailableThemeIndex);
-                auto ft = Formatter();
-                ft.Add<const utf8*>(activeThemeName);
 
                 auto screenPos = windowPos
                     + ScreenCoordsXY{ widgets[WIDX_THEMES_PRESETS].left + 1, widgets[WIDX_THEMES_PRESETS].top };
                 auto newWidth = windowPos.x + widgets[WIDX_THEMES_PRESETS_DROPDOWN].left - widgets[WIDX_THEMES_PRESETS].left
                     - 4;
 
-                DrawTextEllipsised(rt, screenPos, newWidth, STR_STRING, ft, { colours[1] });
+                DrawTextEllipsised(rt, screenPos, newWidth, activeThemeName, { colours[1] });
             }
         }
 
@@ -780,7 +778,7 @@ namespace OpenRCT2::Ui::Windows
                     for (uint8_t j = 0; j < numColours; j++)
                     {
                         DrawTextWrapped(
-                            rt, { 2, screenCoords.y + 4 }, kWindowHeaderWidth, ThemeDescGetName(wc), {}, { colours[1] });
+                            rt, { 2, screenCoords.y + 4 }, kWindowHeaderWidth, ThemeDescGetName(wc), { colours[1] });
 
                         // Don't draw the empty row
                         if (emptyRow && j == 1)

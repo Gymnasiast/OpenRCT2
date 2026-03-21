@@ -1465,6 +1465,13 @@ namespace OpenRCT2
         }
     }
 
+    std::string Peep::getAction() const
+    {
+        Formatter ft;
+        FormatActionTo(ft);
+        return FormatStringIDLegacy(STR_STRINGID, ft.Data());
+    }
+
     static constexpr StringId kStaffNames[] = {
         STR_HANDYMAN_X,
         STR_MECHANIC_X,

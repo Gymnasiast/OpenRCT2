@@ -153,7 +153,9 @@ namespace OpenRCT2::Ui::Windows
 
     // MapTooltip
     void SetMapTooltip(Formatter& ft);
-    const Formatter& GetMapTooltip();
+    void SetMapTooltip(u8string_view string);
+    void clearMapTooltip();
+    u8string GetMapTooltip();
     void WindowMapTooltipUpdateVisibility();
 
     // MazeConstruction

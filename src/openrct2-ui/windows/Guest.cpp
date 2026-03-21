@@ -817,10 +817,9 @@ namespace OpenRCT2::Ui::Windows
             auto screenPos = windowPos + ScreenCoordsXY{ actionLabelWidget.midX(), actionLabelWidget.top - 1 };
 
             {
-                auto ft = Formatter();
-                peep->FormatActionTo(ft);
                 int32_t textWidth = actionLabelWidget.width() - 1;
-                DrawTextEllipsised(rt, screenPos, textWidth, STR_BLACK_STRING, ft, { TextAlignment::centre });
+                auto actionString = "{BLACK}" + peep->getAction();
+                DrawTextEllipsised(rt, screenPos, textWidth, actionString, { TextAlignment::centre });
             }
 
             // Draw the marquee thought
@@ -1352,18 +1351,14 @@ namespace OpenRCT2::Ui::Windows
 
             screenCoords.y = windowPos.y + widgets[WIDX_PAGE_BACKGROUND].bottom - 12;
 
-            auto ft = Formatter();
+            u8string rideString;
             auto* r = GetRide(peep->FavouriteRide);
             if (r != nullptr)
-            {
-                r->formatNameTo(ft);
-            }
+                rideString = r->getName();
             else
-            {
-                ft.Add<StringId>(STR_PEEP_FAVOURITE_RIDE_NOT_AVAILABLE);
-            }
+                rideString = LanguageGetString(STR_PEEP_FAVOURITE_RIDE_NOT_AVAILABLE);
 
-            DrawTextEllipsised(rt, screenCoords, width - 14, STR_FAVOURITE_RIDE, ft);
+            DrawTextEllipsised(rt, screenCoords, width - 14, FormatStringID(STR_FAVOURITE_RIDE, rideString.c_str()));
         }
 
         void onScrollDrawRides(int32_t scrollIndex, RenderTarget& rt)
@@ -1599,7 +1594,8 @@ namespace OpenRCT2::Ui::Windows
 
                 auto ft = Formatter();
                 PeepThoughtSetFormatArgs(&thought, ft);
-                screenCoords.y += DrawTextWrapped(rt, screenCoords, widgWidth, STR_BLACK_STRING, ft, { FontStyle::small });
+                auto formattedThought = FormatStringIDLegacy(STR_BLACK_STRING, ft.Data());
+                screenCoords.y += DrawTextWrapped(rt, screenCoords, widgWidth, formattedThought, { FontStyle::small });
 
                 // If this is the last visible line end drawing.
                 if (screenCoords.y > windowPos.y + widgets[WIDX_PAGE_BACKGROUND].bottom - 32)
@@ -1785,7 +1781,8 @@ namespace OpenRCT2::Ui::Windows
 
                 screenCoords.x += 16;
                 screenCoords.y += 1;
-                screenCoords.y += DrawTextWrapped(rt, screenCoords, itemNameWidth, STR_BLACK_STRING, ft);
+                screenCoords.y += DrawTextWrapped(
+                    rt, screenCoords, itemNameWidth, FormatStringIDLegacy(STR_BLACK_STRING, ft.Data()));
 
                 screenCoords.x -= 16;
                 numItems++;

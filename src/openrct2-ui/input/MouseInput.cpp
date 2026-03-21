@@ -1148,9 +1148,7 @@ namespace OpenRCT2
     void ProcessMouseOver(const ScreenCoordsXY& screenCoords)
     {
         CursorID cursorId = CursorID::Arrow;
-        auto ft = Formatter();
-        ft.Add<StringId>(kStringIdNone);
-        SetMapTooltip(ft);
+        clearMapTooltip();
 
         auto* windowMgr = GetWindowManager();
         WindowBase* window = windowMgr->FindFromPoint(screenCoords);

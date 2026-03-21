@@ -18,6 +18,7 @@
 #include <openrct2/actions/park/ParkSetResearchFundingAction.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/Localisation.Date.h>
 #include <openrct2/management/Finance.h>
 #include <openrct2/management/NewsItem.h>
@@ -353,21 +354,16 @@ namespace OpenRCT2::Ui::Windows
         if (gameState.researchProgressStage == RESEARCH_STAGE_FINISHED_ALL)
         {
             // Research type
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_RESEARCH_UNKNOWN);
-            DrawTextWrapped(rt, screenCoords, 296, STR_RESEARCH_TYPE_LABEL, ft);
+            DrawTextWrapped(rt, screenCoords, 296, FormatStringID(STR_RESEARCH_TYPE_LABEL, EnumValue(STR_RESEARCH_UNKNOWN)));
             screenCoords.y += 25;
 
             // Progress
-            ft = Formatter();
-            ft.Add<StringId>(STR_RESEARCH_COMPLETED_AL);
-            DrawTextWrapped(rt, screenCoords, 296, STR_RESEARCH_PROGRESS_LABEL, ft);
+            DrawTextWrapped(
+                rt, screenCoords, 296, FormatStringID(STR_RESEARCH_PROGRESS_LABEL, EnumValue(STR_RESEARCH_COMPLETED_AL)));
             screenCoords.y += 15;
 
             // Expected
-            ft = Formatter();
-            ft.Add<StringId>(STR_RESEARCH_STAGE_UNKNOWN);
-            DrawTextBasic(rt, screenCoords, STR_RESEARCH_EXPECTED_LABEL, ft);
+            DrawTextBasic(rt, screenCoords, FormatStringID(STR_RESEARCH_EXPECTED_LABEL, EnumValue(STR_RESEARCH_STAGE_UNKNOWN)));
         }
         else
         {
@@ -404,29 +400,30 @@ namespace OpenRCT2::Ui::Windows
             {
                 ft.Add<StringId>(gameState.researchNextItem->GetName());
             }
-            DrawTextWrapped(rt, screenCoords, 296, label, ft);
+            DrawTextWrapped(rt, screenCoords, 296, FormatStringIDLegacy(label, ft.Data()));
             screenCoords.y += 25;
 
             // Progress
-            ft = Formatter();
-            ft.Add<StringId>(ResearchStageNames[gameState.researchProgressStage]);
-            DrawTextWrapped(rt, screenCoords, 296, STR_RESEARCH_PROGRESS_LABEL, ft);
+            DrawTextWrapped(
+                rt, screenCoords, 296,
+                FormatStringID(STR_RESEARCH_PROGRESS_LABEL, ResearchStageNames[gameState.researchProgressStage]));
             screenCoords.y += 15;
 
             // Expected
             ft = Formatter();
+            u8string expected;
             if (gameState.researchProgressStage != RESEARCH_STAGE_INITIAL_RESEARCH && gameState.researchExpectedDay != 255)
             {
                 // TODO: Should probably use game date format setting
-                ft.Add<StringId>(STR_RESEARCH_EXPECTED_FORMAT);
-                ft.Add<StringId>(DateDayNames[gameState.researchExpectedDay]);
-                ft.Add<StringId>(DateGameMonthNames[gameState.researchExpectedMonth]);
+                expected = FormatStringID(
+                    STR_RESEARCH_EXPECTED_LABEL, EnumValue(STR_RESEARCH_EXPECTED_FORMAT),
+                    DateDayNames[gameState.researchExpectedDay], DateGameMonthNames[gameState.researchExpectedMonth]);
             }
             else
             {
-                ft.Add<StringId>(STR_RESEARCH_STAGE_UNKNOWN);
+                expected = FormatStringID(STR_RESEARCH_EXPECTED_LABEL, EnumValue(STR_RESEARCH_STAGE_UNKNOWN));
             }
-            DrawTextBasic(rt, screenCoords, STR_RESEARCH_EXPECTED_LABEL, ft);
+            DrawTextBasic(rt, screenCoords, expected);
         }
 
         // Last development
@@ -461,7 +458,7 @@ namespace OpenRCT2::Ui::Windows
                 }
             }
 
-            DrawTextWrapped(rt, screenCoords, 266, lastDevelopmentFormat, ft);
+            DrawTextWrapped(rt, screenCoords, 266, FormatStringIDLegacy(lastDevelopmentFormat, ft.Data()));
         }
     }
 

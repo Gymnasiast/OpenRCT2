@@ -21,6 +21,7 @@
 #include <openrct2/drawing/ColourMap.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/object/ObjectManager.h>
 #include <openrct2/object/TerrainEdgeObject.h>
 #include <openrct2/object/TerrainSurfaceObject.h>
@@ -1000,15 +1001,16 @@ namespace OpenRCT2::Ui::Windows
             DrawTextBasic(rt, windowPos + pos, STR_COMMA16, ft, { strengthColour });
 
             // Current heightmap image filename
-            ft = Formatter();
+            u8string heightmapFileString;
             if (!_heightmapLoaded)
-                ft.Add<char*>(LanguageGetString(STR_MAPGEN_NONE_SELECTED));
+                heightmapFileString = FormatStringID(
+                    STR_MAPGEN_CURRENT_HEIGHTMAP_FILE, LanguageGetString(STR_MAPGEN_NONE_SELECTED));
             else
-                ft.Add<char*>(_heightmapFilename.c_str());
+                heightmapFileString = FormatStringID(STR_MAPGEN_CURRENT_HEIGHTMAP_FILE, _heightmapFilename.c_str());
 
             pos = ScreenCoordsXY{ 10, widgets[WIDX_HEIGHTMAP_BROWSE].top + 1 };
             auto textWidth = widgets[WIDX_HEIGHTMAP_BROWSE].left - 11;
-            DrawTextEllipsised(rt, windowPos + pos, textWidth, STR_MAPGEN_CURRENT_HEIGHTMAP_FILE, ft);
+            DrawTextEllipsised(rt, windowPos + pos, textWidth, heightmapFileString);
         }
 
         void HeightmapTextInput(WidgetIndex widgetIndex, int32_t value)

@@ -2218,18 +2218,13 @@ namespace OpenRCT2::Ui::Windows
 
         void AdvancedDraw(RenderTarget& rt)
         {
-            auto ft = Formatter();
-            ft.Add<int32_t>(Config::Get().general.autosaveAmount);
+            auto formattedAutosaveAmount = FormatStringID(
+                STR_WINDOW_COLOUR_2_COMMA32, static_cast<int32_t>(Config::Get().general.autosaveAmount));
             DrawTextBasic(
                 rt, windowPos + ScreenCoordsXY{ widgets[WIDX_AUTOSAVE_AMOUNT].left + 1, widgets[WIDX_AUTOSAVE_AMOUNT].top + 1 },
-                STR_WINDOW_COLOUR_2_COMMA32, ft, { colours[1] });
+                formattedAutosaveAmount, { colours[1] });
 
             // Format RCT1 path
-            const auto normalisedPath = Platform::StrDecompToPrecomp(Config::Get().general.rct1Path);
-            ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const utf8*>(normalisedPath.c_str());
-
             auto& pathWidget = widgets[WIDX_PATH_TO_RCT1_PATH];
             int32_t widgetHeight = pathWidget.bottom - pathWidget.top;
 
@@ -2238,7 +2233,9 @@ namespace OpenRCT2::Ui::Windows
             int32_t padding = widgetHeight > lineHeight ? (widgetHeight - lineHeight) / 2 : 0;
 
             auto screenCoords = windowPos + ScreenCoordsXY{ pathWidget.left + 1, pathWidget.top + padding };
-            DrawTextEllipsised(rt, screenCoords, pathWidget.width() - 1, STR_BLACK_STRING, ft);
+            const auto normalisedPath = Platform::StrDecompToPrecomp(Config::Get().general.rct1Path);
+            u8string formattedRCT1Path = "{BLACK}" + normalisedPath;
+            DrawTextEllipsised(rt, screenCoords, pathWidget.width() - 1, formattedRCT1Path);
         }
 
         StringWithArgs AdvancedTooltip(WidgetIndex widgetIndex, StringId fallback)

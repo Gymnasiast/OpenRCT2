@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <openrct2/core/StringTypes.h>
 #include <openrct2/localisation/StringIdType.h>
 
 namespace OpenRCT2
@@ -24,7 +24,5 @@ namespace OpenRCT2::Scenario
 
 namespace OpenRCT2::Ui
 {
-    void formatObjective(Formatter& ft, const Scenario::Objective& objective);
-
-    extern const StringId kObjectiveNames[12];
+    u8string formatObjective(const Scenario::Objective& objective);
 } // namespace OpenRCT2::Ui

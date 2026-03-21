@@ -25,6 +25,7 @@
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/LocalisationService.h>
 #include <openrct2/management/NewsItem.h>
 #include <openrct2/management/Research.h>
@@ -955,35 +956,26 @@ namespace OpenRCT2::Ui::Windows
             UpdateVehicleAvailability(item.Type);
 
             // Ride name and description
-            ft.Add<StringId>(rideNaming.Name);
-            ft.Add<StringId>(rideNaming.Description);
-            DrawTextWrapped(rt, screenPos, textWidth, STR_NEW_RIDE_NAME_AND_DESCRIPTION, ft);
+            auto nameAndDescription = FormatStringID(
+                STR_NEW_RIDE_NAME_AND_DESCRIPTION, rideNaming.Name, rideNaming.Description);
+            DrawTextWrapped(rt, screenPos, textWidth, nameAndDescription);
 
             if (!_vehicleAvailability.empty())
             {
+                u8string availableVehicles;
                 if (Config::Get().interface.listRideVehiclesSeparately)
-                {
-                    ft = Formatter();
-                    ft.Add<StringId>(rideEntry.naming.Name);
-                    DrawTextEllipsised(
-                        rt, screenPos + ScreenCoordsXY{ 0, 39 }, kWindowSize.width - 2, STR_NEW_RIDE_VEHICLE_NAME, ft);
-                }
+                    availableVehicles = FormatStringID(STR_NEW_RIDE_VEHICLE_NAME, rideEntry.naming.Name);
                 else
-                {
-                    ft = Formatter();
-                    ft.Add<const utf8*>(_vehicleAvailability.c_str());
-                    DrawTextEllipsised(
-                        rt, screenPos + ScreenCoordsXY{ 0, 39 }, kWindowSize.width - 2, STR_AVAILABLE_VEHICLES, ft);
-                }
+                    availableVehicles = FormatStringID(STR_AVAILABLE_VEHICLES, _vehicleAvailability.c_str());
+
+                DrawTextEllipsised(rt, screenPos + ScreenCoordsXY{ 0, 39 }, kWindowSize.width - 2, availableVehicles);
             }
 
             if (_currentTab != SHOP_TAB)
             {
                 auto count = GetNumTrackDesigns(item);
                 auto designCountStringId = GetDesignsAvailableStringId(count);
-                ft = Formatter();
-                ft.Add<int32_t>(count);
-                DrawTextBasic(rt, screenPos + ScreenCoordsXY{ 0, 51 }, designCountStringId, ft);
+                DrawTextBasic(rt, screenPos + ScreenCoordsXY{ 0, 51 }, FormatStringID(designCountStringId, count));
             }
 
             // Price
@@ -1020,12 +1012,11 @@ namespace OpenRCT2::Ui::Windows
                     authorsString.append(author);
                 }
 
-                ft = Formatter();
-                ft.Add<StringId>(authors.size() > 1 ? STR_AUTHORS_STRING : STR_AUTHOR_STRING);
-                ft.Add<const char*>(authorsString.c_str());
+                StringId authorsStringId = authors.size() > 1 ? STR_AUTHORS_STRING : STR_AUTHOR_STRING;
+                auto formattedAuthors = FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, authorsStringId, authorsString.c_str());
 
                 DrawTextEllipsised(
-                    rt, screenPos + ScreenCoordsXY{ textWidth, 0 }, kWindowSize.width - 2, STR_WINDOW_COLOUR_2_STRINGID, ft,
+                    rt, screenPos + ScreenCoordsXY{ textWidth, 0 }, kWindowSize.width - 2, formattedAuthors,
                     { TextAlignment::right });
             }
         }

@@ -377,17 +377,15 @@ namespace OpenRCT2::Ui::Windows
                 const int16_t spaceAvailableForInfo = listWidgetWidth - numPlayersStringWidth - kScrollBarWidth - 35;
 
                 // Are we showing the server's name or description?
-                const char* serverInfoToShow = serverDetails.Name.c_str();
+                auto serverInfoToShow = serverDetails.Name;
                 if (highlighted && !serverDetails.Description.empty())
                 {
-                    serverInfoToShow = serverDetails.Description.c_str();
+                    serverInfoToShow = serverDetails.Description;
                 }
 
                 // Finally, draw the server information.
-                auto ft = Formatter();
-                ft.Add<const char*>(serverInfoToShow);
                 DrawTextEllipsised(
-                    rt, screenCoords + ScreenCoordsXY{ 0, 3 }, spaceAvailableForInfo, STR_STRING, ft, { colour });
+                    rt, screenCoords + ScreenCoordsXY{ 0, 3 }, spaceAvailableForInfo, serverInfoToShow, { colour });
 
                 int32_t right = listWidgetWidth - 7 - kScrollBarWidth;
 

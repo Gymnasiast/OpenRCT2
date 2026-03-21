@@ -717,7 +717,9 @@ namespace OpenRCT2::Ui::Windows
                     continue;
 
                 noCampaignsActive = 0;
-                auto ft = Formatter();
+
+                StringId campaignStringId = kMarketingCampaignNames[i][1];
+                u8string formatted;
 
                 // Set special parameters
                 switch (i)
@@ -728,34 +730,33 @@ namespace OpenRCT2::Ui::Windows
                         auto campaignRide = GetRide(marketingCampaign->RideId);
                         if (campaignRide != nullptr)
                         {
-                            campaignRide->formatNameTo(ft);
+                            formatted = FormatStringID(campaignStringId, EnumValue(STR_STRING), campaignRide->getName());
                         }
                         else
                         {
-                            ft.Add<StringId>(kStringIdNone);
+                            formatted = FormatStringID(campaignStringId, kStringIdNone);
                         }
                         break;
                     }
                     case ADVERTISING_CAMPAIGN_FOOD_OR_DRINK_FREE:
-                        ft.Add<StringId>(GetShopItemDescriptor(marketingCampaign->ShopItemType).Naming.Plural);
+                    {
+                        StringId naming = GetShopItemDescriptor(marketingCampaign->ShopItemType).Naming.Plural;
+                        formatted = FormatStringID(campaignStringId, naming);
                         break;
+                    }
                     default:
                     {
                         auto parkName = getGameState().park.name.c_str();
-                        ft.Add<StringId>(STR_STRING);
-                        ft.Add<const char*>(parkName);
+                        formatted = FormatStringID(campaignStringId, EnumValue(STR_STRING), parkName);
                     }
                 }
                 // Advertisement
-                DrawTextEllipsised(rt, screenCoords + ScreenCoordsXY{ 4, 0 }, 296, kMarketingCampaignNames[i][1], ft);
+                DrawTextEllipsised(rt, screenCoords + ScreenCoordsXY{ 4, 0 }, 296, formatted);
 
                 // Duration
                 uint16_t weeksRemaining = marketingCampaign->WeeksLeft;
-                ft = Formatter();
-                ft.Add<uint16_t>(weeksRemaining);
-                DrawTextBasic(
-                    rt, screenCoords + ScreenCoordsXY{ 304, 0 },
-                    weeksRemaining == 1 ? STR_1_WEEK_REMAINING : STR_X_WEEKS_REMAINING, ft);
+                StringId formatStringId = weeksRemaining == 1 ? STR_1_WEEK_REMAINING : STR_X_WEEKS_REMAINING;
+                DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ 304, 0 }, FormatStringID(formatStringId, weeksRemaining));
 
                 screenCoords.y += kListRowHeight;
             }
@@ -774,9 +775,8 @@ namespace OpenRCT2::Ui::Windows
                     // Draw button text
                     screenCoords = windowPos + ScreenCoordsXY{ campaignButton->left, campaignButton->textTop() };
                     DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ 4, 0 }, kMarketingCampaignNames[i][0]);
-                    auto ft = Formatter();
-                    ft.Add<money64>(AdvertisingCampaignPricePerWeek[i]);
-                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kCostPerWeekOffset, 0 }, STR_MARKETING_PER_WEEK, ft);
+                    auto string = FormatStringID(STR_MARKETING_PER_WEEK, AdvertisingCampaignPricePerWeek[i]);
+                    DrawTextBasic(rt, screenCoords + ScreenCoordsXY{ kCostPerWeekOffset, 0 }, string);
                 }
             }
         }

@@ -18,6 +18,7 @@
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/StringIds.h>
 #include <openrct2/ui/WindowManager.h>
 
@@ -128,17 +129,13 @@ namespace OpenRCT2::Ui::Windows
 
             ScreenCoordsXY stringCoords(windowPos.x + 125, windowPos.y + widgets[WIDX_TITLE].bottom + 16);
 
-            auto ft = Formatter();
+            u8string prompt;
             if (_shortcutCustomName.empty())
-            {
-                ft.Add<StringId>(_shortcutLocalisedName);
-            }
+                prompt = FormatStringID(STR_SHORTCUT_CHANGE_PROMPT, _shortcutLocalisedName);
             else
-            {
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(_shortcutCustomName.c_str());
-            }
-            DrawTextWrapped(rt, stringCoords, 242, STR_SHORTCUT_CHANGE_PROMPT, ft, { TextAlignment::centre });
+                prompt = FormatStringID(STR_SHORTCUT_CHANGE_PROMPT, EnumValue(STR_STRING), _shortcutCustomName.c_str());
+
+            DrawTextWrapped(rt, stringCoords, 242, prompt, { TextAlignment::centre });
         }
 
     private:
@@ -519,26 +516,19 @@ namespace OpenRCT2::Ui::Windows
                     rt, { 0, y - 1, scrollWidth, y + (kScrollableRowHeight - 2) }, FilterPaletteID::paletteDarken1);
             }
 
-            auto bindingOffset = (scrollWidth * 2) / 3;
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_SHORTCUT_ENTRY_FORMAT);
+            u8string formattedEntry;
             if (shortcut.CustomString.empty())
-            {
-                ft.Add<StringId>(shortcut.StringId);
-            }
+                formattedEntry = FormatStringID(format, shortcut.StringId);
             else
-            {
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(shortcut.CustomString.c_str());
-            }
-            DrawTextEllipsised(rt, { 0, y - 1 }, bindingOffset, format, ft);
+                formattedEntry = FormatStringID(format, EnumValue(STR_STRING), shortcut.CustomString.c_str());
+
+            auto bindingOffset = (scrollWidth * 2) / 3;
+            DrawTextEllipsised(rt, { 0, y - 1 }, bindingOffset, formattedEntry);
 
             if (!shortcut.Binding.empty())
             {
-                ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(shortcut.Binding.c_str());
-                DrawTextEllipsised(rt, { bindingOffset, y - 1 }, 150, format, ft);
+                auto formattedBinding = FormatStringID(format, EnumValue(STR_STRING), shortcut.Binding.c_str());
+                DrawTextEllipsised(rt, { bindingOffset, y - 1 }, 150, formattedBinding);
             }
         }
     };

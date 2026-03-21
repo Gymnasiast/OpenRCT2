@@ -30,6 +30,7 @@
 #include <openrct2/drawing/Text.h>
 #include <openrct2/entity/Peep.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/localisation/Language.h>
 #include <openrct2/localisation/Localisation.Date.h>
 #include <openrct2/management/Finance.h>
@@ -1288,20 +1289,17 @@ namespace OpenRCT2::Ui::Windows
             {
                 auto parkName = gameState.park.name.c_str();
 
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(parkName);
-                DrawTextEllipsised(rt, screenCoords, widthToSet, STR_WINDOW_PARK_NAME, ft);
+                auto formatted = FormatStringID(STR_WINDOW_PARK_NAME, EnumValue(STR_STRING), parkName);
+                DrawTextEllipsised(rt, screenCoords, widthToSet, formatted);
             }
 
             // Scenario name
             screenCoords = windowPos + ScreenCoordsXY{ 8, widgets[WIDX_SCENARIO_NAME].top + 1 };
             widthToSet = widgets[WIDX_SCENARIO_NAME].left - 16;
 
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const char*>(gameState.scenarioOptions.name.c_str());
-            DrawTextEllipsised(rt, screenCoords, widthToSet, STR_WINDOW_SCENARIO_NAME, ft);
+            auto scenarioName = FormatStringID(
+                STR_WINDOW_SCENARIO_NAME, EnumValue(STR_STRING), gameState.scenarioOptions.name.c_str());
+            DrawTextEllipsised(rt, screenCoords, widthToSet, scenarioName);
 
             // Scenario details label
             screenCoords = windowPos + ScreenCoordsXY{ 8, widgets[WIDX_DETAILS].top + 1 };
@@ -1311,10 +1309,7 @@ namespace OpenRCT2::Ui::Windows
             screenCoords = windowPos + ScreenCoordsXY{ 16, widgets[WIDX_DETAILS].top + 10 };
             widthToSet = widgets[WIDX_DETAILS].left - 4;
 
-            ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const char*>(gameState.scenarioOptions.details.c_str());
-            DrawTextWrapped(rt, screenCoords, widthToSet, STR_BLACK_STRING, ft);
+            DrawTextWrapped(rt, screenCoords, widthToSet, "{BLACK}" + gameState.scenarioOptions.details);
 
             // Scenario category label
             screenCoords = windowPos + ScreenCoordsXY{ 8, widgets[WIDX_CATEGORY].top + 1 };
@@ -1322,9 +1317,10 @@ namespace OpenRCT2::Ui::Windows
 
             // Scenario category value
             screenCoords = windowPos + ScreenCoordsXY{ widgets[WIDX_CATEGORY].left + 1, widgets[WIDX_CATEGORY].top + 1 };
-            ft = Formatter();
-            ft.Add<StringId>(Scenario::kScenarioCategoryStringIds[EnumValue(gameState.scenarioOptions.category)]);
-            DrawTextBasic(rt, screenCoords, STR_WINDOW_COLOUR_2_STRINGID, ft);
+            auto formattedCategory = FormatStringID(
+                STR_WINDOW_COLOUR_2_STRINGID,
+                Scenario::kScenarioCategoryStringIds[EnumValue(gameState.scenarioOptions.category)]);
+            DrawTextBasic(rt, screenCoords, formattedCategory);
         }
 
         /**

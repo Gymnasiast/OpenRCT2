@@ -210,15 +210,13 @@ struct TextPaint
     }
 };
 
-enum class Overflow : uint8_t
-{
-    ellipsise,
-    wrapped,
-};
-
 void DrawTextBasic(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, StringId format);
-void DrawTextEllipsised(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format);
-int32_t DrawTextWrapped(OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format);
+void DrawTextEllipsised(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
+    TextPaint textPaint = {});
+int32_t DrawTextWrapped(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
+    TextPaint textPaint = {});
 
 void DrawText(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, const TextPaint& paint, const_utf8string text,
@@ -227,14 +225,40 @@ void DrawTextBasic(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, StringId format, const OpenRCT2::Formatter& ft,
     TextPaint textPaint = {});
 void DrawTextEllipsised(
-    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
-    const OpenRCT2::Formatter& ft, TextPaint textPaint = {});
-void DrawTextEllipsised(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string,
     TextPaint textPaint = {});
 int32_t DrawTextWrapped(
-    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, StringId format,
-    const OpenRCT2::Formatter& ft, TextPaint textPaint = {});
-int32_t DrawTextWrapped(
     OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string,
     TextPaint textPaint = {});
+
+inline void DrawTextBasic(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, const_utf8string string, TextPaint textPaint = {})
+{
+    DrawText(rt, coords, textPaint, string);
+}
+inline void DrawTextBasic(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, const u8string& string, TextPaint textPaint = {})
+{
+    DrawText(rt, coords, textPaint, string.c_str());
+}
+
+enum class Overflow
+{
+    ellipsise,
+    wrapped,
+};
+
+inline void DrawTextWithWidth(
+    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, int32_t width, u8string_view string, Overflow overflow,
+    TextPaint textPaint = {})
+{
+    switch (overflow)
+    {
+        case Overflow::ellipsise:
+            DrawTextEllipsised(rt, coords, width, string, textPaint);
+            return;
+        case Overflow::wrapped:
+            DrawTextWrapped(rt, coords, width, string, textPaint);
+            return;
+    }
+}

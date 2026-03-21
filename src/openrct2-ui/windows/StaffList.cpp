@@ -36,6 +36,7 @@
 #include <openrct2/entity/PatrolArea.h>
 #include <openrct2/entity/Staff.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
 #include <openrct2/management/Finance.h>
 #include <openrct2/object/ObjectLimits.h>
 #include <openrct2/object/ObjectManager.h>
@@ -412,13 +413,11 @@ namespace OpenRCT2::Ui::Windows
                             format = STR_LIGHTPINK_STRINGID;
                     }
 
-                    auto ft = Formatter();
-                    peep->FormatNameTo(ft);
-                    DrawTextEllipsised(rt, { 0, y }, nameColumnSize, format, ft);
+                    auto nameFormatted = FormatStringID(format, EnumValue(STR_STRING), peep->GetName());
+                    DrawTextEllipsised(rt, { 0, y }, nameColumnSize, nameFormatted);
 
-                    ft = Formatter();
-                    peep->FormatActionTo(ft);
-                    DrawTextEllipsised(rt, { actionOffset, y }, actionColumnSize, format, ft);
+                    auto actionFormatted = FormatStringID(format, EnumValue(STR_STRING), peep->getAction());
+                    DrawTextEllipsised(rt, { actionOffset, y }, actionColumnSize, actionFormatted);
 
                     // True if a patrol path is set for the worker
                     if (peep->HasPatrolArea())

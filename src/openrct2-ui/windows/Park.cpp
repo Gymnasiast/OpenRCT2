@@ -591,13 +591,13 @@ namespace OpenRCT2::Ui::Windows
             }
 
             // Draw park closed / open label
-            auto ft = Formatter();
-            ft.Add<StringId>(Park::IsOpen(getGameState().park) ? STR_PARK_OPEN : STR_PARK_CLOSED);
+            StringId stringId = Park::IsOpen(getGameState().park) ? STR_PARK_OPEN : STR_PARK_CLOSED;
+            auto openClosedString = FormatStringID(STR_BLACK_STRING, stringId);
 
             auto* labelWidget = &widgets[WIDX_STATUS];
             DrawTextEllipsised(
                 rt, windowPos + ScreenCoordsXY{ labelWidget->midX(), labelWidget->top }, labelWidget->width() - 1,
-                STR_BLACK_STRING, ft, { TextAlignment::centre });
+                openClosedString, { TextAlignment::centre });
         }
 
         void initViewport()
@@ -1069,10 +1069,9 @@ namespace OpenRCT2::Ui::Windows
             // Scenario description
             auto screenCoords = windowPos
                 + ScreenCoordsXY{ widgets[WIDX_PAGE_BACKGROUND].left + 4, widgets[WIDX_PAGE_BACKGROUND].top + 7 };
-            auto ft = Formatter();
-            ft.Add<StringId>(STR_STRING);
-            ft.Add<const char*>(gameState.scenarioOptions.details.c_str());
-            screenCoords.y += DrawTextWrapped(rt, screenCoords, 222, STR_BLACK_STRING, ft);
+            auto formattedDescription = FormatStringID(
+                STR_BLACK_STRING, EnumValue(STR_STRING), gameState.scenarioOptions.details.c_str());
+            screenCoords.y += DrawTextWrapped(rt, screenCoords, 222, formattedDescription);
             screenCoords.y += 5;
 
             // Your objective:
@@ -1080,11 +1079,8 @@ namespace OpenRCT2::Ui::Windows
             screenCoords.y += kListRowHeight;
 
             // Objective
-            ft = Formatter();
-            formatObjective(ft, gameState.scenarioOptions.objective);
-
-            screenCoords.y += DrawTextWrapped(
-                rt, screenCoords, 221, kObjectiveNames[EnumValue(gameState.scenarioOptions.objective.Type)], ft);
+            auto formattedObjective = formatObjective(gameState.scenarioOptions.objective);
+            screenCoords.y += DrawTextWrapped(rt, screenCoords, 221, formattedObjective);
             screenCoords.y += 5;
 
             // Objective outcome
@@ -1098,9 +1094,8 @@ namespace OpenRCT2::Ui::Windows
                 else
                 {
                     // Objective completed
-                    ft = Formatter();
-                    ft.Add<money64>(gameState.scenarioCompletedCompanyValue);
-                    DrawTextWrapped(rt, screenCoords, 222, STR_OBJECTIVE_ACHIEVED, ft);
+                    DrawTextWrapped(
+                        rt, screenCoords, 222, FormatStringID(STR_OBJECTIVE_ACHIEVED, gameState.scenarioCompletedCompanyValue));
                 }
             }
         }

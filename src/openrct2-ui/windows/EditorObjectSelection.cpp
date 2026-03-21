@@ -769,9 +769,7 @@ namespace OpenRCT2::Ui::Windows
 
                     screenCoords.x = gLegacyScene == LegacyScene::trackDesignsManager ? 0 : 15;
 
-                    utf8 itemBuffer[512]{};
-                    auto bufferWithColour = strcpy(itemBuffer, highlighted ? "{WINDOW_COLOUR_2}" : "{BLACK}");
-                    auto buffer = strchr(bufferWithColour, '\0');
+                    u8string lineFormat = highlighted ? "{WINDOW_COLOUR_2}" : "{BLACK}";
 
                     Drawing::Colour colour = Drawing::Colour::black;
                     auto darkness = TextDarkness::regular;
@@ -788,26 +786,15 @@ namespace OpenRCT2::Ui::Windows
                         width_limit /= 2;
                         // Draw ride type
                         StringId rideTypeStringId = GetRideTypeStringId(listItem.repositoryItem);
-                        String::safeUtf8Copy(buffer, LanguageGetString(rideTypeStringId), 256 - (buffer - bufferWithColour));
-                        auto ft = Formatter();
-                        ft.Add<const char*>(itemBuffer);
+                        auto rideTypeString = lineFormat + LanguageGetString(rideTypeStringId);
                         DrawTextEllipsised(
-                            rt, screenCoords, width_limit - 15, STR_STRING, ft, { colour, FontStyle::medium, darkness });
+                            rt, screenCoords, width_limit - 15, rideTypeString, { colour, FontStyle::medium, darkness });
                         screenCoords.x = widgets[WIDX_LIST_SORT_RIDE].left - widgets[WIDX_LIST].left;
                     }
 
                     // Draw text
-                    String::safeUtf8Copy(buffer, listItem.repositoryItem->Name.c_str(), 256 - (buffer - bufferWithColour));
-                    if (gLegacyScene == LegacyScene::trackDesignsManager)
-                    {
-                        while (*buffer != 0 && *buffer != 9)
-                            buffer++;
-
-                        *buffer = 0;
-                    }
-                    auto ft = Formatter();
-                    ft.Add<const char*>(itemBuffer);
-                    DrawTextEllipsised(rt, screenCoords, width_limit, STR_STRING, ft, { colour, FontStyle::medium, darkness });
+                    auto nameString = lineFormat + listItem.repositoryItem->Name;
+                    DrawTextEllipsised(rt, screenCoords, width_limit, nameString, { colour, FontStyle::medium, darkness });
                 }
                 screenCoords.y += kScrollableRowHeight;
             }
@@ -1089,22 +1076,21 @@ namespace OpenRCT2::Ui::Windows
             const auto& listSortTypeWidget = widgets[WIDX_LIST_SORT_TYPE];
             if (listSortTypeWidget.type != WidgetType::empty)
             {
-                auto ft = Formatter();
-                auto stringId = _listSortType == RIDE_SORT_TYPE ? static_cast<StringId>(_listSortDescending ? STR_DOWN : STR_UP)
-                                                                : kStringIdNone;
-                ft.Add<StringId>(stringId);
+                StringId stringId = _listSortType == RIDE_SORT_TYPE
+                    ? static_cast<StringId>(_listSortDescending ? STR_DOWN : STR_UP)
+                    : kStringIdNone;
+                auto sortString = FormatStringID(STR_OBJECTS_SORT_TYPE, stringId);
                 auto screenPos = windowPos + ScreenCoordsXY{ listSortTypeWidget.left + 1, listSortTypeWidget.top + 1 };
-                DrawTextEllipsised(rt, screenPos, listSortTypeWidget.width() - 1, STR_OBJECTS_SORT_TYPE, ft, { colours[1] });
+                DrawTextEllipsised(rt, screenPos, listSortTypeWidget.width() - 1, sortString, { colours[1] });
             }
             const auto& listSortRideWidget = widgets[WIDX_LIST_SORT_RIDE];
             if (listSortRideWidget.type != WidgetType::empty)
             {
-                auto ft = Formatter();
                 auto stringId = _listSortType == RIDE_SORT_RIDE ? static_cast<StringId>(_listSortDescending ? STR_DOWN : STR_UP)
                                                                 : kStringIdNone;
-                ft.Add<StringId>(stringId);
+                auto sortString = FormatStringID(STR_OBJECTS_SORT_RIDE, stringId);
                 auto screenPos = windowPos + ScreenCoordsXY{ listSortRideWidget.left + 1, listSortRideWidget.top + 1 };
-                DrawTextEllipsised(rt, screenPos, listSortRideWidget.width() - 1, STR_OBJECTS_SORT_RIDE, ft, { colours[1] });
+                DrawTextEllipsised(rt, screenPos, listSortRideWidget.width() - 1, sortString, { colours[1] });
             }
 
             if (selectedListItem == -1 || _loadedObject == nullptr)
@@ -1260,11 +1246,8 @@ namespace OpenRCT2::Ui::Windows
             {
                 ObjectListItem* listItem = &_listItems[selectedListItem];
 
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(listItem->repositoryItem->Name.c_str());
-                screenPos.y += DrawTextWrapped(
-                    rt, screenPos, descriptionWidth, STR_WINDOW_COLOUR_2_STRINGID, ft, { TextAlignment::centre });
+                u8string objectName = "{WINDOW_COLOUR_2}" + listItem->repositoryItem->Name;
+                screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, objectName, { TextAlignment::centre });
 
                 // Leave some space between name and description
                 screenPos.y += kListRowHeight;
@@ -1276,7 +1259,7 @@ namespace OpenRCT2::Ui::Windows
             if (_loadedObject->IsCompatibilityObject())
             {
                 screenPos.y += DrawTextWrapped(
-                                   rt, screenPos, descriptionWidth, STR_OBJECT_SELECTION_COMPAT_OBJECT_DESCRIPTION, {},
+                                   rt, screenPos, descriptionWidth, STR_OBJECT_SELECTION_COMPAT_OBJECT_DESCRIPTION,
                                    { Drawing::Colour::brightRed })
                     + kListRowHeight;
             }
@@ -1284,11 +1267,8 @@ namespace OpenRCT2::Ui::Windows
             auto description = ObjectGetDescription(_loadedObject.get());
             if (!description.empty())
             {
-                auto ft = Formatter();
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(description.c_str());
-
-                screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, STR_WINDOW_COLOUR_2_STRINGID, ft);
+                u8string descriptionFormatted = "{WINDOW_COLOUR_2}" + description;
+                screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, descriptionFormatted);
                 screenPos.y += kListRowHeight;
             }
 
@@ -1309,17 +1289,16 @@ namespace OpenRCT2::Ui::Windows
 
                         sells += LanguageGetString(GetShopItemDescriptor(rideEntry.shop_item[i]).Naming.Plural);
                     }
-                    auto ft = Formatter();
-                    ft.Add<const char*>(sells.c_str());
-                    screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, STR_RIDE_OBJECT_SHOP_SELLS, ft) + 2;
+
+                    auto sellsFormatted = FormatStringID(STR_RIDE_OBJECT_SHOP_SELLS, sells.c_str());
+                    screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, sellsFormatted) + 2;
                 }
             }
             else if (GetSelectedObjectType() == ObjectType::sceneryGroup)
             {
                 const auto* sceneryGroupObject = reinterpret_cast<SceneryGroupObject*>(_loadedObject.get());
-                auto ft = Formatter();
-                ft.Add<uint16_t>(sceneryGroupObject->GetNumIncludedObjects());
-                screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, STR_INCLUDES_X_OBJECTS, ft) + 2;
+                auto includes = FormatStringID(STR_INCLUDES_X_OBJECTS, sceneryGroupObject->GetNumIncludedObjects());
+                screenPos.y += DrawTextWrapped(rt, screenPos, descriptionWidth, includes) + 2;
             }
             else if (GetSelectedObjectType() == ObjectType::music)
             {
@@ -1333,10 +1312,8 @@ namespace OpenRCT2::Ui::Windows
 
                     auto stringId = track->Composer.empty() ? STR_MUSIC_OBJECT_TRACK_LIST_ITEM
                                                             : STR_MUSIC_OBJECT_TRACK_LIST_ITEM_WITH_COMPOSER;
-                    auto ft = Formatter();
-                    ft.Add<const char*>(track->Name.c_str());
-                    ft.Add<const char*>(track->Composer.c_str());
-                    screenPos.y += DrawTextWrapped(rt, screenPos + ScreenCoordsXY{ 10, 0 }, descriptionWidth, stringId, ft);
+                    auto trackFormatted = FormatStringID(stringId, track->Name.c_str(), track->Composer.c_str());
+                    screenPos.y += DrawTextWrapped(rt, screenPos + ScreenCoordsXY{ 10, 0 }, descriptionWidth, trackFormatted);
                 }
             }
         }
@@ -1408,8 +1385,7 @@ namespace OpenRCT2::Ui::Windows
 
             // Draw object author (will be blank space if no author in file or a non JSON object)
             {
-                auto ft = Formatter();
-                std::string authorsString;
+                std::string authorsString = "{WINDOW_COLOUR_2}";
                 for (size_t i = 0; i < listItem->repositoryItem->Authors.size(); i++)
                 {
                     if (i > 0)
@@ -1418,11 +1394,9 @@ namespace OpenRCT2::Ui::Windows
                     }
                     authorsString.append(listItem->repositoryItem->Authors[i]);
                 }
-                ft.Add<StringId>(STR_STRING);
-                ft.Add<const char*>(authorsString.c_str());
                 DrawTextEllipsised(
-                    rt, { windowPos.x + width - 5, screenPos.y }, width - widgets[WIDX_LIST].right - 4,
-                    STR_WINDOW_COLOUR_2_STRINGID, ft, { TextAlignment::right });
+                    rt, { windowPos.x + width - 5, screenPos.y }, width - widgets[WIDX_LIST].right - 4, authorsString,
+                    { TextAlignment::right });
             }
         }
 

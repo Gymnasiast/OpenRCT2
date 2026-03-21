@@ -2194,7 +2194,7 @@ namespace OpenRCT2::Ui::Windows
         void drawEntranceStyleDropdownItem(
             Drawing::RenderTarget& rt, const Dropdown::Item& item, bool highlighted, int32_t ddWidth)
         {
-            auto formatString = item.isChecked() ? STR_OPTIONS_DROPDOWN_ITEM_SELECTED : STR_OPTIONS_DROPDOWN_ITEM;
+            auto formatStringId = item.isChecked() ? STR_OPTIONS_DROPDOWN_ITEM_SELECTED : STR_OPTIONS_DROPDOWN_ITEM;
 
             ColourWithFlags colour = colours[1];
             if (highlighted)
@@ -2204,11 +2204,10 @@ namespace OpenRCT2::Ui::Windows
 
             bool isEnlarged = Config::Get().interface.enlargedUi;
             auto yOffset = isEnlarged ? 6 : 3;
-            Formatter ft;
-            ft.Add<const utf8*>(item.text);
 
             // Draw text label
-            DrawTextEllipsised(rt, ScreenCoordsXY{ 2, yOffset }, ddWidth - 7, formatString, ft, { colour });
+            auto label = FormatStringID(formatStringId, item.text);
+            DrawTextEllipsised(rt, ScreenCoordsXY{ 2, yOffset }, ddWidth - 7, label, { colour });
 
             // Draw icon in front of the label
             auto stationObjectIndex = item.value;
@@ -2552,31 +2551,33 @@ namespace OpenRCT2::Ui::Windows
             }
         }
 
-        StringId GetStatusOverallView(Formatter& ft) const
-        {
-            auto stringId = kStringIdNone;
-            auto ride = GetRide(rideId);
-            if (ride != nullptr)
-            {
-                ride->formatStatusTo(ft);
-                stringId = STR_BLACK_STRING;
-                if (ride->flags.hasAny(RideFlag::brokenDown, RideFlag::crashed))
-                {
-                    stringId = STR_RED_OUTLINED_STRING;
-                }
-            }
-            return stringId;
-        }
-
-        StringId GetStatusVehicle(Formatter& ft) const
+        u8string GetStatusOverallView() const
         {
             auto ride = GetRide(rideId);
             if (ride == nullptr)
-                return kStringIdEmpty;
+                return {};
+
+            StringId stringId = STR_BLACK_STRING;
+            if (ride->flags.hasAny(RideFlag::brokenDown, RideFlag::crashed))
+            {
+                stringId = STR_RED_OUTLINED_STRING;
+            }
+
+            Formatter ft{};
+            ride->formatStatusTo(ft);
+            return FormatStringIDLegacy(stringId, ft.Data());
+            ;
+        }
+
+        u8string GetStatusVehicle() const
+        {
+            auto ride = GetRide(rideId);
+            if (ride == nullptr)
+                return {};
 
             auto vehicle = getGameState().entities.GetEntity<Vehicle>(ride->vehicles[_viewIndex - 1]);
             if (vehicle == nullptr)
-                return kStringIdEmpty;
+                return {};
 
             auto& rtd = ride->getRideTypeDescriptor();
             if (vehicle->status != Vehicle::Status::crashing && vehicle->status != Vehicle::Status::crashed)
@@ -2589,45 +2590,50 @@ namespace OpenRCT2::Ui::Windows
                 {
                     if (rtd.SupportsTrackGroup(TrackGroup::blockBrakes) && vehicle->velocity == 0)
                     {
-                        ft.Add<StringId>(STR_STOPPED_BY_BLOCK_BRAKES);
-                        return STR_BLACK_STRING;
+                        return FormatStringID(STR_BLACK_STRING, EnumValue(STR_STOPPED_BY_BLOCK_BRAKES));
                     }
                 }
             }
 
             if (rtd.specialType == RtdSpecialType::miniGolf)
-                return kStringIdEmpty;
+                return {};
 
-            auto stringId = VehicleStatusNames[EnumValue(vehicle->status)];
+            auto statusStringId = VehicleStatusNames[EnumValue(vehicle->status)];
             if (ride->getRideTypeDescriptor().flags.has(RtdFlag::singleSession)
                 && vehicle->status <= Vehicle::Status::unloadingPassengers)
             {
-                stringId = SingleSessionVehicleStatusNames[EnumValue(vehicle->status)];
+                statusStringId = SingleSessionVehicleStatusNames[EnumValue(vehicle->status)];
             }
 
-            ft.Add<StringId>(stringId);
             uint16_t speedInMph = ToHumanReadableSpeed(abs(vehicle->velocity));
-            ft.Add<uint16_t>(speedInMph);
             const RideComponentName stationName = GetRideComponentName(ride->getRideTypeDescriptor().NameConvention.station);
-            ft.Add<StringId>(ride->numStations > 1 ? stationName.number : stationName.singular);
+            StringId stationString = ride->numStations > 1 ? stationName.number : stationName.singular;
+
+            Formatter ft{};
+            ft.Add<StringId>(statusStringId);
+            ft.Add<uint16_t>(speedInMph);
+            ft.Add<StringId>(stationString);
             ft.Add<uint16_t>(vehicle->current_station.ToUnderlying() + 1);
 
-            if (stringId != STR_CRASHING && stringId != STR_CRASHED_0)
-                return STR_BLACK_STRING;
+            StringId formatStringId;
+            if (statusStringId != STR_CRASHING && statusStringId != STR_CRASHED_0)
+                formatStringId = STR_BLACK_STRING;
             else
-                return STR_RED_OUTLINED_STRING;
+                formatStringId = STR_RED_OUTLINED_STRING;
+
+            return FormatStringIDLegacy(formatStringId, ft.Data());
         }
 
-        StringId GetStatusStation(Formatter& ft) const
+        u8string GetStatusStation() const
         {
             auto ride = GetRide(rideId);
             if (ride == nullptr)
-                return kStringIdNone;
+                return {};
 
             const auto stationIndex = GetStationIndexFromViewSelection();
             if (!stationIndex)
             {
-                return kStringIdNone;
+                return {};
             }
 
             const auto& station = ride->getStation(*stationIndex);
@@ -2646,6 +2652,7 @@ namespace OpenRCT2::Ui::Windows
                     stringId = STR_EXIT_ONLY;
             }
             // Queue length
+            Formatter ft{};
             if (stringId == kStringIdEmpty)
             {
                 stringId = STR_QUEUE_EMPTY;
@@ -2663,19 +2670,19 @@ namespace OpenRCT2::Ui::Windows
                 ft.Add<StringId>(stringId);
             }
 
-            return STR_BLACK_STRING;
+            return FormatStringIDLegacy(STR_BLACK_STRING, ft.Data());
         }
 
-        StringId GetStatus(Formatter& ft) const
+        u8string GetStatus() const
         {
             auto ride = GetRide(rideId);
             if (_viewIndex == 0)
-                return GetStatusOverallView(ft);
+                return GetStatusOverallView();
             if (ride != nullptr && _viewIndex <= ride->numTrains)
-                return GetStatusVehicle(ft);
+                return GetStatusVehicle();
             if (ride != nullptr && ride->flags.has(RideFlag::brokenDown))
-                return GetStatusOverallView(ft);
-            return GetStatusStation(ft);
+                return GetStatusOverallView();
+            return GetStatusStation();
         }
 
         void MainOnDraw(RenderTarget& rt)
@@ -2721,12 +2728,11 @@ namespace OpenRCT2::Ui::Windows
                 STR_WINDOW_COLOUR_2_STRINGID, ft, { TextAlignment::centre });
 
             // Status
-            ft = Formatter();
             widget = &widgets[WIDX_STATUS];
-            StringId rideStatus = GetStatus(ft);
+            auto rideStatus = GetStatus();
             DrawTextEllipsised(
                 rt, windowPos + ScreenCoordsXY{ (widget->left + widget->right) / 2, widget->top }, widget->width() - 1,
-                rideStatus, ft, { TextAlignment::centre });
+                rideStatus, { TextAlignment::centre });
         }
 
 #pragma endregion
@@ -2967,22 +2973,20 @@ namespace OpenRCT2::Ui::Windows
 
             auto screenCoords = windowPos + ScreenCoordsXY{ 8, widgets[WIDX_VEHICLE_TYPE_DROPDOWN].bottom + 5 };
             // Description
-            auto ft = Formatter();
-            ft.Add<StringId>(rideEntry->naming.Description);
-            screenCoords.y += DrawTextWrapped(rt, screenCoords, 300, STR_BLACK_STRING, ft, { TextAlignment::left });
+            screenCoords.y += DrawTextWrapped(
+                rt, screenCoords, 300, FormatStringID(STR_BLACK_STRING, rideEntry->naming.Description),
+                { TextAlignment::left });
             screenCoords.y += 2;
 
             // Capacity
-            ft = Formatter();
-            ft.Add<StringId>(rideEntry->capacity);
-            DrawTextBasic(rt, screenCoords, STR_CAPACITY, ft);
+            DrawTextBasic(rt, screenCoords, FormatStringID(STR_CAPACITY, rideEntry->capacity));
 
             // Excitement Factor
             if (rideEntry->excitement_multiplier != 0)
             {
                 screenCoords.y += kListRowHeight;
 
-                ft = Formatter();
+                auto ft = Formatter();
                 ft.Add<int16_t>(abs(rideEntry->excitement_multiplier));
                 StringId stringId = rideEntry->excitement_multiplier > 0 ? STR_EXCITEMENT_FACTOR
                                                                          : STR_EXCITEMENT_FACTOR_NEGATIVE;
@@ -2998,7 +3002,7 @@ namespace OpenRCT2::Ui::Windows
                 else
                     screenCoords.y += kListRowHeight;
 
-                ft = Formatter();
+                auto ft = Formatter();
                 ft.Add<int16_t>(abs(rideEntry->intensity_multiplier));
                 StringId stringId = rideEntry->intensity_multiplier > 0 ? STR_INTENSITY_FACTOR : STR_INTENSITY_FACTOR_NEGATIVE;
                 DrawTextBasic(rt, screenCoords, stringId, ft);
@@ -3012,7 +3016,7 @@ namespace OpenRCT2::Ui::Windows
             {
                 screenCoords.y += kListRowHeight;
 
-                ft = Formatter();
+                auto ft = Formatter();
                 ft.Add<int16_t>(abs(rideEntry->nausea_multiplier));
                 StringId stringId = rideEntry->nausea_multiplier > 0 ? STR_NAUSEA_FACTOR : STR_NAUSEA_FACTOR_NEGATIVE;
                 DrawTextBasic(rt, screenCoords, stringId, ft);
@@ -4198,16 +4202,15 @@ namespace OpenRCT2::Ui::Windows
                 {
                     if (stringId == STR_CALLING_MECHANIC || stringId == STR_NO_MECHANICS_ARE_HIRED_MESSAGE)
                     {
-                        DrawTextWrapped(rt, screenCoords, 280, stringId, {}, { TextAlignment::left });
+                        DrawTextWrapped(rt, screenCoords, 280, stringId, { TextAlignment::left });
                     }
                     else
                     {
                         auto staff = getGameState().entities.GetEntity<Staff>(ride->mechanic);
                         if (staff != nullptr && staff->IsMechanic())
                         {
-                            ft = Formatter();
-                            staff->FormatNameTo(ft);
-                            DrawTextWrapped(rt, screenCoords, 280, stringId, ft, { TextAlignment::left });
+                            auto formatted = FormatStringID(stringId, EnumValue(STR_STRING), staff->GetName());
+                            DrawTextWrapped(rt, screenCoords, 280, formatted, { TextAlignment::left });
                         }
                     }
                 }
@@ -5038,9 +5041,8 @@ namespace OpenRCT2::Ui::Windows
 
             // Draw entrance label
             auto* stationObj = ride->getStationObject();
-            Formatter ft;
-            ft.Add<StringId>(stationObj->NameStringId);
-            DrawTextEllipsised(clippedRT, { 19, 1 }, widget.width() - 12 - 19, STR_WINDOW_COLOUR_2_STRINGID, ft);
+            auto stationTypeName = FormatStringID(STR_WINDOW_COLOUR_2_STRINGID, stationObj->NameStringId);
+            DrawTextEllipsised(clippedRT, { 19, 1 }, widget.width() - 12 - 19, stationTypeName);
         }
 
         void ColourOnDrawEntrancePreview(RenderTarget& rt, const Ride* ride, const Widget& widget)
@@ -5386,7 +5388,7 @@ namespace OpenRCT2::Ui::Windows
 
             // 'Tracks' caption
             auto trackLabelPos = windowPos + ScreenCoordsXY{ widgets[WIDX_MUSIC_DATA].left, widgets[WIDX_MUSIC_DATA].top - 13 };
-            DrawTextWrapped(rt, trackLabelPos, width, STR_MUSIC_OBJECT_TRACK_HEADER, {}, { TextAlignment::left });
+            DrawTextWrapped(rt, trackLabelPos, width, STR_MUSIC_OBJECT_TRACK_HEADER, { TextAlignment::left });
 
             // Do we have a preview image to draw?
             auto musicObj = ride->getMusicObject();
@@ -5757,8 +5759,7 @@ namespace OpenRCT2::Ui::Windows
                 Widget* widget = &widgets[WIDX_PAGE_BACKGROUND];
 
                 ScreenCoordsXY widgetCoords(windowPos.x + widget->midX(), windowPos.y + widget->top + 40);
-                DrawTextWrapped(
-                    rt, widgetCoords, width - 8, STR_CLICK_ITEMS_OF_SCENERY_TO_SELECT, {}, { TextAlignment::centre });
+                DrawTextWrapped(rt, widgetCoords, width - 8, STR_CLICK_ITEMS_OF_SCENERY_TO_SELECT, { TextAlignment::centre });
 
                 widgetCoords.x = windowPos.x + 4;
                 widgetCoords.y = windowPos.y + widgets[WIDX_SELECT_NEARBY_SCENERY].bottom + 17;
@@ -5876,7 +5877,12 @@ namespace OpenRCT2::Ui::Windows
                             ft.Add<uint16_t>(0);
                             ft.Add<uint16_t>(0);
                             ft.Add<uint16_t>(0);
-                            DrawTextEllipsised(rt, screenCoords, 308, STR_RIDE_TIME, ft);
+
+                            // TODO: the usage of the formatter here should be refactored out, together with the way
+                            // the strings are cut.
+                            auto formattedTime = FormatStringIDLegacy(STR_RIDE_TIME, ft.Data());
+
+                            DrawTextEllipsised(rt, screenCoords, 308, formattedTime);
                             screenCoords.y += kListRowHeight;
                         }
 
@@ -5916,7 +5922,12 @@ namespace OpenRCT2::Ui::Windows
                         ft.Add<uint16_t>(0);
                         ft.Add<uint16_t>(0);
                         ft.Add<uint16_t>(0);
-                        DrawTextEllipsised(rt, screenCoords, 308, STR_RIDE_LENGTH, ft);
+
+                        // TODO: the usage of the formatter here should be refactored out, together with the way
+                        // the strings are cut.
+                        auto formattedLength = FormatStringIDLegacy(STR_RIDE_LENGTH, ft.Data());
+
+                        DrawTextEllipsised(rt, screenCoords, 308, formattedLength);
 
                         screenCoords.y += kListRowHeight;
 
@@ -6212,7 +6223,8 @@ namespace OpenRCT2::Ui::Windows
                 // No measurement message
                 ScreenCoordsXY stringCoords(widget->width() / 2, widget->height() - 1 / 2 - 5);
                 int32_t txtWidth = widget->width() - 3;
-                DrawTextWrapped(rt, stringCoords, txtWidth, message.str, message.args, { TextAlignment::centre });
+                auto formatted = FormatStringIDLegacy(message.str, message.args.Data());
+                DrawTextWrapped(rt, stringCoords, txtWidth, formatted, { TextAlignment::centre });
                 return;
             }
 
@@ -7014,9 +7026,8 @@ namespace OpenRCT2::Ui::Windows
             {
                 queueTime = ride->getMaxQueueTime();
                 stringId = queueTime == 1 ? STR_QUEUE_TIME_MINUTE : STR_QUEUE_TIME_MINUTES;
-                ft = Formatter();
-                ft.Add<int32_t>(queueTime);
-                screenCoords.y += DrawTextWrapped(rt, screenCoords, 308, stringId, ft, { TextAlignment::left });
+                auto formattedQueueTime = FormatStringID(stringId, static_cast<int32_t>(queueTime));
+                screenCoords.y += DrawTextWrapped(rt, screenCoords, 308, formattedQueueTime, { TextAlignment::left });
                 screenCoords.y += 5;
             }
 

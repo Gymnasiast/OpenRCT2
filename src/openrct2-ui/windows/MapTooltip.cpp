@@ -16,6 +16,8 @@
 #include <openrct2/Input.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/localisation/Formatter.h>
+#include <openrct2/localisation/Formatting.h>
+#include <openrct2/localisation/StringIds.h>
 #include <openrct2/ui/WindowManager.h>
 
 namespace OpenRCT2::Ui::Windows
@@ -31,7 +33,7 @@ namespace OpenRCT2::Ui::Windows
 
     static void WindowMapTooltipOpen();
 
-    static Formatter _mapTooltipArgs;
+    static u8string _mapTooltip{};
 
     class MapTooltip final : public Window
     {
@@ -48,26 +50,37 @@ namespace OpenRCT2::Ui::Windows
 
         void onDraw(Drawing::RenderTarget& rt) override
         {
-            StringId stringId;
-            std::memcpy(&stringId, _mapTooltipArgs.Data(), sizeof(StringId));
-            if (stringId == kStringIdNone)
-            {
+            if (_mapTooltip.empty())
                 return;
-            }
 
             auto stringCoords = windowPos + ScreenCoordsXY{ width / 2, height / 2 };
-            DrawTextWrapped(rt, stringCoords, width, STR_MAP_TOOLTIP_STRINGID, _mapTooltipArgs, { TextAlignment::centre });
+            DrawTextWrapped(rt, stringCoords, width, "{OUTLINE}{TOPAZ}" + _mapTooltip, { TextAlignment::centre });
         }
     };
 
     void SetMapTooltip(Formatter& ft)
     {
-        _mapTooltipArgs = ft;
+        StringId stringId;
+        std::memcpy(&stringId, ft.Data(), sizeof(StringId));
+        if (stringId == kStringIdNone)
+            _mapTooltip.clear();
+        else
+            _mapTooltip = FormatStringIDLegacy(STR_STRINGID, ft.Data());
     }
 
-    const Formatter& GetMapTooltip()
+    void SetMapTooltip(u8string_view string)
     {
-        return _mapTooltipArgs;
+        _mapTooltip = string;
+    }
+
+    void clearMapTooltip()
+    {
+        _mapTooltip.clear();
+    }
+
+    u8string GetMapTooltip()
+    {
+        return _mapTooltip;
     }
 
     void WindowMapTooltipUpdateVisibility()
@@ -93,12 +106,9 @@ namespace OpenRCT2::Ui::Windows
         _lastCursor = cursor;
 
         // Show or hide tooltip
-        StringId stringId;
-        std::memcpy(&stringId, _mapTooltipArgs.Data(), sizeof(StringId));
-
         auto& im = GetInputManager();
         auto* wm = GetWindowManager();
-        if (_cursorHoldDuration < 25 || stringId == kStringIdNone || im.isModifierKeyPressed(ModifierKey::ctrl)
+        if (_cursorHoldDuration < 25 || _mapTooltip.empty() || im.isModifierKeyPressed(ModifierKey::ctrl)
             || im.isModifierKeyPressed(ModifierKey::shift) || wm->FindByClass(WindowClass::error) != nullptr)
         {
             auto* windowMgr = GetWindowManager();
