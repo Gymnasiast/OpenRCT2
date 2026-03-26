@@ -19,6 +19,12 @@
 
 namespace OpenRCT2
 {
+    struct WindowBase;
+    namespace Drawing
+    {
+        struct RenderTarget;
+    }
+
     using WidgetIndex = uint16_t;
     constexpr WidgetIndex kWidgetIndexNull = 0xFFFF;
 
@@ -81,6 +87,8 @@ namespace OpenRCT2
 
     struct Widget
     {
+        virtual ~Widget() = default;
+
         WidgetType type{};
         uint8_t colour{};
         int16_t left{};
@@ -194,6 +202,13 @@ namespace OpenRCT2
             sztooltip = newString;
             flags.set(WidgetFlag::tooltipIsString);
         }
+
+        virtual void draw(Drawing::RenderTarget& rt, WindowBase& w, WidgetIndex widgetIndex) const
+        {
+        }
+    };
+    struct Caption : Widget
+    {
     };
 
     constexpr uint8_t kTitleHeightNormal = 13;

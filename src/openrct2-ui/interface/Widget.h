@@ -74,6 +74,21 @@ namespace OpenRCT2::Ui
         return out;
     }
 
+    constexpr Widget makeCaptionWidget(const ScreenCoordsXY& origin, const ScreenSize& size, StringId title)
+    {
+        Caption out = {};
+        out.left = origin.x;
+        out.right = origin.x + size.width - 1;
+        out.top = origin.y;
+        out.bottom = origin.y + size.height - 1;
+        out.type = WidgetType::caption;
+        out.colour = static_cast<uint8_t>(WindowColour::primary);
+        out.content = title;
+        out.tooltip = STR_WINDOW_TITLE_TIP;
+
+        return static_cast<Widget>(out);
+    }
+
     constexpr Widget makeRemapWidget(
         const ScreenCoordsXY& origin, const ScreenSize& size, WidgetType type, WindowColour colour, ImageIndex content,
         StringId tooltip = kStringIdNone)
@@ -177,7 +192,7 @@ namespace OpenRCT2::Ui
         // clang-format off
         std::array<Widget, 3> out = {
             makeWidget({ 0, 0 }, { size.width, size.height }, WidgetType::frame, WindowColour::primary),
-            makeWidget({ 1, 1 }, { size.width - 1, kTitleHeightNormal }, WidgetType::caption, WindowColour::primary, title, STR_WINDOW_TITLE_TIP),
+            makeCaptionWidget({ 1, 1 }, { size.width - 1, kTitleHeightNormal }, title),
             makeWidget({ size.width - 12, 2 }, { 11, 11 }, WidgetType::closeBox, WindowColour::primary, kWidgetContentEmpty, STR_CLOSE_WINDOW_TIP),
         };
         // clang-format on
