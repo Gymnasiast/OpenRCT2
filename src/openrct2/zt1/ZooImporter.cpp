@@ -10,7 +10,6 @@
 #include "../Cheats.h"
 #include "../Context.h"
 #include "../Diagnostic.h"
-#include "../Editor.h"
 #include "../GameState.h"
 #include "../ParkImporter.h"
 #include "../actions/GameActionRunner.h"
@@ -19,7 +18,6 @@
 #include "../core/FileStream.h"
 #include "../interface/Viewport.h"
 #include "../object/DefaultObjects.h"
-#include "../object/ObjectManager.h"
 #include "../object/ObjectRepository.h"
 #include "../object/ObjectTypes.h"
 #include "../park/Legacy.h"
@@ -30,8 +28,8 @@
 #include "../rct12/RCT12.h"
 #include "../rct2/RCT2.h"
 #include "../ride/RideData.h"
+#include "../ride/Track.h"
 #include "../scenario/ScenarioRepository.h"
-#include "../world/Entrance.h"
 #include "../world/Map.h"
 #include "../world/Scenery.h"
 #include "../world/tile_element/EntranceElement.h"
@@ -39,7 +37,6 @@
 #include "../world/tile_element/Slope.h"
 #include "../world/tile_element/SmallSceneryElement.h"
 #include "../world/tile_element/SurfaceElement.h"
-#include "../world/tile_element/TrackElement.h"
 #include "../world/tile_element/WallElement.h"
 
 using namespace OpenRCT2;
@@ -127,24 +124,24 @@ static constexpr FootpathSlope kDefaultPathSlope[] = {
 
 enum class ZooTerrainType : uint8_t
 {
-    Grass,
-    SavannahGrass,
-    Sand,
-    Dirt,
-    RainforestFloor,
-    BrownStone,
-    GrayStone,
-    Gravel,
-    Snow,
-    FreshWater,
-    SaltWater,
-    DecideousFloor,
-    Waterfall,
-    ConiferousFloor,
-    Concrete,
-    Asphalt,
-    TrampledTerrain,
-    Gunite,
+    grass,
+    savannahGrass,
+    sand,
+    dirt,
+    rainforestFloor,
+    brownStone,
+    grayStone,
+    gravel,
+    snow,
+    freshWater,
+    saltWater,
+    decideousFloor,
+    waterfall,
+    coniferousFloor,
+    concrete,
+    asphalt,
+    trampledTerrain,
+    gunite,
 };
 
 struct ShapeMap
@@ -619,7 +616,7 @@ namespace ZT1
 
             // Do map initialisation, same kind of stuff done when loading scenario editor
             gameStateInitAll(gameState, { _header2.MapSizeX + 2, _header2.MapSizeY + 2 });
-            gameState.editorStep = EditorStep::ObjectSelection;
+            gameState.editorStep = Editor::Step::objectSelection;
             // gameState.scenarioCategory = Scenario::Category::other;
         }
 
@@ -641,9 +638,9 @@ namespace ZT1
 
                     auto* surface = MapGetSurfaceElementAt(rctCoords);
                     auto height = (tileElement.Height + 13) * 2;
-                    if (tileElement.Type == ZooTerrainType::FreshWater || tileElement.Type == ZooTerrainType::SaltWater)
+                    if (tileElement.Type == ZooTerrainType::freshWater || tileElement.Type == ZooTerrainType::saltWater)
                     {
-                        surface->SetWaterHeight(height * kCoordsZStep);
+                        surface->setWaterHeight(height * kCoordsZStep);
                         height -= 2;
                     }
 
@@ -653,15 +650,15 @@ namespace ZT1
                     }
 
                     const auto shapeAndHeightOffset = GetConvertedShape(tileElement.Shape);
-                    surface->SetSlope(shapeAndHeightOffset.Shape);
-                    surface->BaseHeight = height + shapeAndHeightOffset.HeightOffset;
+                    surface->setSlope(shapeAndHeightOffset.Shape);
+                    surface->baseHeight = height + shapeAndHeightOffset.HeightOffset;
                     // TODO: fix this, based on shape.
-                    surface->ClearanceHeight = height + shapeAndHeightOffset.HeightOffset;
+                    surface->clearanceHeight = height + shapeAndHeightOffset.HeightOffset;
                     const auto surfaceIndentifier = GetTerrainSurfaceObject(tileElement.Type);
                     auto entryIndex = _terrainSurfaceEntries.GetOrAddEntry(surfaceIndentifier);
-                    surface->SetSurfaceObjectIndex(entryIndex);
+                    surface->setSurfaceObjectIndex(entryIndex);
 
-                    surface->SetOwnership(OWNERSHIP_OWNED);
+                    surface->setOwnership(OwnershipFlag::landOwned);
                 }
             }
         }
@@ -673,7 +670,7 @@ namespace ZT1
             auto numElements = _stream->ReadValue<uint32_t>();
 
             gameState.cheats.sandboxMode = true;
-            gameState.park.flags |= PARK_FLAGS_NO_MONEY;
+            gameState.park.flags.set(ParkFlag::noMoney);
 
             for (uint32_t i = 0; i < numElements; i++)
             {
@@ -777,7 +774,7 @@ namespace ZT1
             LOG_ERROR("Name: %s", name.c_str());
 
             auto* surface = MapGetSurfaceElementAt(coords);
-            auto fences = surface->GetParkFences();
+            auto fences = surface->getParkFences();
 
             fences |= GetEdgeFromDirection(coords.direction);
 
@@ -797,7 +794,7 @@ namespace ZT1
             //                    break;
             //            }
 
-            surface->SetParkFences(fences);
+            surface->setParkFences(fences);
         }
 
         void ImportZooEntrance(GameState_t& gameState)
@@ -867,20 +864,20 @@ namespace ZT1
                 if (pathElement != nullptr)
                 {
                     auto* baseElement = pathElement->as<TileElement>();
-                    baseElement->ClearAs(TileElementType::Entrance);
-                    tileElement = baseElement->AsEntrance();
+                    baseElement->clearAs(TileElementType::entrance);
+                    tileElement = baseElement->asEntrance();
                 }
                 else
                 {
                     tileElement = TileElementInsert<EntranceElement>(current.ToCoordsXYZ(), 0b1111);
                 }
 
-                tileElement->SetEntranceType(ENTRANCE_TYPE_PARK_ENTRANCE);
-                tileElement->SetSequenceIndex(sequenceIndex);
-                tileElement->BaseHeight = current.z;
-                tileElement->SetDirection(current.direction);
-                tileElement->ClearanceHeight = current.z + 12;
-                tileElement->SetSurfaceEntryIndex(0);
+                tileElement->setEntranceType(EntranceType::parkEntrance);
+                tileElement->setSequenceIndex(static_cast<ParkEntranceSequence>(sequenceIndex));
+                tileElement->baseHeight = current.z;
+                tileElement->setDirection(current.direction);
+                tileElement->clearanceHeight = current.z + 12;
+                tileElement->setSurfaceEntryIndex(0);
 
                 if (sequenceIndex == 0)
                 {
@@ -890,13 +887,13 @@ namespace ZT1
 
             gameState.peepSpawns.push_back(peepSpawnCoords);
             auto* peepSpawnSurface = MapGetSurfaceElementAt(peepSpawnCoords);
-            peepSpawnSurface->SetOwnership(OWNERSHIP_UNOWNED);
+            peepSpawnSurface->setOwnership(kUnowned);
 
             gameState.park.entrances.push_back(segmentTileCoords[0].ToCoordsXYZD());
             gameState.savedView = Translate3DTo2DWithZ(segmentTileCoords[0].direction, segmentTileCoords[0].ToCoordsXYZ());
             gameState.savedViewRotation = segmentTileCoords[0].direction;
             auto* surface = MapGetSurfaceElementAt(firstOwnedSquareCoords);
-            surface->SetOwnership(OWNERSHIP_OWNED);
+            surface->setOwnership(OwnershipFlag::landOwned);
         }
 
         void ImportFacility(GameState_t& gameState, const MappingWithOffset& mapping)
@@ -1059,8 +1056,8 @@ namespace ZT1
             // auto* trackElement = TileElementInsert<TrackElement>(coords, 0b1111);
             // if (trackElement != nullptr)
             // {
-            //     trackElement->SetDirection(coords.direction);
-            //     trackElement->SetClearanceZ(trackElement->GetBaseZ() + (4 * kCoordsZStep));
+            //     trackElement->setDirection(coords.direction);
+            //     trackElement->setClearanceZ(trackElement->getBaseZ() + (4 * kCoordsZStep));
             //     trackElement->SetRideIndex(rideIndex);
             //     trackElement->SetTrackType(rtd.StartTrackPiece);
             //     trackElement->SetRideType(rideTypeId);
@@ -1088,14 +1085,14 @@ namespace ZT1
             {
                 auto entryIndex = _smallSceneryEntries.GetOrAddEntry(objectIdentifier);
 
-                smallSceneryElement->SetDirection(coords.direction);
-                smallSceneryElement->SetClearanceZ(smallSceneryElement->GetBaseZ() + (4 * kCoordsZStep));
-                smallSceneryElement->SetEntryIndex(entryIndex);
+                smallSceneryElement->setDirection(coords.direction);
+                smallSceneryElement->setClearanceZ(smallSceneryElement->getBaseZ() + (4 * kCoordsZStep));
+                smallSceneryElement->setEntryIndex(entryIndex);
 
-                const auto* entry = smallSceneryElement->GetEntry();
+                const auto* entry = smallSceneryElement->getEntry();
                 if (entry != nullptr)
                 {
-                    smallSceneryElement->SetClearanceZ(smallSceneryElement->GetBaseZ() + entry->height);
+                    smallSceneryElement->setClearanceZ(smallSceneryElement->getBaseZ() + entry->height);
                 }
             }
         }
@@ -1119,9 +1116,9 @@ namespace ZT1
             {
                 auto entryIndex = _wallEntries.GetOrAddEntry(objectIdentifier);
 
-                wallElement->SetDirection(coords.direction);
-                wallElement->SetClearanceZ(wallElement->GetBaseZ() + (2 * kCoordsZStep));
-                wallElement->SetEntryIndex(entryIndex);
+                wallElement->setDirection(coords.direction);
+                wallElement->setClearanceZ(wallElement->getBaseZ() + (2 * kCoordsZStep));
+                wallElement->setEntryIndex(entryIndex);
             }
         }
 
@@ -1144,25 +1141,25 @@ namespace ZT1
 
             auto pathElement = TileElementInsert<PathElement>(coords, 0b1111);
             auto entryIndex = _footpathSurfaceEntries.GetOrAddEntry(objectIdentifier);
-            pathElement->SetSurfaceEntryIndex(entryIndex);
+            pathElement->setSurfaceEntryIndex(entryIndex);
 
-            pathElement->SetRailingsEntryIndex(0);
-            pathElement->SetClearanceZ(coords.z + kPathHeightStep);
+            pathElement->setRailingsEntryIndex(0);
+            pathElement->setClearanceZ(coords.z + kPathHeightStep);
 
             auto* surfaceElement = MapGetSurfaceElementAt(coords);
-            auto pathSlope = kDefaultPathSlope[surfaceElement->GetSlope() & kTileSlopeRaisedCornersMask];
+            auto pathSlope = kDefaultPathSlope[surfaceElement->getSlope() & kTileSlopeRaisedCornersMask];
             auto isSloped = pathSlope.type == FootpathSlopeType::sloped;
-            pathElement->SetSloped(isSloped);
+            pathElement->setSloped(isSloped);
             if (isSloped)
             {
-                pathElement->SetSlopeDirection(pathSlope.direction);
-                pathElement->SetBaseZ(pathElement->GetBaseZ() - kCoordsZStep);
-                pathElement->SetClearanceZ(pathElement->GetClearanceZ() - kCoordsZStep);
+                pathElement->setSlopeDirection(pathSlope.direction);
+                pathElement->setBaseZ(pathElement->getBaseZ() - kCoordsZStep);
+                pathElement->setClearanceZ(pathElement->getClearanceZ() - kCoordsZStep);
             }
-            pathElement->SetAddition(0);
-            pathElement->SetRideIndex(RideId::GetNull());
-            pathElement->SetAdditionStatus(255);
-            pathElement->SetIsBroken(false);
+            pathElement->setAddition(0);
+            pathElement->setRideIndex(RideId::GetNull());
+            pathElement->setAdditionStatus(255);
+            pathElement->setIsBroken(false);
 
             // ZT does not save footpath edges. Autoconnect them. This will need rework once fences are imported.
             FootpathConnectEdges(
@@ -1208,7 +1205,7 @@ namespace ZT1
                             case ObjectType::paths:
                             case ObjectType::pathAdditions:
                             {
-                                RCT12::EntryList* entries = GetEntryList(objectType);
+                                RCT12::EntryList* entries = getEntryList(objectType);
 
                                 // Check if there are spare entries available
                                 size_t maxEntries = static_cast<size_t>(getObjectEntryGroupCount(objectType));
@@ -1231,7 +1228,7 @@ namespace ZT1
             }
         }
 
-        RCT12::EntryList* GetEntryList(ObjectType objectType)
+        RCT12::EntryList* getEntryList(ObjectType objectType)
         {
             switch (objectType)
             {
