@@ -442,6 +442,18 @@ namespace ZT1
                 }
                 else if (extension == 0x1010000) // SHOW TANK
                 {
+                    _stream->Seek(8, STREAM_SEEK_CURRENT);
+                    [[maybe_unused]] auto hasTricks = _stream->ReadValue<int32_t>();
+                    auto initialised = _stream->ReadValue<int32_t>();
+                    if (initialised)
+                    {
+                        _stream->Seek(272, STREAM_SEEK_CURRENT);
+                        // _stream->Seek(88, STREAM_SEEK_CURRENT);
+                        // if (hasTricks)
+                        // {
+                        //     _stream->Seek(4, STREAM_SEEK_CURRENT);
+                        // }
+                    }
                 }
 
                 LOG_ERROR("%s", name.c_str());
