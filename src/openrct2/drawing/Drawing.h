@@ -48,8 +48,6 @@ extern bool gPaintForceRedraw;
 bool ClipRenderTarget(
     OpenRCT2::Drawing::RenderTarget& dst, OpenRCT2::Drawing::RenderTarget& src, const ScreenCoordsXY& coords, int32_t width,
     int32_t height);
-void GfxSetDirtyBlocks(const ScreenRect& rect);
-void GfxInvalidateScreen();
 
 // other
 void GfxClear(OpenRCT2::Drawing::RenderTarget& rt, OpenRCT2::Drawing::PaletteIndex paletteIndex);
@@ -75,8 +73,5 @@ void FASTCALL GfxDrawSpriteRawMasked(
 
 std::optional<uint32_t> GetPaletteG1Index(OpenRCT2::Drawing::FilterPaletteID paletteId);
 std::optional<OpenRCT2::Drawing::PaletteMap> GetPaletteMapForColour(OpenRCT2::Drawing::FilterPaletteID paletteId);
-
-void RefreshVideo();
-void ToggleWindowedMode();
 
 void DebugRT(OpenRCT2::Drawing::RenderTarget& rt);

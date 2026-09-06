@@ -253,6 +253,7 @@
     <ClInclude Include="drawing\Colour.h" />
     <ClInclude Include="drawing\ColourMap.h" />
     <ClInclude Include="drawing\Drawing.h" />
+    <ClInclude Include="drawing\Drawing.Screen.h" />
     <ClInclude Include="drawing\Drawing.String.h" />
     <ClInclude Include="drawing\FilterPaletteIds.h" />
     <ClInclude Include="drawing\Font.h" />
@@ -901,6 +902,7 @@
     <ClCompile Include="drawing\Colour.cpp" />
     <ClCompile Include="drawing\ColourMap.cpp" />
     <ClCompile Include="drawing\Drawing.cpp" />
+    <ClCompile Include="drawing\Drawing.Screen.cpp" />
     <ClCompile Include="drawing\Drawing.Sprite.BMP.cpp" />
     <ClCompile Include="drawing\Drawing.Sprite.cpp" />
     <ClCompile Include="drawing\Drawing.Sprite.RLE.cpp" />

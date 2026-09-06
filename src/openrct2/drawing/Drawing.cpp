@@ -410,15 +410,6 @@ void GfxFilterPixel(RenderTarget& rt, const ScreenCoordsXY& coords, FilterPalett
     Rectangle::filter(rt, { coords, coords }, palette);
 }
 
-/**
- *
- *  rct2: 0x006ED7E5
- */
-void GfxInvalidateScreen()
-{
-    GfxSetDirtyBlocks({ { 0, 0 }, { ContextGetWidth(), ContextGetHeight() } });
-}
-
 /*
  *
  * rct2: 0x006EE53B
@@ -504,21 +495,6 @@ std::optional<PaletteMap> GetPaletteMapForColour(FilterPaletteID paletteId)
 FilterPaletteID GetGlassPaletteId(Colour c)
 {
     return kGlassPaletteIds[EnumValue(c)];
-}
-
-void RefreshVideo()
-{
-    ContextRecreateWindow();
-    DrawingEngineSetPalette(Drawing::gPalette);
-    GfxInvalidateScreen();
-}
-
-void ToggleWindowedMode()
-{
-    int32_t rt = Config::Get().general.fullscreenMode == 0 ? 2 : 0;
-    ContextSetFullscreenMode(rt);
-    Config::Get().general.fullscreenMode = rt;
-    Config::Save();
 }
 
 void DebugRT(RenderTarget& rt)

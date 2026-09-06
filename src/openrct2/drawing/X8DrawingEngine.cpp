@@ -17,6 +17,7 @@
 #include "../interface/Window.h"
 #include "../scenes/intro/IntroScene.h"
 #include "BlendColourMap.h"
+#include "Drawing.Screen.h"
 #include "Drawing.Sprite.h"
 #include "Drawing.String.h"
 #include "Drawing.h"
