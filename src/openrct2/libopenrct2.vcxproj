@@ -910,6 +910,7 @@
     <ClCompile Include="drawing\Drawing.String.cpp" />
     <ClCompile Include="drawing\Font.cpp" />
     <ClCompile Include="drawing\Image.cpp" />
+    <ClCompile Include="drawing\ImageId.cpp" />
     <ClCompile Include="drawing\ImageImporter.cpp" />
     <ClCompile Include="drawing\InvalidationGrid.cpp" />
     <ClCompile Include="drawing\LightFX.cpp" />
