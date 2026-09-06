@@ -24,6 +24,7 @@
 #include "IDrawingEngine.h"
 #include "InvalidationGrid.h"
 #include "LightFX.h"
+#include "Line.h"
 #include "TTF.h"
 #include "WeatherDrawer.h"
 
