@@ -374,11 +374,6 @@ const TranslucentWindowPalette kTranslucentWindowPalettes[kColourNumTotal] = {
 };
 // clang-format on
 
-void GfxFilterPixel(RenderTarget& rt, const ScreenCoordsXY& coords, FilterPaletteID palette)
-{
-    Rectangle::filter(rt, { coords, coords }, palette);
-}
-
 /*
  *
  * rct2: 0x006EE53B

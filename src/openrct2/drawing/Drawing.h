@@ -51,8 +51,6 @@ bool ClipRenderTarget(
 
 // other
 void GfxClear(OpenRCT2::Drawing::RenderTarget& rt, OpenRCT2::Drawing::PaletteIndex paletteIndex);
-void GfxFilterPixel(
-    OpenRCT2::Drawing::RenderTarget& rt, const ScreenCoordsXY& coords, OpenRCT2::Drawing::FilterPaletteID palette);
 
 // sprite (NewDrawing.cpp functions that use the drawing engine)
 void FASTCALL GfxDrawSprite(OpenRCT2::Drawing::RenderTarget& rt, ImageId image_id, const ScreenCoordsXY& coords);
