@@ -280,44 +280,14 @@ private:
         int32_t pitch;
         if (SDL_LockTexture(texture, nullptr, &pixels, &pitch) == 0)
         {
-            int32_t padding = pitch - (width * 4);
-            if (pitch == width * 4)
+            assert(pitch == width * 4);
+
+            uint32_t* dst = static_cast<uint32_t*>(pixels);
+            for (int32_t i = width * height; i > 0; i--)
             {
-                uint32_t* dst = static_cast<uint32_t*>(pixels);
-                for (int32_t i = width * height; i > 0; i--)
-                {
-                    *dst++ = palette[EnumValue(*src++)];
-                }
+                *dst++ = palette[EnumValue(*src++)];
             }
-            else
-            {
-                if (pitch == (width * 2) + padding)
-                {
-                    uint16_t* dst = static_cast<uint16_t*>(pixels);
-                    for (int32_t y = height; y > 0; y--)
-                    {
-                        for (int32_t x = width; x > 0; x--)
-                        {
-                            const uint8_t lower = *reinterpret_cast<const uint8_t*>(&palette[EnumValue(*src++)]);
-                            const uint8_t upper = *reinterpret_cast<const uint8_t*>(&palette[EnumValue(*src++)]);
-                            *dst++ = (lower << 8) | upper;
-                        }
-                        dst = reinterpret_cast<uint16_t*>(reinterpret_cast<uint8_t*>(dst) + padding);
-                    }
-                }
-                else if (pitch == width + padding)
-                {
-                    uint8_t* dst = static_cast<uint8_t*>(pixels);
-                    for (int32_t y = height; y > 0; y--)
-                    {
-                        for (int32_t x = width; x > 0; x--)
-                        {
-                            *dst++ = *reinterpret_cast<const uint8_t*>(&palette[EnumValue(*src++)]);
-                        }
-                        dst += padding;
-                    }
-                }
-            }
+
             SDL_UnlockTexture(texture);
         }
     }
